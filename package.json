@@ -1,0 +1,16 @@
+{
+  "name": "diamarket",
+  "private": true,
+  "workspaces": [
+    "diamarket-web",
+    "diamarket-cms",
+    "diamarket-api"
+  ],
+  "scripts": {
+    "dev:web": "npm --workspace diamarket-web run dev",
+    "dev:cms": "npm --workspace diamarket-cms run dev",
+    "dev:api": "npm --workspace diamarket-api run dev",
+    "build": "npm run -ws build",
+    "lint": "npm run -ws lint"
+  }
+}
