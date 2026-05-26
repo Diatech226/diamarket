@@ -2,6 +2,5 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply bg-slate-100 text-slate-900;
-}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: Inter, Arial, sans-serif; }
