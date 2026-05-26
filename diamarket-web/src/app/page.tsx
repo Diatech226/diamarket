@@ -1,12 +1,7 @@
-import { defaultCurrency, supportedCurrencies } from '@/lib/currency';
-import { defaultLocale, supportedLocales } from '@/lib/i18n';
+import { api } from '@/lib/api';
+import HomeClient from './pageClient';
 
-export default function HomePage() {
-  return (
-    <section className="space-y-4">
-      <h2 className="text-2xl font-bold">Base client prête</h2>
-      <p>Locales: {supportedLocales.join(', ')} (défaut: {defaultLocale})</p>
-      <p>Devises: {supportedCurrencies.join(', ')} (défaut: {defaultCurrency})</p>
-    </section>
-  );
+export default async function HomePage() {
+  const [slides, categories, products] = await Promise.all([api.getSlides(), api.getCategories(), api.getProducts()]);
+  return <HomeClient slides={slides} categories={categories} products={products} />;
 }
