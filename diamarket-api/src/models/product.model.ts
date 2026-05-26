@@ -20,6 +20,7 @@ const ProductSchema = new Schema(
     originCountry: { type: String, trim: true },
     originCity: { type: String, trim: true },
     status: { type: String, enum: PRODUCT_STATUSES, default: 'draft', index: true },
+    ownerUserId: { type: Schema.Types.ObjectId, ref: 'User', index: true },
     isFeatured: { type: Boolean, default: false, index: true },
     isPromoted: { type: Boolean, default: false, index: true },
   },

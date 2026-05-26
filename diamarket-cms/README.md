@@ -38,3 +38,6 @@ NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
 CLERK_SECRET_KEY=
 NEXT_PUBLIC_DIAMARKET_API_URL=http://localhost:8000
 ```
+
+## Iteration 7 Security
+Role/permission governance and vendor approvals are managed from CMS admin flows.

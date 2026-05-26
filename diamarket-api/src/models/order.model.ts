@@ -23,6 +23,7 @@ const OrderSchema = new Schema(
     currency: { type: String, enum: ['FCFA', 'USD'], default: 'FCFA' },
     status: { type: String, enum: ORDER_STATUSES, default: 'pending', index: true },
     shipmentStatus: { type: String, enum: SHIPMENT_STATUSES, default: 'not_created', index: true },
+    marketplacePointId: { type: Schema.Types.ObjectId, ref: 'MarketplacePoint' },
     shippingEstimate: {
       provider: String,
       estimatedCost: Number,
