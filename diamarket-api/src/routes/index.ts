@@ -40,3 +40,4 @@ apiRouter.post('/orders', requireAuth, validateRequest(validateOrder), ordersCon
 apiRouter.get('/orders', requireAuth, ordersController.list);
 apiRouter.get('/orders/:id', requireAuth, ordersController.getById);
 apiRouter.put('/orders/:id/status', requireAuth, requireRole('admin', 'super_admin', 'agent_logistique'), ordersController.updateStatus);
+apiRouter.post('/orders/:id/shipment/sync', requireAuth, requireRole('admin', 'super_admin', 'agent_logistique'), ordersController.syncShipmentStatus);
