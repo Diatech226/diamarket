@@ -21,3 +21,6 @@ npm run dev
 ```
 
 Configurer `NEXT_PUBLIC_API_URL` pour connecter `diamarket-api`.
+
+## Iteration 7 Security
+Vendor dashboard access must be server-authorized; never trust only client role checks.

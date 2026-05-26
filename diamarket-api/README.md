@@ -96,3 +96,6 @@ See `.env.example`.
   "distanceKm": 35
 }
 ```
+
+## Iteration 7 Security
+See ../SECURITY.md and API permissions middlewares for roles, permissions, and vendor workflow.
