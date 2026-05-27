@@ -3,8 +3,19 @@ import cors from 'cors';
 import morgan from 'morgan';
 import { apiRouter } from './routes';
 import { errorHandler } from './middlewares/error.middleware';
+import { env } from './config/env';
 
 const rateBucket = new Map<string, { count: number; resetAt: number }>();
+
+const isAllowedOrigin = (origin: string | undefined) => {
+  if (!origin) return true;
+
+  if (env.corsAllowedOrigins.length > 0) {
+    return env.corsAllowedOrigins.includes(origin);
+  }
+
+  return /localhost|diamarket/.test(origin);
+};
 
 export const app = express();
 app.disable('x-powered-by');
@@ -14,7 +25,12 @@ app.use((req, res, next) => {
   res.setHeader('Referrer-Policy', 'no-referrer');
   next();
 });
-app.use(cors({ origin: (origin, cb) => cb(null, !origin || /localhost|diamarket/.test(origin)), credentials: true }));
+app.use(
+  cors({
+    origin: (origin, cb) => cb(null, isAllowedOrigin(origin)),
+    credentials: true
+  })
+);
 app.use((req, res, next) => {
   const key = req.ip || 'unknown';
   const now = Date.now();
@@ -29,6 +45,6 @@ app.use((req, res, next) => {
   next();
 });
 app.use(express.json({ limit: '1mb' }));
-app.use(morgan('dev'));
+app.use(morgan(env.nodeEnv === 'production' ? 'combined' : 'dev'));
 app.use('/api', apiRouter);
 app.use(errorHandler);
