@@ -1,12 +1,19 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
+const parseList = (value: string | undefined): string[] =>
+  (value ?? '')
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean);
+
 export const env = {
   nodeEnv: process.env.NODE_ENV ?? 'development',
   port: Number(process.env.PORT ?? 4000),
-  mongoUri: process.env.MONGO_URI ?? '',
+  mongoUri: process.env.MONGO_URI ?? process.env.MONGODB_URI ?? '',
   clerkIssuer: process.env.CLERK_ISSUER_URL ?? '',
   clerkSecretKey: process.env.CLERK_SECRET_KEY ?? '',
+  corsAllowedOrigins: parseList(process.env.CORS_ALLOWED_ORIGINS),
   shippingProvider: process.env.SHIPPING_PROVIDER ?? 'mock',
   shippingApiBaseUrl: process.env.SHIPPING_API_BASE_URL ?? '',
   shippingApiKey: process.env.SHIPPING_API_KEY ?? '',
