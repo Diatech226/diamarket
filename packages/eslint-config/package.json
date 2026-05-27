@@ -1,0 +1,1 @@
+{"name":"@diamarket/eslint-config","version":"0.1.0","private":true,"main":"index.js","scripts":{"build":"echo build eslint-config","lint":"echo lint eslint-config","typecheck":"echo typecheck eslint-config"}}

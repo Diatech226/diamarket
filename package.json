@@ -1,16 +1,19 @@
 {
-  "name": "diamarket",
+  "name": "diamarket-platform",
   "private": true,
-  "workspaces": [
-    "diamarket-web",
-    "diamarket-cms",
-    "diamarket-api"
-  ],
+  "packageManager": "pnpm@9.12.0",
   "scripts": {
-    "dev:web": "npm --workspace diamarket-web run dev",
-    "dev:cms": "npm --workspace diamarket-cms run dev",
-    "dev:api": "npm --workspace diamarket-api run dev",
-    "build": "npm run -ws build",
-    "lint": "npm run -ws lint"
+    "dev:diamarket": "turbo run dev --filter=diamarket-web --filter=diamarket-cms --filter=diamarket-api",
+    "dev:diapay": "turbo run dev --filter=diapay-api --filter=diapay-dashboard --filter=diapay-docs --filter=diapay-sandbox",
+    "dev:all": "turbo run dev",
+    "build:diamarket": "turbo run build --filter=diamarket-web --filter=diamarket-cms --filter=diamarket-api",
+    "build:diapay": "turbo run build --filter=diapay-api --filter=diapay-dashboard --filter=diapay-docs --filter=diapay-sandbox",
+    "build:all": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck"
+  },
+  "devDependencies": {
+    "turbo": "^2.1.1",
+    "typescript": "^5.5.2"
   }
 }

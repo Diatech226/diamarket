@@ -1,47 +1,39 @@
-# Diamarket - Iteration 1 Foundation
+# Diamarket Platform Monorepo
 
-Monorepo contenant:
-- `diamarket-web` (front client Next.js)
-- `diamarket-cms` (back-office Next.js)
-- `diamarket-api` (Express + MongoDB)
+## Structure
+- `apps/diamarket-*`: applications marketplace existantes
+- `apps/diapay-*`: plateforme de paiement indépendante
+- `packages/*`: packages partagés (UI, config, types, SDK)
+- `docs/diamarket` et `docs/diapay`: documentation produit
 
-## Installation
+## Lancement
+- `pnpm install`
+- `pnpm dev:diamarket` pour web/cms/api Diamarket
+- `pnpm dev:diapay` pour api/dashboard/docs/sandbox Diapay
+- `pnpm dev:all` pour tout
 
-1. Installer les dépendances:
-```bash
-npm install
-```
-2. Copier les variables d'environnement:
-- `diamarket-web/.env.example` -> `diamarket-web/.env.local`
-- `diamarket-cms/.env.example` -> `diamarket-cms/.env.local`
-- `diamarket-api/.env.example` -> `diamarket-api/.env`
+## Build
+- `pnpm build:diamarket`
+- `pnpm build:diapay`
+- `pnpm build:all`
 
-3. Lancer chaque service:
-```bash
-npm run dev:web
-npm run dev:cms
-npm run dev:api
-```
+## Qualité
+- `pnpm lint`
+- `pnpm typecheck`
 
-## Architecture
+## Variables d'environnement
+Chaque app contient un `.env.example`.
 
-### Web & CMS
-- Next.js + TypeScript + Tailwind configurés.
-- Layout client et layout admin séparés.
-- Préparation multi-langue (`fr`, `en`, `zh`) et multi-devise (`FCFA`, `USD`).
-- Provider Clerk déjà branché (placeholder de config via env).
+## Ports
+- diamarket-web: `3000`
+- diamarket-cms: `3001`
+- diamarket-api: `5000`
+- diapay-dashboard: `3100`
+- diapay-docs: `3101`
+- diapay-sandbox: `3102`
+- diapay-api: `5100`
 
-### API
-- Express modulaire (`config`, `models`, `routes`, `controllers`, `middlewares`).
-- Connexion MongoDB via Mongoose.
-- Modèles initiaux: User, VendorRequest, Vendor, Product, Category, Slide, Order, Shipment, Setting, CurrencyRate, MarketplacePoint.
-- Routes REST de base scaffoldées (GET/POST), prêtes à être implémentées.
-- Middleware placeholder pour l'intégration Clerk.
-- Préparation donnée pour API logistique future avec `Shipment.externalProviderPayload`.
-
-## Prochaine étape recommandée (Itération 2)
-- Validation de schémas (zod/joi)
-- Contrôle RBAC complet
-- CRUD complet par module
-- Internationalisation des contenus CMS/API
-- Service de conversion de devises basé sur `CurrencyRate`
+## Notes d'architecture
+- Diamarket et Diapay sont découplés.
+- Bases MongoDB séparées (`diamarket` vs `diapay`).
+- `apps/diapay-api/src/providers/mock` permet les tests sans provider réel.
