@@ -1,0 +1,1 @@
+{"name":"@diamarket/ui","version":"0.1.0","private":true,"main":"index.js","scripts":{"build":"echo build ui","lint":"echo lint ui","typecheck":"echo typecheck ui"}}
