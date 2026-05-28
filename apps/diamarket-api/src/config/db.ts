@@ -35,7 +35,7 @@ const buildConnectionErrorMessage = (error: unknown, hostname: string) => {
     return [
       `MongoDB DNS SRV lookup failed for host "${hostname}".`,
       'Verify that the Atlas cluster exists and that your DNS resolver can resolve the _mongodb._tcp SRV record.',
-      'If mongodb+srv:// keeps failing, try the standard mongodb:// connection string from Atlas or use a local fallback such as mongodb://127.0.0.1:27017/diamarket.',
+      'If mongodb+srv:// keeps failing, try the standard mongodb:// connection string from Atlas or use your local fallback from apps/diamarket-api/.env.',
       `Original error: ${baseMessage}`
     ].join(' ');
   }
@@ -46,7 +46,8 @@ const buildConnectionErrorMessage = (error: unknown, hostname: string) => {
 const markDegraded = (reason: string) => {
   databaseStatus = 'degraded';
   databaseUnavailableReason = reason;
-  console.warn(`[database] WARNING: API started without MongoDB. ${reason}`);
+  console.warn('[database] MongoDB unavailable, API started in degraded mode');
+  console.warn(`[database] Reason: ${reason}`);
   console.warn('[database] Routes that require MongoDB will return 503 Database unavailable; /api/health remains available.');
 };
 
@@ -63,10 +64,10 @@ export async function connectDatabase() {
   }
 
   const hostname = getMongoHostname(mongoUri);
-  console.info(`[database] Connecting to MongoDB host: ${hostname}`);
+  console.info(`[database] MongoDB host: ${hostname}`);
 
   try {
-    await mongoose.connect(mongoUri);
+    await mongoose.connect(mongoUri, { serverSelectionTimeoutMS: 3000 });
     databaseStatus = 'connected';
     databaseUnavailableReason = '';
     console.info(`[database] Connected to MongoDB host: ${hostname}`);
