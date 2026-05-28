@@ -1,5 +1,14 @@
+import path from 'path';
 import dotenv from 'dotenv';
-dotenv.config();
+
+export const apiEnvPath = path.resolve(__dirname, '../../.env');
+
+dotenv.config({
+  path: apiEnvPath,
+  override: true
+});
+
+console.info(`[env] Loaded API env from: ${apiEnvPath}`);
 
 const parseList = (value: string | undefined): string[] =>
   (value ?? '')

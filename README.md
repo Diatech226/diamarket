@@ -24,6 +24,45 @@
 ## Variables d'environnement
 Chaque app contient un `.env.example`.
 
+
+## MongoDB Diamarket API
+
+`diamarket-api` charge explicitement son environnement depuis `apps/diamarket-api/.env`. Ce fichier est prioritaire sur une variable `MONGODB_URI` héritée du shell afin d'éviter de réutiliser accidentellement une ancienne URI Atlas.
+
+### Configuration MongoDB local
+
+1. Démarrer un serveur MongoDB local. Exemples usuels :
+   - service système : `mongod --dbpath <chemin-vers-vos-donnees>` ;
+   - Docker : `docker run --rm -p 27017:27017 --name diamarket-mongo mongo:7`.
+2. Configurer `apps/diamarket-api/.env` :
+
+```env
+MONGODB_URI=mongodb://127.0.0.1:27017/diamarket
+ALLOW_API_WITHOUT_DB=true
+```
+
+### Configuration MongoDB Atlas
+
+1. Copier l'URI officielle depuis l'interface Atlas.
+2. Remplacer uniquement la valeur de `MONGODB_URI` dans `apps/diamarket-api/.env`, par exemple avec un hôte Atlas et des identifiants propres à votre environnement :
+
+```env
+MONGODB_URI=mongodb+srv://<username>:<password>@<cluster-hostname>/diamarket?retryWrites=true&w=majority
+ALLOW_API_WITHOUT_DB=false
+```
+
+Ne commitez jamais d'identifiants Atlas réels. L'API journalise uniquement l'hôte MongoDB, sans mot de passe.
+
+### Mode API dégradé sans MongoDB
+
+Pour le développement web/cms quand MongoDB est temporairement indisponible, activer :
+
+```env
+ALLOW_API_WITHOUT_DB=true
+```
+
+Dans ce mode, l'API démarre quand même, `/api/health` reste disponible, et les routes qui dépendent de MongoDB retournent `503 Database unavailable`.
+
 ## Ports
 - diamarket-web: `3000`
 - diamarket-cms: `3001`
