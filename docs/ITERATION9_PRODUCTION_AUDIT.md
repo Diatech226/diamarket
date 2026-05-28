@@ -9,11 +9,11 @@
 
 ### Variables d’environnement
 **Observations**
-- Incohérence historique `MONGODB_URI` vs `MONGO_URI` côté API.
+- Incohérence historique `MONGODB_URI` vs `MONGO_URI` côté API, désormais résolue au profit de `MONGODB_URI`.
 - Absence d’allowlist CORS explicite pilotée par env.
 
 **Actions appliquées**
-- Normalisation de lecture Mongo (`MONGO_URI` prioritaire, fallback `MONGODB_URI`).
+- Normalisation de lecture Mongo sur `MONGODB_URI` uniquement, avec fallback local documenté et mode dégradé optionnel pour le développement UI.
 - Ajout `CORS_ALLOWED_ORIGINS` (liste CSV) pour contrôle strict par environnement.
 
 ### Sécurité

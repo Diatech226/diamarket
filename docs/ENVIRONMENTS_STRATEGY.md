@@ -23,7 +23,7 @@ production
 
 ### diamarket-api
 - `NODE_ENV`, `PORT`
-- `MONGO_URI`
+- `MONGODB_URI`
 - `CLERK_ISSUER_URL`, `CLERK_SECRET_KEY`
 - `CORS_ALLOWED_ORIGINS`
 - `PAYMENT_PROVIDER`, `DIAPAY_*`
