@@ -9,6 +9,7 @@ import { requireRole } from '../middlewares/requireRole';
 import { requirePermission } from '../middlewares/requirePermission';
 import { ownershipGuard } from '../middlewares/ownershipGuard';
 import { validateRequest } from '../middlewares/validate-request.middleware';
+import { requireDatabase } from '../middlewares/database-availability.middleware';
 
 const validateProduct = (req: Request) => {
   const required = ['name', 'slug', 'description', 'price', 'currency', 'category', 'vendor', 'stock'];
@@ -26,6 +27,7 @@ const validateOrder = (req: Request) => {
 
 export const apiRouter = Router();
 apiRouter.get('/health', (_req, res) => res.json({ ok: true }));
+apiRouter.use(requireDatabase);
 apiRouter.get('/products', productsController.list);
 apiRouter.get('/products/:slug', productsController.getBySlug);
 apiRouter.post('/products', requireAuth, requirePermission('products:create'), ownershipGuard('product'), validateRequest(validateProduct), productsController.create);

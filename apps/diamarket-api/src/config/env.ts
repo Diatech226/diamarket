@@ -9,8 +9,9 @@ const parseList = (value: string | undefined): string[] =>
 
 export const env = {
   nodeEnv: process.env.NODE_ENV ?? 'development',
-  port: Number(process.env.PORT ?? 4000),
-  mongoUri: process.env.MONGO_URI ?? process.env.MONGODB_URI ?? '',
+  port: Number(process.env.PORT ?? 5000),
+  mongodbUri: process.env.MONGODB_URI ?? '',
+  allowApiWithoutDb: process.env.ALLOW_API_WITHOUT_DB === 'true',
   clerkIssuer: process.env.CLERK_ISSUER_URL ?? '',
   clerkSecretKey: process.env.CLERK_SECRET_KEY ?? '',
   corsAllowedOrigins: parseList(process.env.CORS_ALLOWED_ORIGINS),
