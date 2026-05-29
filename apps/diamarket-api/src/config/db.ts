@@ -27,48 +27,30 @@ const redactMongoCredentials = (message: string) =>
   message.replace(/(mongodb(?:\+srv)?:\/\/)([^@\s/]+)@/gi, '$1***:***@');
 
 const buildSrvDnsErrorMessage = (error: unknown, hostname: string) => {
-  const baseMessage = redactMongoCredentials(getErrorText(error));
-  const srvRecord = getSrvRecord(hostname);
-  const configuredResolvers = dns.getServers().join(', ') || 'unknown';
+  const baseMessage = redactMongoCredentials(error instanceof Error ? error.message : String(error));
+  const srvRecord = `_mongodb._tcp.${hostname}`;
 
   return [
     `MongoDB Atlas DNS SRV lookup failed for host "${hostname}" (${srvRecord}).`,
     'Connection to MongoDB is required, so the API will stop.',
-    `Configured DNS resolver(s): ${configuredResolvers}.`,
-    '',
     'Checks to run:',
-    '1) Verify that this machine has internet access.',
-    `2) Verify DNS resolution with: nslookup -type=SRV ${srvRecord}`,
-    '3) Verify that the MongoDB Atlas cluster exists, is not paused, and that the hostname was not typed manually.',
-    '4) Copy MONGODB_URI again from Atlas > Connect > Drivers and paste it unchanged, then only replace username/password.',
-    '5) If mongodb+srv:// keeps failing on this network, copy the standard mongodb:// URI from Atlas and use it as MONGODB_URI.',
-    '',
+    '1) verify that this machine has internet access;',
+    '2) verify that DNS resolution works for the Atlas SRV record;',
+    '3) verify that the MongoDB Atlas cluster exists and is running;',
+    '4) verify that MONGODB_URI exactly matches the URI copied from Atlas > Connect > Drivers;',
+    '5) if mongodb+srv:// keeps failing on this network, try the standard mongodb:// URI from Atlas.',
     `Original error: ${baseMessage}`
-  ].join('\n');
+  ].join(' ');
 };
 
 const buildConnectionErrorMessage = (error: unknown, hostname: string, uri: string) => {
-  const baseMessage = redactMongoCredentials(getErrorText(error));
+  const baseMessage = redactMongoCredentials(error instanceof Error ? error.message : String(error));
 
   if (uri.startsWith(MONGODB_SRV_PREFIX) && isSrvDnsError(error)) {
     return buildSrvDnsErrorMessage(error, hostname);
   }
 
-  return [
-    `MongoDB connection failed for host "${hostname}".`,
-    'Connection to MongoDB is required, so the API will stop.',
-    `Original error: ${baseMessage}`
-  ].join('\n');
-};
-
-const assertSrvDnsResolves = async (uri: string, hostname: string) => {
-  if (!uri.startsWith(MONGODB_SRV_PREFIX)) return;
-
-  try {
-    await dns.resolveSrv(getSrvRecord(hostname));
-  } catch (error) {
-    throw new Error(buildSrvDnsErrorMessage(error, hostname));
-  }
+  return `MongoDB connection failed for host "${hostname}". Connection to MongoDB is required, so the API will stop. Original error: ${baseMessage}`;
 };
 
 export async function connectDatabase() {
@@ -82,14 +64,9 @@ export async function connectDatabase() {
   console.info(`[database] MongoDB host: ${hostname}`);
 
   try {
-    await assertSrvDnsResolves(mongoUri, hostname);
     await mongoose.connect(mongoUri, { serverSelectionTimeoutMS: 10000 });
     console.info(`[database] Connected to MongoDB host: ${hostname}`);
   } catch (error) {
-    if (error instanceof Error && error.message.startsWith('MongoDB Atlas DNS SRV lookup failed')) {
-      throw error;
-    }
-
     throw new Error(buildConnectionErrorMessage(error, hostname, mongoUri));
   }
 }

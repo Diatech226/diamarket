@@ -9,7 +9,15 @@ dotenv.config({ path: apiEnvPath, override: true });
 const redactMongoCredentials = (value) =>
   value.replace(/(mongodb(?:\+srv)?:\/\/)([^@\s/]+)@/gi, '$1***:***@');
 
-const getHostnameFromMongoUri = (uri) => {
+const getSrvRecordFromMongoUri = (uri) => {
+  if (!uri) {
+    throw new Error('MONGODB_URI is missing. Set it in apps/diamarket-api/.env or export it before running this script.');
+  }
+
+  if (!uri.startsWith('mongodb+srv://')) {
+    throw new Error('MONGODB_URI must start with mongodb+srv:// to test Atlas SRV DNS resolution. Use the Atlas SRV URI from Connect > Drivers.');
+  }
+
   let parsed;
   try {
     parsed = new URL(uri);
@@ -21,33 +29,14 @@ const getHostnameFromMongoUri = (uri) => {
     throw new Error(`MONGODB_URI does not contain a hostname: ${redactMongoCredentials(uri)}`);
   }
 
-  return parsed.hostname;
-};
-
-const getSrvRecordFromMongoUri = (uri) => {
-  if (!uri) {
-    throw new Error('MONGODB_URI is missing. Set it in apps/diamarket-api/.env or export it before running this script.');
-  }
-
-  if (!uri.startsWith('mongodb+srv://')) {
-    const hostname = getHostnameFromMongoUri(uri);
-    console.info(`[mongo:dns] MONGODB_URI does not use mongodb+srv://, so there is no SRV record to test. Hostname: ${hostname}`);
-    console.info('[mongo:dns] Standard mongodb:// URIs bypass Atlas SRV lookup.');
-    return null;
-  }
-
-  return `_mongodb._tcp.${getHostnameFromMongoUri(uri)}`;
+  return `_mongodb._tcp.${parsed.hostname}`;
 };
 
 const main = async () => {
   console.info(`[mongo:dns] Loaded API env from: ${apiEnvPath}`);
-  console.info(`[mongo:dns] DNS resolver(s): ${dns.getServers().join(', ') || 'unknown'}`);
 
   const srvRecord = getSrvRecordFromMongoUri(process.env.MONGODB_URI);
-  if (!srvRecord) return;
-
   console.info(`[mongo:dns] Testing SRV record: ${srvRecord}`);
-  console.info(`[mongo:dns] Equivalent manual command: nslookup -type=SRV ${srvRecord}`);
 
   try {
     const records = await dns.resolveSrv(srvRecord);
@@ -58,7 +47,6 @@ const main = async () => {
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     console.error(`[mongo:dns] DNS SRV resolution failed for ${srvRecord}.`);
-    console.error('[mongo:dns] This is a DNS/Atlas URI problem before Mongoose can connect.');
     console.error('[mongo:dns] Checks: verify internet access, DNS resolver, Atlas cluster existence, and the exact Atlas URI copied from Connect > Drivers.');
     console.error('[mongo:dns] If mongodb+srv:// keeps failing on this network, try the standard mongodb:// URI from Atlas.');
     console.error(`[mongo:dns] Original error: ${message}`);

@@ -54,7 +54,7 @@ You can also run the API helper script from the package directory:
 pnpm --filter diamarket-api test:mongo:dns
 ```
 
-The helper reads `apps/diamarket-api/.env`, extracts the hostname from `MONGODB_URI`, prints the DNS resolver used by Node.js, and resolves the SRV record without printing the username or password. If `MONGODB_URI` uses the standard `mongodb://` format, there is no Atlas SRV record to test, so the helper reports the hostname and exits successfully.
+The helper reads `apps/diamarket-api/.env`, extracts the hostname from `MONGODB_URI`, and resolves the SRV record without printing the username or password.
 
 ## 5. Change Windows DNS to 1.1.1.1 or 8.8.8.8
 
@@ -82,7 +82,7 @@ ipconfig /flushdns
 Check the following before restarting the API:
 
 - Internet access is working from the machine running the API.
-- DNS resolution works for the Atlas SRV record. If `nslookup -type=SRV _mongodb._tcp.cluster0.wmizrba.mongodb.net` returns `ENOTFOUND` / `Non-existent domain`, the hostname is not resolvable from your machine; copy the URI again from Atlas instead of editing the hostname manually.
+- DNS resolution works for the Atlas SRV record.
 - The Atlas cluster exists, is not paused, and belongs to the selected project.
 - `MONGODB_URI` exactly matches the URI copied from **Atlas > Connect > Drivers**.
 - Network Access includes your current public IP or your server outbound IP.

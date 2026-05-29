@@ -30,8 +30,6 @@ You can also run:
 pnpm --filter diamarket-api test:mongo:dns
 ```
 
-This helper prints the DNS resolver used by Node.js and the exact `nslookup` command to run manually. It never prints the MongoDB username or password.
-
 ## If `querySrv ENOTFOUND` persists
 
 `querySrv ENOTFOUND` means the DNS SRV record cannot be resolved from the machine starting the API. The API logs only the MongoDB hostname, never the password, to help identify which cluster is being used.
@@ -39,7 +37,7 @@ This helper prints the DNS resolver used by Node.js and the exact `nslookup` com
 If the cluster hostname is correct but SRV lookup still fails:
 
 - verify internet access from the machine running the API;
-- verify DNS resolution with `nslookup -type=SRV _mongodb._tcp.<atlas-hostname>`; if it returns `ENOTFOUND` / `Non-existent domain`, the Atlas hostname is wrong, deleted, paused, or not resolvable from your DNS resolver;
+- verify DNS resolution with `nslookup -type=SRV _mongodb._tcp.<atlas-hostname>`;
 - verify that the Atlas cluster exists and is running;
 - verify that `MONGODB_URI` exactly matches the URI copied from **Atlas > Connect > Drivers**;
 - change DNS to reliable public resolvers such as `1.1.1.1` or `8.8.8.8`;
