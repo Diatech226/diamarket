@@ -120,11 +120,19 @@ const buildSrvDnsErrorMessage = (error: unknown, hostname: string) => {
   ].join(' ');
 };
 
-const buildConnectionErrorMessage = (error: unknown, validation: MongoUriValidation) => {
+const atlasHostnameIsConfirmedMissing = async (error: unknown, validation: MongoUriValidation) => {
+  if (!validation.isAtlasHostname || !isSrvHostNotFoundError(error)) {
+    return false;
+  }
+
+  return (await hostnameExists(validation.hostname)) === false;
+};
+
+const buildConnectionErrorMessage = async (error: unknown, validation: MongoUriValidation) => {
   const baseMessage = redactMongoCredentials(getErrorText(error));
 
   if (validation.isSrvUri && isSrvDnsError(error)) {
-    if (isSrvHostNotFoundError(error)) {
+    if (await atlasHostnameIsConfirmedMissing(error, validation)) {
       return buildInvalidAtlasHostnameMessage(error, validation.hostname);
     }
 
@@ -142,11 +150,8 @@ const validateAtlasSrvDns = async (validation: MongoUriValidation) => {
   try {
     await dns.resolveSrv(validation.srvRecord);
   } catch (error) {
-    if (isSrvHostNotFoundError(error)) {
-      const exists = await hostnameExists(validation.hostname);
-      if (exists === false) {
-        throw new Error(buildInvalidAtlasHostnameMessage(error, validation.hostname));
-      }
+    if (await atlasHostnameIsConfirmedMissing(error, validation)) {
+      throw new Error(buildInvalidAtlasHostnameMessage(error, validation.hostname));
     }
 
     throw new Error(buildSrvDnsErrorMessage(error, validation.hostname));
@@ -171,6 +176,6 @@ export async function connectDatabase() {
     await mongoose.connect(mongoUri, { serverSelectionTimeoutMS: 10000 });
     console.info(`[database] Connected to MongoDB host: ${validation.hostname}`);
   } catch (error) {
-    throw new Error(buildConnectionErrorMessage(error, validation));
+    throw new Error(await buildConnectionErrorMessage(error, validation));
   }
 }
