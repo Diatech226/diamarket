@@ -4,6 +4,7 @@ import { currentUser } from '../lib/api';
 const nav = [
   ['Dashboard', '/dashboard'],
   ['Paiements', '/payments'],
+  ['Checkout', '/checkout-sessions'],
   ['Transactions', '/transactions'],
   ['API Keys', '/api-keys'],
   ['Webhooks', '/webhooks'],

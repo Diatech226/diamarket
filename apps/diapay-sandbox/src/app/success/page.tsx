@@ -1,0 +1,1 @@
+export default function SuccessPage() { return <main className="shell"><section className="card"><span className="pill">Succès</span><h1>Paiement sandbox réussi</h1><p className="muted">La session est complétée, les événements webhooks ont été créés et signés.</p><a className="btn btn-secondary" href="/">Retour boutique</a></section></main>; }

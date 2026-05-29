@@ -1,0 +1,1 @@
+export default function CancelPage() { return <main className="shell"><section className="card"><span className="pill">Annulé</span><h1>Paiement annulé</h1><p className="muted">La session checkout a été annulée sans débit réel.</p><a className="btn btn-secondary" href="/">Retour boutique</a></section></main>; }
