@@ -10,3 +10,5 @@ export * from './user.model';
 export * from './vendor-request.model';
 export * from './vendor.model';
 export * from './commission.model';
+export * from './media.model';
+export * from './project.model';

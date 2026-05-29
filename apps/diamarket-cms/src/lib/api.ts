@@ -1,16 +1,34 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_DIAMARKET_API_URL || "http://localhost:8000";
+const API_BASE_URL = process.env.NEXT_PUBLIC_DIAMARKET_API_URL || "http://localhost:5000/api";
+export const API_ORIGIN = API_BASE_URL.replace(/\/api\/?$/, "");
 
 type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+
+function cmsHeaders(contentType = "application/json") {
+  return {
+    "Content-Type": contentType,
+    "x-user-id": process.env.NEXT_PUBLIC_CMS_USER_ID || "000000000000000000000001",
+    "x-user-role": process.env.NEXT_PUBLIC_CMS_USER_ROLE || "super_admin",
+  };
+}
+
+export function resolveMediaUrl(url?: string) {
+  if (!url) return "";
+  if (/^https?:\/\//i.test(url) || url.startsWith("data:")) return url;
+  return `${API_ORIGIN}${url.startsWith("/") ? url : `/${url}`}`;
+}
 
 export async function apiRequest<T>(path: string, method: HttpMethod, body?: unknown): Promise<T> {
   const res = await fetch(`${API_BASE_URL}${path}`, {
     method,
-    headers: { "Content-Type": "application/json" },
+    headers: cmsHeaders(),
     body: body ? JSON.stringify(body) : undefined,
     cache: "no-store",
   });
 
-  if (!res.ok) throw new Error(`API error: ${res.status}`);
+  if (!res.ok) {
+    const payload = await res.json().catch(() => null);
+    throw new Error(payload?.message || `API error: ${res.status}`);
+  }
   if (res.status === 204) return null as T;
   return res.json() as Promise<T>;
 }
@@ -26,6 +44,10 @@ export const api = {
 export const endpoints = {
   dashboard: "/admin/dashboard",
   products: "/admin/products",
+  projects: "/projects",
+  media: "/media",
+  mediaUrl: "/media/url",
+  mediaUpload: "/media/upload",
   categories: "/admin/categories",
   slides: "/admin/slides",
   orders: "/admin/orders",
