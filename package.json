@@ -11,7 +11,7 @@
     "build:all": "turbo run build",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
-    "test:mongo:dns": "npm --prefix apps/diamarket-api run test:mongo:dns"
+    "test:mongo:dns": "npm --prefix apps/diamarket-api run test:mongo:dns --"
   },
   "devDependencies": {
     "turbo": "^2.1.1",

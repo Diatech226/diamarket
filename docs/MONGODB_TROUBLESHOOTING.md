@@ -27,12 +27,14 @@ nslookup -type=SRV _mongodb._tcp.<atlas-hostname>
 You can also run:
 
 ```bash
-pnpm --filter diamarket-api test:mongo:dns
+npm run test:mongo:dns
 ```
 
 ## If `querySrv ENOTFOUND` persists
 
 `querySrv ENOTFOUND` means the DNS SRV record cannot be resolved from the machine starting the API. The API logs only the MongoDB hostname, never the password, to help identify which cluster is being used.
+
+If DNS confirms that the Atlas `.mongodb.net` hostname itself no longer exists, the API and `npm run test:mongo:dns` print `The Atlas hostname appears invalid or no longer exists.` In that case, copy a fresh URI from **Atlas > Connect > Drivers** and confirm you are in the correct Atlas project before treating it as a network outage.
 
 If the cluster hostname is correct but SRV lookup still fails:
 

@@ -60,7 +60,11 @@ Or, if you are working inside the API package directly:
 npm --prefix apps/diamarket-api run test:mongo:dns
 ```
 
-The helper reads `apps/diamarket-api/.env`, validates that `MONGODB_URI` is a usable Atlas SRV URI, extracts the hostname, and resolves the SRV record without printing the username or password.
+The helper reads `MONGODB_URI` from the shell first and then `apps/diamarket-api/.env`, validates that it is a usable Atlas SRV URI, extracts the hostname, and resolves the SRV record without printing the username or password. To test a URI without editing `.env`, pass it explicitly:
+
+```bash
+npm run test:mongo:dns -- --uri "mongodb+srv://<username>:<password>@cluster0.wmizrba.mongodb.net/diamarket"
+```
 
 
 ## 5. Startup URI validation and invalid-host diagnostics
@@ -72,8 +76,9 @@ At startup, `diamarket-api` validates `MONGODB_URI` before opening the Mongoose 
 - `mongodb+srv://` URIs must not include a port.
 - `mongodb+srv://` hostnames must be fully qualified.
 - The API validates the SRV record (`_mongodb._tcp.<hostname>`) before connecting, so DNS problems fail fast with a targeted message.
+- Atlas invalid-host diagnostics are only shown after the API confirms that the `.mongodb.net` hostname itself does not exist.
 
-If the MongoDB driver reports `querySrv ENOTFOUND`, the API now checks whether the Atlas hostname itself exists. When DNS confirms that the host does not exist, the startup error includes this exact diagnostic:
+If the MongoDB driver or startup SRV validation reports `querySrv ENOTFOUND`, the API checks whether the Atlas hostname itself exists. When DNS confirms that the host does not exist, the startup error includes this exact diagnostic:
 
 ```text
 The Atlas hostname appears invalid or no longer exists.

@@ -4,7 +4,20 @@ const path = require('node:path');
 const dotenv = require('dotenv');
 
 const apiEnvPath = path.resolve(__dirname, '../.env');
-dotenv.config({ path: apiEnvPath, override: true });
+
+const getCliUri = () => {
+  const args = process.argv.slice(2);
+  const uriFlagIndex = args.findIndex((arg) => arg === '--uri');
+
+  if (uriFlagIndex >= 0) {
+    return args[uriFlagIndex + 1];
+  }
+
+  const uriFlag = args.find((arg) => arg.startsWith('--uri='));
+  return uriFlag ? uriFlag.slice('--uri='.length) : undefined;
+};
+
+dotenv.config({ path: apiEnvPath });
 
 const ATLAS_HOSTNAME_SUFFIX = '.mongodb.net';
 
@@ -43,7 +56,7 @@ const hostnameExists = async (hostname) => {
 
 const validateMongoUri = (uri) => {
   if (!uri) {
-    throw new Error('MONGODB_URI is missing. Set it in apps/diamarket-api/.env or export it before running this script.');
+    throw new Error('MONGODB_URI is missing. Set it in apps/diamarket-api/.env, export it, or pass -- --uri <mongodb+srv://...> when running this script.');
   }
 
   if (!uri.startsWith('mongodb+srv://')) {
@@ -85,9 +98,15 @@ const printInvalidAtlasHostname = (error, hostname, srvRecord) => {
 };
 
 const main = async () => {
-  console.info(`[mongo:dns] Loaded API env from: ${apiEnvPath}`);
+  const cliUri = getCliUri();
+  const mongoUri = cliUri ?? process.env.MONGODB_URI;
 
-  const validation = validateMongoUri(process.env.MONGODB_URI);
+  console.info(`[mongo:dns] Loaded API env from: ${apiEnvPath}`);
+  if (cliUri) {
+    console.info('[mongo:dns] Using MONGODB_URI from --uri CLI argument.');
+  }
+
+  const validation = validateMongoUri(mongoUri);
   console.info(`[mongo:dns] Testing SRV record: ${validation.srvRecord}`);
 
   if (!validation.isAtlasHostname) {
@@ -101,7 +120,7 @@ const main = async () => {
       console.info(`[mongo:dns] ${record.name}:${record.port} priority=${record.priority} weight=${record.weight}`);
     }
   } catch (error) {
-    if (isSrvHostNotFoundError(error)) {
+    if (validation.isAtlasHostname && isSrvHostNotFoundError(error)) {
       const exists = await hostnameExists(validation.hostname);
       if (exists === false) {
         printInvalidAtlasHostname(error, validation.hostname, validation.srvRecord);
