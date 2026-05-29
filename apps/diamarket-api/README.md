@@ -127,3 +127,25 @@ Optional project fields accepted by create/update include `description`, `catego
 - `DELETE /api/media/:id` removes the media record and deletes the local file when applicable.
 
 The media upload middleware accepts `jpeg`, `png`, `webp`, `gif`, and `svg` images up to 8 MB. URL-based media and uploaded media are both available for project cover and gallery selections.
+
+## Diapay Checkout
+
+`diamarket-api` est le seul composant Diamarket autorisé à utiliser `DIAPAY_SECRET_KEY`. Les frontends appellent les endpoints Diamarket suivants :
+
+- `POST /api/payments/diapay/checkout-session` avec `{ "orderId": "..." }`
+- `GET /api/payments/diapay/session/:sessionId`
+- `POST /api/payments/diapay/webhook`
+- `GET /api/orders/:id/payment-status`
+
+Variables sandbox :
+
+```env
+DIAPAY_API_BASE_URL=http://localhost:5100
+DIAPAY_SECRET_KEY=sk_test_xxx
+DIAPAY_PUBLIC_KEY=pk_test_xxx
+DIAPAY_WEBHOOK_SECRET=whsec_xxx
+DIAMARKET_SUCCESS_URL=http://localhost:3000/orders/success
+DIAMARKET_CANCEL_URL=http://localhost:3000/orders/cancel
+```
+
+La commande n’est jamais marquée payée par retour navigateur : seul un webhook Diapay signé, ou une vérification serveur équivalente, peut passer `paymentStatus` à `paid`.

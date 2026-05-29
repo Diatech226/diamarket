@@ -2,7 +2,19 @@
 import { createContext, useContext, useMemo, useState } from 'react';
 import { CartItem, Currency, Locale, Product } from '@/lib/types';
 
-const Ctx = createContext<any>(null);
+type StoreContext = {
+  currency: Currency;
+  setCurrency: (currency: Currency) => void;
+  locale: Locale;
+  setLocale: (locale: Locale) => void;
+  cart: CartItem[];
+  addToCart: (product: Product) => void;
+  removeFromCart: (id: string) => void;
+  updateQty: (id: string, quantity: number) => void;
+  totalFcfa: number;
+};
+
+const Ctx = createContext<StoreContext | null>(null);
 export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [currency, setCurrency] = useState<Currency>('FCFA');
   const [locale, setLocale] = useState<Locale>('fr');
@@ -16,4 +28,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const totalFcfa = useMemo(() => cart.reduce((s, i) => s + i.product.priceFcfa * i.quantity, 0), [cart]);
   return <Ctx.Provider value={{ currency, setCurrency, locale, setLocale, cart, addToCart, removeFromCart, updateQty, totalFcfa }}>{children}</Ctx.Provider>;
 }
-export const useStore = () => useContext(Ctx);
+export const useStore = () => {
+  const value = useContext(Ctx);
+  if (!value) throw new Error('useStore must be used within StoreProvider');
+  return value;
+};

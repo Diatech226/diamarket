@@ -32,7 +32,10 @@ export const env = {
   diapayApiBaseUrl: process.env.DIAPAY_API_BASE_URL ?? '',
   diapayApiKey: process.env.DIAPAY_API_KEY ?? '',
   diapaySecretKey: process.env.DIAPAY_SECRET_KEY ?? '',
+  diapayPublicKey: process.env.DIAPAY_PUBLIC_KEY ?? '',
   diapayWebhookSecret: process.env.DIAPAY_WEBHOOK_SECRET ?? '',
   diapayApiTimeout: Number(process.env.DIAPAY_API_TIMEOUT ?? 15000),
+  diamarketSuccessUrl: process.env.DIAMARKET_SUCCESS_URL ?? 'http://localhost:3000/orders/success',
+  diamarketCancelUrl: process.env.DIAMARKET_CANCEL_URL ?? 'http://localhost:3000/orders/cancel',
   paymentDefaultCurrency: process.env.PAYMENT_DEFAULT_CURRENCY ?? 'FCFA'
 };

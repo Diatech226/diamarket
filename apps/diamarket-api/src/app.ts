@@ -45,7 +45,12 @@ app.use((req, res, next) => {
   if (current.count > 300) return res.status(429).json({ message: 'Too many requests' });
   next();
 });
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({
+  limit: '10mb',
+  verify: (req, _res, buf) => {
+    (req as express.Request & { rawBody?: string }).rawBody = buf.toString('utf8');
+  }
+}));
 app.use(morgan(env.nodeEnv === 'production' ? 'combined' : 'dev'));
 app.use('/uploads', express.static(path.resolve(__dirname, '../uploads')));
 app.use('/api', apiRouter);
