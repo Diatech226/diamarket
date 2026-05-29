@@ -1,6 +1,6 @@
+import { env } from './config/env';
 import { app } from './app';
 import { connectDatabase } from './config/db';
-import { env } from './config/env';
 
 async function bootstrap() {
   await connectDatabase();
@@ -10,6 +10,7 @@ async function bootstrap() {
 }
 
 bootstrap().catch((error) => {
-  console.error('Failed to start API', error);
+  const message = error instanceof Error ? error.message : String(error);
+  console.error(`[startup] Failed to start API. ${message}`);
   process.exit(1);
 });
