@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-const links = ["dashboard","products","categories","slides","orders","vendors","focal-points","settings","currencies","shipping"];
+const links = ["dashboard","projects","products","categories","slides","orders","vendors","focal-points","settings","currencies","shipping"];
 
 export function Sidebar() {
   return (

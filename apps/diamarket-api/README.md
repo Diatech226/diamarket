@@ -99,3 +99,31 @@ See `.env.example`.
 
 ## Iteration 7 Security
 See ../SECURITY.md and API permissions middlewares for roles, permissions, and vendor workflow.
+
+## Projects and media CMS flow
+
+### Projects
+- `GET /api/projects` lists projects with optional `page`, `limit`, `status`, `category`, and `search` query params.
+- `GET /api/projects/:id` reads one project.
+- `POST /api/projects` creates a project. Only `title` is required; all enrichment fields are optional.
+- `PUT /api/projects/:id` updates any subset of project fields.
+- `DELETE /api/projects/:id` removes a project.
+
+Minimal project creation payload:
+
+```json
+{
+  "title": "Villa témoin Ouaga 2000"
+}
+```
+
+Optional project fields accepted by create/update include `description`, `category`, `status` (`draft`, `active`, `archived`), `coverImageUrl`, `coverMedia`, `galleryImageUrls`, `galleryMedia`, `media`, `links`, `startDate`, `endDate`, and `isFeatured`.
+
+### Media library
+- `GET /api/media` lists reusable CMS media assets.
+- `POST /api/media/url` stores an external image URL in the media library.
+- `POST /api/media/upload` imports a local image using JSON `{ "fileName": "cover.png", "dataUrl": "data:image/png;base64,..." }`; uploaded files are stored under `apps/diamarket-api/uploads` and served from `/uploads/:filename`.
+- `PUT /api/media/:id` updates editable metadata such as `alt`, `originalName`, or `url`.
+- `DELETE /api/media/:id` removes the media record and deletes the local file when applicable.
+
+The media upload middleware accepts `jpeg`, `png`, `webp`, `gif`, and `svg` images up to 8 MB. URL-based media and uploaded media are both available for project cover and gallery selections.
