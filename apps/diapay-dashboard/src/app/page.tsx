@@ -1,1 +1,5 @@
-export default function Home() { return <main>diapay-dashboard bootstrap ready.</main>; }
+import { redirect } from 'next/navigation';
+
+export default function Home() {
+  redirect('/login');
+}
