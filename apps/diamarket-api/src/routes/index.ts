@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { Request } from 'express';
 import { categoriesController } from '../controllers/categories.controller';
 import { ordersController } from '../controllers/orders.controller';
+import { paymentsController } from '../controllers/payments.controller';
 import { productsController } from '../controllers/products.controller';
 import { projectsController } from '../controllers/projects.controller';
 import { mediaController } from '../controllers/media.controller';
@@ -56,5 +57,9 @@ apiRouter.put('/vendor-requests/:id/reject', requireAuth, requirePermission('ven
 apiRouter.post('/orders', requireAuth, ownershipGuard('order'), validateRequest(validateOrder), ordersController.create);
 apiRouter.get('/orders', requireAuth, requirePermission('orders:read'), ordersController.list);
 apiRouter.get('/orders/:id', requireAuth, requirePermission('orders:read'), ordersController.getById);
+apiRouter.get('/orders/:id/payment-status', requireAuth, ordersController.getPaymentStatus);
 apiRouter.put('/orders/:id/status', requireAuth, requirePermission('orders:update'), ordersController.updateStatus);
+apiRouter.post('/payments/diapay/checkout-session', requireAuth, paymentsController.createDiapayCheckoutSession);
+apiRouter.get('/payments/diapay/session/:sessionId', requireAuth, paymentsController.retrieveDiapaySession);
+apiRouter.post('/payments/diapay/webhook', paymentsController.handleDiapayWebhook);
 apiRouter.post('/orders/:id/shipment/sync', requireAuth, requireRole('admin', 'super_admin', 'agent_logistique', 'marketplace_point_focal'), ordersController.syncShipmentStatus);

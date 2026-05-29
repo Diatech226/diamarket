@@ -6,7 +6,7 @@ import { shippingService } from '../services/shipping';
 export const ordersController = {
   async create(req: Request, res: Response) {
     const estimate = await shippingService.estimateShipping(req.body);
-    const order = await Order.create({ ...req.body, shipmentStatus: 'estimated', shippingEstimate: estimate });
+    const order = await Order.create({ ...req.body, paymentStatus: req.body.paymentMode === 'cod' ? 'unpaid' : req.body.paymentStatus || 'unpaid', shipmentStatus: 'estimated', shippingEstimate: estimate });
     return res.status(201).json({ data: order });
   },
   async list(_req: Request, res: Response) {
@@ -47,6 +47,11 @@ export const ordersController = {
       return res.json({ data, shipment });
     }
 
+    return res.json({ data });
+  },
+  async getPaymentStatus(req: Request, res: Response) {
+    const data = await Order.findById(req.params.id).select('status paymentProvider paymentStatus paymentMethod diapaySessionId diapayPaymentId checkoutUrl paidAt cancelledAt failedAt totalAmount currency');
+    if (!data) return res.status(404).json({ message: 'Order not found' });
     return res.json({ data });
   },
   async syncShipmentStatus(req: Request, res: Response) {

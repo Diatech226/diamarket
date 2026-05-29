@@ -62,3 +62,22 @@ export type ProjectPayload = Partial<Omit<Project, "_id" | "coverMedia" | "galle
   galleryMedia?: string[];
   media?: string[];
 };
+
+export type OrderPaymentStatus = 'unpaid' | 'pending' | 'paid' | 'failed' | 'cancelled' | 'expired' | 'refunded';
+
+export interface OrderAdminItem {
+  _id: string;
+  status?: string;
+  paymentProvider?: 'cash_on_delivery' | 'diapay';
+  paymentStatus?: OrderPaymentStatus;
+  paymentMethod?: string;
+  diapaySessionId?: string;
+  diapayPaymentId?: string;
+  checkoutUrl?: string;
+  totalAmount?: number;
+  currency?: string;
+  paidAt?: string;
+  cancelledAt?: string;
+  failedAt?: string;
+  createdAt?: string;
+}

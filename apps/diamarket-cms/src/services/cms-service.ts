@@ -1,5 +1,5 @@
 import { api, endpoints } from "@/lib/api";
-import type { ApiCollection, ApiItem, MediaAsset, Project, ProjectPayload } from "@/types/cms";
+import type { ApiCollection, ApiItem, MediaAsset, OrderAdminItem, Project, ProjectPayload } from "@/types/cms";
 
 export async function fetchCollection<T>(endpoint: string): Promise<T[]> {
   try {
@@ -23,7 +23,8 @@ export const cmsService = {
   deleteMedia: (id: string) => api.delete<void>(`${endpoints.media}/${id}`),
   getCategories: () => fetchCollection(endpoints.categories),
   getSlides: () => fetchCollection(endpoints.slides),
-  getOrders: () => fetchCollection(endpoints.orders),
+  getOrders: () => fetchCollection<OrderAdminItem>(endpoints.orders),
+  verifyDiapayPayment: (orderId: string) => api.get(`${endpoints.orders.replace('/admin', '')}/${orderId}/payment-status`),
   getVendors: () => fetchCollection(endpoints.vendors),
   getFocalPoints: () => fetchCollection(endpoints.focalPoints),
   getSettings: () => api.get(endpoints.settings),

@@ -1,3 +1,5 @@
+import * as crypto from 'crypto';
+
 export type DiapayOptions = {
   secretKey: string;
   baseUrl?: string;
@@ -12,6 +14,13 @@ export type CheckoutSessionCreateParams = {
   customer?: Record<string, unknown>;
   items?: Array<{ name: string; quantity?: number; amount?: number }>;
   metadata?: Record<string, unknown>;
+};
+
+export type DiapayWebhookEvent<T = Record<string, unknown>> = {
+  id?: string;
+  type: string;
+  data?: T;
+  created?: string;
 };
 
 type RequestOptions = RequestInit & { idempotencyKey?: string };
@@ -37,7 +46,7 @@ export class Diapay {
   private async request<T>(path: string, options: RequestOptions = {}): Promise<T> {
     const response = await fetch(`${this.baseUrl}/api/v1${path}`, { ...options, headers: this.headers(options) });
     const data = await response.json();
-    if (!response.ok) throw new Error(data?.error?.message ?? `Diapay API error ${response.status}`);
+    if (!response.ok) throw new Error(data?.error?.message ?? data?.message ?? `Diapay API error ${response.status}`);
     return data as T;
   }
 
@@ -79,8 +88,16 @@ export class Diapay {
   async refundPayment(id: string) { return this.request(`/payments/${id}/refund`, { method: 'POST' }); }
   async cancelPayment(id: string) { return this.request(`/payments/${id}/cancel`, { method: 'POST' }); }
 
-  verifyWebhook(rawBody: string, signature: string, secret?: string) {
-    return Boolean(rawBody && signature && secret !== '');
+  static verifyWebhookSignature(rawBody: string, signature: string, secret: string) {
+    if (!rawBody || !signature || !secret) return false;
+    const expected = crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
+    const left = Buffer.from(signature);
+    const right = Buffer.from(expected);
+    return left.length === right.length && crypto.timingSafeEqual(left, right);
+  }
+
+  verifyWebhook(rawBody: string, signature: string, secret: string) {
+    return Diapay.verifyWebhookSignature(rawBody, signature, secret);
   }
 }
 

@@ -17,6 +17,9 @@ importers:
 
   apps/diamarket-api:
     dependencies:
+      diapay-sdk-js:
+        specifier: file:../../packages/diapay-sdk-js
+        version: link:../../packages/diapay-sdk-js
       cors:
         specifier: ^2.8.5
         version: 2.8.6
@@ -273,7 +276,11 @@ importers:
 
   packages/config: {}
 
-  packages/diapay-sdk-js: {}
+  packages/diapay-sdk-js:
+    devDependencies:
+      '@types/node':
+        specifier: ^20.14.2
+        version: 20.19.41
 
   packages/eslint-config: {}
 

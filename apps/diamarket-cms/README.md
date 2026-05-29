@@ -62,3 +62,7 @@ NEXT_PUBLIC_CMS_USER_ROLE=super_admin
 ```
 
 `NEXT_PUBLIC_CMS_USER_ID` et `NEXT_PUBLIC_CMS_USER_ROLE` alimentent le pont temporaire par headers attendu par `diamarket-api` (`x-user-id`, `x-user-role`) jusqu’au branchement complet des tokens Clerk.
+
+## Suivi des paiements Diapay
+
+La page commandes affiche les colonnes `paymentProvider`, `paymentStatus`, `diapaySessionId` et `diapayPaymentId`. Le bouton **Vérifier paiement** appelle `diamarket-api` (`GET /api/orders/:id/payment-status`) afin de récupérer un statut serveur sans exposer de secret Diapay au CMS.

@@ -1,41 +1,38 @@
-# Diapay SDK JavaScript
+# diapay-sdk-js
 
-SDK serveur pour créer des paiements sandbox et des sessions Checkout hébergées Diapay.
+SDK JavaScript/Node.js pour Diapay Checkout.
 
-> N’utilisez jamais `secretKey` côté navigateur. Créez la session depuis votre backend puis renvoyez uniquement `checkoutUrl` au frontend.
-
-## Installation
+## Installation workspace
 
 ```bash
-pnpm add diapay-sdk-js
+pnpm add diapay-sdk-js@file:../../packages/diapay-sdk-js --filter diamarket-api
 ```
 
-## Checkout hébergé
+## Utilisation Node.js
 
 ```ts
 import Diapay from 'diapay-sdk-js';
 
 const diapay = new Diapay({
-  secretKey: 'sk_test_xxx',
-  baseUrl: 'http://localhost:5100',
+  baseUrl: process.env.DIAPAY_API_BASE_URL,
+  secretKey: process.env.DIAPAY_SECRET_KEY!,
 });
 
 const session = await diapay.checkout.sessions.create({
   amount: 25000,
   currency: 'XOF',
-  successUrl: 'https://example.com/success',
-  cancelUrl: 'https://example.com/cancel',
-}, { idempotencyKey: 'cart_123' });
-
-console.log(session.checkoutUrl);
+  successUrl: 'http://localhost:3000/orders/success',
+  cancelUrl: 'http://localhost:3000/orders/cancel',
+  metadata: { source: 'diamarket', orderId: '...', customerId: '...', environment: 'test' },
+});
 ```
 
-## API disponible
+## Exemple Diamarket
 
-- `diapay.checkout.sessions.create(params, { idempotencyKey })`
-- `diapay.checkout.sessions.retrieve(id)`
-- `diapay.redirectToCheckout(sessionOrId)`
-- `diapay.createPayment(params)`
-- `diapay.retrievePayment(id)`
-- `diapay.refundPayment(id)`
-- `diapay.cancelPayment(id)`
+`diamarket-api` crée la session côté serveur, sauvegarde `session.id` et `session.checkoutUrl`, puis renvoie uniquement l’URL de checkout au frontend. Les webhooks entrants sont validés avec HMAC SHA-256 :
+
+```ts
+const valid = Diapay.verifyWebhookSignature(rawBody, signature, process.env.DIAPAY_WEBHOOK_SECRET!);
+```
+
+Ne jamais utiliser `secretKey` depuis `diamarket-web` ou `diamarket-cms`.
