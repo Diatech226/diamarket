@@ -1,16 +1,6 @@
 import mongoose from 'mongoose';
-import { env } from './env';
 
-type DatabaseStatus = 'connected' | 'degraded' | 'disconnected';
-
-let databaseStatus: DatabaseStatus = 'disconnected';
-let databaseUnavailableReason = 'Database connection has not been initialized.';
-
-export const getDatabaseStatus = () => ({
-  available: databaseStatus === 'connected',
-  status: databaseStatus,
-  reason: databaseUnavailableReason
-});
+const MONGODB_SRV_PREFIX = 'mongodb+srv://';
 
 const getMongoHostname = (uri: string): string => {
   try {
@@ -28,55 +18,47 @@ const isSrvDnsError = (error: unknown) => {
 const redactMongoCredentials = (message: string) =>
   message.replace(/(mongodb(?:\+srv)?:\/\/)([^@\s/]+)@/gi, '$1***:***@');
 
-const buildConnectionErrorMessage = (error: unknown, hostname: string) => {
+const buildSrvDnsErrorMessage = (error: unknown, hostname: string) => {
   const baseMessage = redactMongoCredentials(error instanceof Error ? error.message : String(error));
+  const srvRecord = `_mongodb._tcp.${hostname}`;
 
-  if (isSrvDnsError(error)) {
-    return [
-      `MongoDB DNS SRV lookup failed for host "${hostname}".`,
-      'Verify that the Atlas cluster exists and that your DNS resolver can resolve the _mongodb._tcp SRV record.',
-      'If mongodb+srv:// keeps failing, try the standard mongodb:// connection string from Atlas or use your local fallback from apps/diamarket-api/.env.',
-      `Original error: ${baseMessage}`
-    ].join(' ');
-  }
-
-  return `MongoDB connection failed for host "${hostname}": ${baseMessage}`;
+  return [
+    `MongoDB Atlas DNS SRV lookup failed for host "${hostname}" (${srvRecord}).`,
+    'Connection to MongoDB is required, so the API will stop.',
+    'Checks to run:',
+    '1) verify that this machine has internet access;',
+    '2) verify that DNS resolution works for the Atlas SRV record;',
+    '3) verify that the MongoDB Atlas cluster exists and is running;',
+    '4) verify that MONGODB_URI exactly matches the URI copied from Atlas > Connect > Drivers;',
+    '5) if mongodb+srv:// keeps failing on this network, try the standard mongodb:// URI from Atlas.',
+    `Original error: ${baseMessage}`
+  ].join(' ');
 };
 
-const markDegraded = (reason: string) => {
-  databaseStatus = 'degraded';
-  databaseUnavailableReason = reason;
-  console.warn('[database] MongoDB unavailable, API started in degraded mode');
-  console.warn(`[database] Reason: ${reason}`);
-  console.warn('[database] Routes that require MongoDB will return 503 Database unavailable; /api/health remains available.');
+const buildConnectionErrorMessage = (error: unknown, hostname: string, uri: string) => {
+  const baseMessage = redactMongoCredentials(error instanceof Error ? error.message : String(error));
+
+  if (uri.startsWith(MONGODB_SRV_PREFIX) && isSrvDnsError(error)) {
+    return buildSrvDnsErrorMessage(error, hostname);
+  }
+
+  return `MongoDB connection failed for host "${hostname}". Connection to MongoDB is required, so the API will stop. Original error: ${baseMessage}`;
 };
 
 export async function connectDatabase() {
-  const mongoUri = env.mongodbUri;
+  const mongoUri = process.env.MONGODB_URI;
 
   if (!mongoUri) {
-    const message = 'MONGODB_URI is missing. Set it in apps/diamarket-api/.env or export it before starting the API.';
-    if (env.allowApiWithoutDb) {
-      markDegraded(message);
-      return;
-    }
-    throw new Error(message);
+    throw new Error('MONGODB_URI is missing. Set it in apps/diamarket-api/.env or export it before starting the API.');
   }
 
   const hostname = getMongoHostname(mongoUri);
   console.info(`[database] MongoDB host: ${hostname}`);
 
   try {
-    await mongoose.connect(mongoUri, { serverSelectionTimeoutMS: 3000 });
-    databaseStatus = 'connected';
-    databaseUnavailableReason = '';
+    await mongoose.connect(mongoUri, { serverSelectionTimeoutMS: 10000 });
     console.info(`[database] Connected to MongoDB host: ${hostname}`);
   } catch (error) {
-    const message = buildConnectionErrorMessage(error, hostname);
-    if (env.allowApiWithoutDb) {
-      markDegraded(message);
-      return;
-    }
-    throw new Error(message);
+    throw new Error(buildConnectionErrorMessage(error, hostname, mongoUri));
   }
 }
