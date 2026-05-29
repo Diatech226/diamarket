@@ -38,7 +38,6 @@ Chaque app contient un `.env.example`.
 
 ```env
 MONGODB_URI=mongodb://127.0.0.1:27017/diamarket
-ALLOW_API_WITHOUT_DB=true
 ```
 
 ### Configuration MongoDB Atlas
@@ -48,20 +47,9 @@ ALLOW_API_WITHOUT_DB=true
 
 ```env
 MONGODB_URI=mongodb+srv://<username>:<password>@<cluster-hostname>/diamarket?retryWrites=true&w=majority
-ALLOW_API_WITHOUT_DB=false
 ```
 
-Ne commitez jamais d'identifiants Atlas réels. L'API journalise uniquement l'hôte MongoDB, sans mot de passe.
-
-### Mode API dégradé sans MongoDB
-
-Pour le développement web/cms quand MongoDB est temporairement indisponible, activer :
-
-```env
-ALLOW_API_WITHOUT_DB=true
-```
-
-Dans ce mode, l'API démarre quand même, `/api/health` reste disponible, et les routes qui dépendent de MongoDB retournent `503 Database unavailable`.
+Ne commitez jamais d'identifiants Atlas réels. L'API journalise uniquement l'hôte MongoDB, sans mot de passe. MongoDB est obligatoire : si la connexion échoue, l'API s'arrête proprement au démarrage. Voir `docs/MONGODB_ATLAS_SETUP.md` pour le diagnostic Atlas/DNS.
 
 ## Ports
 - diamarket-web: `3000`

@@ -13,7 +13,7 @@
 - Absence d’allowlist CORS explicite pilotée par env.
 
 **Actions appliquées**
-- Normalisation de lecture Mongo sur `MONGODB_URI` uniquement, avec fallback local documenté et mode dégradé optionnel pour le développement UI.
+- Normalisation de lecture Mongo sur `MONGODB_URI` uniquement, avec connexion obligatoire et arrêt propre de l'API en cas d'échec MongoDB.
 - Ajout `CORS_ALLOWED_ORIGINS` (liste CSV) pour contrôle strict par environnement.
 
 ### Sécurité
