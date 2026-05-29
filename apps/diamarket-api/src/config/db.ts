@@ -1,3 +1,4 @@
+import dns from 'node:dns/promises';
 import mongoose from 'mongoose';
 
 const MONGODB_SRV_PREFIX = 'mongodb+srv://';
@@ -10,9 +11,16 @@ const getMongoHostname = (uri: string): string => {
   }
 };
 
+const getSrvRecord = (hostname: string) => `_mongodb._tcp.${hostname}`;
+
+const getErrorText = (error: unknown) => (error instanceof Error ? error.message : String(error));
+
+const getErrorCode = (error: unknown) =>
+  typeof error === 'object' && error !== null && 'code' in error ? String(error.code) : '';
+
 const isSrvDnsError = (error: unknown) => {
-  if (!(error instanceof Error)) return false;
-  return /querySrv|ENOTFOUND|ETIMEOUT|ENODATA|ESERVFAIL/i.test(error.message);
+  const errorText = `${getErrorCode(error)} ${getErrorText(error)}`;
+  return /querySrv|ENOTFOUND|EAI_AGAIN|ETIMEOUT|ENODATA|ESERVFAIL|ECONNREFUSED/i.test(errorText);
 };
 
 const redactMongoCredentials = (message: string) =>
