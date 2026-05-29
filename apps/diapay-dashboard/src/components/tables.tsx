@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { maskSecret } from '../lib/api';
-import type { ApiKey, Customer, Payment, Payout, Refund, Transaction, WebhookEndpoint, WebhookLog } from '../lib/types';
+import type { ApiKey, CheckoutSession, Customer, Payment, Payout, Refund, Transaction, WebhookEndpoint, WebhookEvent, WebhookLog } from '../lib/types';
 import { Badge, Button, Card, EmptyState, formatMoney } from './ui';
 
 export function PaymentsTable({ rows }: { rows: Payment[] }) {
@@ -30,4 +30,13 @@ export function RefundsTable({ rows }: { rows: Refund[] }) {
 
 export function PayoutsTable({ rows }: { rows: Payout[] }) {
   return <Card className="overflow-x-auto"><table className="w-full text-left text-sm"><thead className="text-xs uppercase text-slate-400"><tr>{['Payout','Destination','Montant','Statut','Arrivée estimée'].map(h => <th className="pb-4" key={h}>{h}</th>)}</tr></thead><tbody className="divide-y">{rows.map(p => <tr key={p.id}><td className="py-4 font-semibold">{p.id}</td><td>{p.destination}</td><td>{formatMoney(p.amount,p.currency)}</td><td><Badge value={p.status}/></td><td>{p.arrivalDate}</td></tr>)}</tbody></table></Card>;
+}
+
+export function CheckoutSessionsTable({ rows }: { rows: CheckoutSession[] }) {
+  if (!rows.length) return <EmptyState title="Aucune session checkout" description="Les sessions créées via Stripe-like Checkout apparaîtront ici." />;
+  return <Card className="overflow-x-auto"><table className="w-full text-left text-sm"><thead className="text-xs uppercase text-slate-400"><tr>{['Session','Marchand','Client','Montant','Statut','Expiration','Paiement'].map(h => <th className="pb-4" key={h}>{h}</th>)}</tr></thead><tbody className="divide-y">{rows.map(s => <tr key={s.id}><td className="py-4"><Link className="font-semibold text-ocean" href={`/checkout-sessions/${s.id}`}>{s.id}</Link><p className="text-xs text-slate-400">{s.items.length} item(s)</p></td><td>{s.merchant}</td><td>{s.customer?.name ?? '—'}<p className="text-xs text-slate-400">{s.customer?.email}</p></td><td className="font-semibold">{formatMoney(s.amount,s.currency)}</td><td><Badge value={s.status}/></td><td>{new Date(s.expiresAt).toLocaleString('fr-FR')}</td><td>{s.payment ?? '—'}</td></tr>)}</tbody></table></Card>;
+}
+
+export function WebhookEventsList({ events }: { events: WebhookEvent[] }) {
+  return <Card><h2 className="mb-4 font-semibold">Événements webhook liés</h2>{events.map(event => <div key={event.id} className="border-b py-4 last:border-0"><div className="flex items-center justify-between gap-3"><div><p className="font-semibold">{event.type}</p><p className="text-xs text-slate-400">{event.id} · {new Date(event.createdAt).toLocaleString('fr-FR')}</p></div><Badge value={event.attempts.some(a => a.status === 'delivered') ? 'delivered' : 'pending'} /></div><div className="mt-2 flex flex-wrap gap-2">{event.attempts.map(attempt => <span className="rounded-full bg-slate-100 px-2 py-1 text-xs dark:bg-slate-800" key={attempt.id}>{attempt.status} {attempt.statusCode ?? ''}</span>)}</div></div>)}</Card>;
 }

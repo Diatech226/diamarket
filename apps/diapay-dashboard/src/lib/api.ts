@@ -1,4 +1,4 @@
-import type { ApiKey, Customer, EnvironmentMode, Payment, Payout, Refund, Transaction, UserRole, WebhookEndpoint, WebhookLog } from './types';
+import type { ApiKey, CheckoutSession, Customer, EnvironmentMode, Payment, Payout, Refund, Transaction, UserRole, WebhookEndpoint, WebhookEvent, WebhookLog } from './types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_DIAPAY_API_URL ?? 'http://localhost:5100';
 
@@ -30,6 +30,9 @@ export const diapayApi = {
   refundPayment: (id: string) => request<Refund>(`/payments/${id}/refund`, { method: 'POST' }),
   createWebhook: (url: string, events: string[]) => request<{ received: boolean }>('/webhooks', { method: 'POST', body: JSON.stringify({ url, events }) }),
   createPayout: (amount: number, currency: string) => request<Payout>('/payouts', { method: 'POST', body: JSON.stringify({ amount, currency }) }),
+  listCheckoutSessions: () => request<CheckoutSession[]>('/checkout/sessions'),
+  getCheckoutSession: (id: string) => request<CheckoutSession>(`/checkout/sessions/${id}`),
+  listWebhookEvents: () => request<WebhookEvent[]>('/webhook-events'),
 };
 
 export function maskSecret(secret: string) {
@@ -63,6 +66,18 @@ export const payments: Payment[] = [
   { id: 'pay_7Qv1nD', reference: 'ORD-77420', customer: 'Nana Appiah', email: 'nana@example.com', amount: 520, currency: 'USD', status: 'requires_action', method: 'crypto', provider: 'USDC Polygon', createdAt: '2026-05-28T19:30:00Z', refundable: false },
   { id: 'pay_5Ls0bF', reference: 'INV-2026-4808', customer: 'Seydou Diallo', email: 'seydou@example.com', amount: 430000, currency: 'XOF', status: 'refunded', method: 'bank-transfer', provider: 'Ecobank', createdAt: '2026-05-28T15:05:00Z', refundable: false },
   { id: 'pay_3Ax7mR', reference: 'ORD-77398', customer: 'Fatou Ndiaye', email: 'fatou@example.com', amount: 240000, currency: 'XOF', status: 'failed', method: 'mobile-money', provider: 'MTN MoMo', createdAt: '2026-05-27T11:22:00Z', refundable: false },
+];
+
+
+export const checkoutSessions: CheckoutSession[] = [
+  { id: 'cs_test_demo1', merchant: 'Kora Payments', payment: 'pay_9M4xqK', amount: 125000, currency: 'XOF', customer: { name: 'Mariam Traoré', email: 'mariam@example.com' }, items: [{ name: 'Facture premium', quantity: 1, amount: 125000 }], successUrl: 'https://merchant.example/success', cancelUrl: 'https://merchant.example/cancel', status: 'completed', expiresAt: '2026-05-29T10:12:00Z', metadata: { orderId: 'INV-2026-4821' }, createdAt: '2026-05-29T09:12:00Z' },
+  { id: 'cs_test_demo2', merchant: 'Kora Payments', payment: 'pay_2Jp8cA', amount: 89000, currency: 'XOF', customer: { name: 'Jean Kouassi', email: 'jean@example.com' }, items: [{ name: 'Abonnement', quantity: 1, amount: 89000 }], successUrl: 'https://merchant.example/success', cancelUrl: 'https://merchant.example/cancel', status: 'open', expiresAt: '2026-05-29T11:45:00Z', metadata: { orderId: 'SUB-2026-118' }, createdAt: '2026-05-29T08:45:00Z' },
+  { id: 'cs_test_demo3', merchant: 'Kora Payments', amount: 240000, currency: 'XOF', customer: { name: 'Fatou Ndiaye', email: 'fatou@example.com' }, items: [{ name: 'Commande marketplace', quantity: 1, amount: 240000 }], successUrl: 'https://merchant.example/success', cancelUrl: 'https://merchant.example/cancel', status: 'cancelled', expiresAt: '2026-05-27T12:22:00Z', metadata: { orderId: 'ORD-77398' }, createdAt: '2026-05-27T11:22:00Z' },
+];
+
+export const webhookEventsData: WebhookEvent[] = [
+  { id: 'evt_checkout_1', type: 'checkout.session.completed', merchant: 'Kora Payments', payload: { session: 'cs_test_demo1' }, attempts: [{ id: 'del_checkout_1', url: 'https://api.kora.ci/diapay/webhooks', status: 'delivered', statusCode: 200 }], createdAt: '2026-05-29T09:12:05Z' },
+  { id: 'evt_payment_1', type: 'payment.succeeded', merchant: 'Kora Payments', payload: { payment: 'pay_9M4xqK' }, attempts: [{ id: 'del_payment_1', url: 'https://api.kora.ci/diapay/webhooks', status: 'delivered', statusCode: 200 }], createdAt: '2026-05-29T09:12:06Z' },
 ];
 
 export const transactions: Transaction[] = payments.map((payment, index) => ({ ...payment, fee: Math.round(payment.amount * 0.018), net: Math.round(payment.amount * 0.982), id: `txn_${index + 1420}` }));

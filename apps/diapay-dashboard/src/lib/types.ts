@@ -24,3 +24,7 @@ export type WebhookLog = { id: string; endpoint: string; event: string; status: 
 export type Customer = { id: string; name: string; email: string; country: string; totalSpend: number; payments: number; createdAt: string };
 export type Refund = { id: string; paymentId: string; amount: number; currency: string; status: 'succeeded' | 'pending' | 'failed'; reason: string; createdAt: string };
 export type Payout = { id: string; amount: number; currency: string; status: 'paid' | 'pending' | 'in_transit' | 'failed'; destination: string; arrivalDate: string };
+
+export type CheckoutSessionStatus = 'created' | 'open' | 'completed' | 'cancelled' | 'expired';
+export type CheckoutSession = { id: string; merchant: string; payment?: string; amount: number; currency: string; customer?: { name?: string; email?: string }; items: Array<{ name: string; quantity?: number; amount?: number }>; successUrl: string; cancelUrl: string; status: CheckoutSessionStatus; expiresAt: string; metadata: Record<string, unknown>; createdAt: string };
+export type WebhookEvent = { id: string; type: string; merchant: string; payload: Record<string, unknown>; attempts: Array<{ id: string; url: string; status: 'pending' | 'delivered' | 'failed'; statusCode?: number }>; createdAt: string };

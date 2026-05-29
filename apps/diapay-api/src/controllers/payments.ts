@@ -1,12 +1,25 @@
 import { Request, Response } from 'express';
-import { mockProvider } from '../providers/mock/provider';
+import { createDirectPayment, listWebhookEvents, registerWebhookEndpoint, retrievePayment, sandboxState } from '../services/checkout-store';
 
-export const createPayment = async (req: Request, res: Response) => res.status(201).json(await mockProvider.createPayment(req.body));
-export const getPayment = async (req: Request, res: Response) => res.json(await mockProvider.getPayment(req.params.id));
-export const cancelPayment = async (req: Request, res: Response) => res.json(await mockProvider.cancelPayment(req.params.id));
-export const refundPayment = async (req: Request, res: Response) => res.json(await mockProvider.refundPayment(req.params.id));
-export const createWebhook = async (_req: Request, res: Response) => res.status(202).json({ received: true });
-export const listTransactions = async (_req: Request, res: Response) => res.json([{ id: 'txn_mock_1', status: 'succeeded' }]);
-export const getBalance = async (_req: Request, res: Response) => res.json({ available: 0, currency: 'USD' });
+function handle(error: unknown, res: Response) {
+  const status = typeof error === 'object' && error !== null && 'status' in error ? Number((error as { status: number }).status) : 500;
+  const message = error instanceof Error ? error.message : 'Internal server error';
+  res.status(status).json({ error: { message } });
+}
+
+export const createPayment = async (req: Request, res: Response) => {
+  try { res.status(201).json(createDirectPayment(req.body, sandboxState.resolveMerchant(req.header('authorization') ?? undefined))); } catch (error) { handle(error, res); }
+};
+export const getPayment = async (req: Request, res: Response) => {
+  try { res.json(retrievePayment(req.params.id)); } catch (error) { handle(error, res); }
+};
+export const cancelPayment = async (req: Request, res: Response) => res.json({ ...retrievePayment(req.params.id), status: 'cancelled' });
+export const refundPayment = async (req: Request, res: Response) => res.json({ ...retrievePayment(req.params.id), status: 'refunded' });
+export const createWebhook = async (req: Request, res: Response) => {
+  try { res.status(201).json(registerWebhookEndpoint(req.body, sandboxState.resolveMerchant(req.header('authorization') ?? undefined))); } catch (error) { handle(error, res); }
+};
+export const listWebhookEventsController = async (_req: Request, res: Response) => res.json(listWebhookEvents());
+export const listTransactions = async (_req: Request, res: Response) => res.json(Array.from(sandboxState.payments.values()).map((payment, index) => ({ ...payment, fee: Math.round(payment.amount * 0.018), net: Math.round(payment.amount * 0.982), id: `txn_${index + 1}` })));
+export const getBalance = async (_req: Request, res: Response) => res.json({ available: 0, pending: 0, currency: 'XOF' });
 export const createPayout = async (_req: Request, res: Response) => res.status(201).json({ id: 'po_mock_1', status: 'pending' });
 export const listMethods = async (_req: Request, res: Response) => res.json(['mobile-money', 'bank-card', 'bank-transfer', 'crypto', 'mock']);

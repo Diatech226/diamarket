@@ -1,12 +1,20 @@
 import { Router } from 'express';
-import { createPayment, getPayment, cancelPayment, refundPayment, listTransactions, listMethods, createWebhook, getBalance, createPayout } from '../controllers/payments';
+import { cancelSession, completeSession, createSession, listSessions, publicConfig, retrieveSession } from '../controllers/checkout';
+import { createPayment, getPayment, cancelPayment, refundPayment, listTransactions, listMethods, createWebhook, getBalance, createPayout, listWebhookEventsController } from '../controllers/payments';
 
 export const apiRouter = Router();
+apiRouter.get('/config', publicConfig);
+apiRouter.post('/checkout/sessions', createSession);
+apiRouter.get('/checkout/sessions', listSessions);
+apiRouter.get('/checkout/sessions/:id', retrieveSession);
+apiRouter.post('/checkout/sessions/:id/complete', completeSession);
+apiRouter.post('/checkout/sessions/:id/cancel', cancelSession);
 apiRouter.post('/payments', createPayment);
 apiRouter.get('/payments/:id', getPayment);
 apiRouter.post('/payments/:id/cancel', cancelPayment);
 apiRouter.post('/payments/:id/refund', refundPayment);
 apiRouter.post('/webhooks', createWebhook);
+apiRouter.get('/webhook-events', listWebhookEventsController);
 apiRouter.get('/transactions', listTransactions);
 apiRouter.get('/balance', getBalance);
 apiRouter.post('/payouts', createPayout);

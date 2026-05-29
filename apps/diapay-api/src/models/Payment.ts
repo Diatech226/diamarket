@@ -1,5 +1,18 @@
+export type PaymentStatus = 'requires_action' | 'processing' | 'succeeded' | 'failed' | 'cancelled' | 'expired' | 'refunded';
+export type PaymentMethod = 'mobile-money' | 'bank-card' | 'bank-transfer' | 'crypto' | 'mock';
+
 export interface Payment {
   id: string;
-  createdAt: Date;
-  updatedAt: Date;
+  sessionId?: string;
+  merchant: string;
+  amount: number;
+  currency: string;
+  method: PaymentMethod;
+  status: PaymentStatus;
+  provider: string;
+  failureCode?: string;
+  failureMessage?: string;
+  metadata?: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
 }
