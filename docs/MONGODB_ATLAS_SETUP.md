@@ -48,17 +48,42 @@ Atlas `mongodb+srv://` URIs require DNS SRV resolution. Test the SRV record dire
 nslookup -type=SRV _mongodb._tcp.cluster0.wmizrba.mongodb.net
 ```
 
-You can also run the API helper script from the package directory:
+You can also run the API helper script from the repository root:
 
 ```bash
-pnpm --filter diamarket-api test:mongo:dns
+npm run test:mongo:dns
 ```
 
-The helper reads `apps/diamarket-api/.env`, extracts the hostname from `MONGODB_URI`, and resolves the SRV record without printing the username or password.
+Or, if you are working inside the API package directly:
 
-## 5. Change Windows DNS to 1.1.1.1 or 8.8.8.8
+```bash
+npm --prefix apps/diamarket-api run test:mongo:dns
+```
 
-If `querySrv ENOTFOUND` persists and the Atlas hostname is correct, switch Windows to a reliable public resolver:
+The helper reads `apps/diamarket-api/.env`, validates that `MONGODB_URI` is a usable Atlas SRV URI, extracts the hostname, and resolves the SRV record without printing the username or password.
+
+
+## 5. Startup URI validation and invalid-host diagnostics
+
+At startup, `diamarket-api` validates `MONGODB_URI` before opening the Mongoose connection:
+
+- `MONGODB_URI` must be present.
+- The URI must start with `mongodb+srv://` for Atlas SRV connections or `mongodb://` for the standard MongoDB URI.
+- `mongodb+srv://` URIs must not include a port.
+- `mongodb+srv://` hostnames must be fully qualified.
+- The API validates the SRV record (`_mongodb._tcp.<hostname>`) before connecting, so DNS problems fail fast with a targeted message.
+
+If the MongoDB driver reports `querySrv ENOTFOUND`, the API now checks whether the Atlas hostname itself exists. When DNS confirms that the host does not exist, the startup error includes this exact diagnostic:
+
+```text
+The Atlas hostname appears invalid or no longer exists.
+```
+
+In that case, do not troubleshoot it as a generic network outage first. Copy a fresh URI from **Atlas > Connect > Drivers** and confirm that the cluster has not been deleted, renamed, paused, or selected from the wrong Atlas project.
+
+## 6. Change Windows DNS to 1.1.1.1 or 8.8.8.8
+
+If `querySrv ENOTFOUND` persists after you have confirmed that the Atlas hostname exists, switch Windows to a reliable public resolver:
 
 1. Open **Settings**.
 2. Go to **Network & internet**.
@@ -77,7 +102,7 @@ You can also flush the local DNS cache after changing DNS:
 ipconfig /flushdns
 ```
 
-## 6. If SRV DNS still fails
+## 7. If SRV DNS still fails
 
 Check the following before restarting the API:
 

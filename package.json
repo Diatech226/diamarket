@@ -10,7 +10,8 @@
     "build:diapay": "turbo run build --filter=diapay-api --filter=diapay-dashboard --filter=diapay-docs --filter=diapay-sandbox",
     "build:all": "turbo run build",
     "lint": "turbo run lint",
-    "typecheck": "turbo run typecheck"
+    "typecheck": "turbo run typecheck",
+    "test:mongo:dns": "npm --prefix apps/diamarket-api run test:mongo:dns"
   },
   "devDependencies": {
     "turbo": "^2.1.1",
