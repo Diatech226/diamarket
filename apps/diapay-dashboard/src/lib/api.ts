@@ -131,3 +131,46 @@ export const providerDescriptors: ProviderDescriptor[] = [
 ];
 
 export const environments: EnvironmentMode[] = ['test', 'live'];
+
+export const marketplaceWallets = [
+  { id: 'wlt_vendor_1', type: 'vendor_wallet' as const, owner: 'Atelier Baoulé', balance: 85000, availableBalance: 0, pendingBalance: 85000, currency: 'XOF', status: 'active' as const },
+  { id: 'wlt_platform_1', type: 'platform_wallet' as const, owner: 'Diamarket', balance: 10000, availableBalance: 10000, pendingBalance: 0, currency: 'XOF', status: 'active' as const },
+  { id: 'wlt_fee_1', type: 'merchant_wallet' as const, owner: 'Diapay Fees', balance: 5000, availableBalance: 5000, pendingBalance: 0, currency: 'XOF', status: 'active' as const },
+  { id: 'wlt_escrow_1', type: 'escrow_wallet' as const, owner: 'Marketplace Escrow', balance: 85000, availableBalance: 0, pendingBalance: 85000, currency: 'XOF', status: 'active' as const },
+  { id: 'wlt_reserve_1', type: 'reserve_wallet' as const, owner: 'Risk Reserve', balance: 1200000, availableBalance: 0, pendingBalance: 1200000, currency: 'XOF', status: 'active' as const },
+];
+
+export const vendorAccounts = [
+  { id: 'vnd_1', businessName: 'Atelier Baoulé', country: 'CI', currencies: ['XOF', 'EUR', 'USD'], wallet: 'wlt_vendor_1', kycStatus: 'verified' as const, capabilities: ['payments', 'escrow', 'payouts', 'refunds'], commission: '10% marketplace + 5% Diapay' },
+  { id: 'vnd_2', businessName: 'Sahel Electronics', country: 'SN', currencies: ['XOF', 'USDT'], wallet: 'wlt_vendor_2', kycStatus: 'pending' as const, capabilities: ['payments', 'escrow'], commission: '8% catégorie électronique' },
+  { id: 'vnd_3', businessName: 'Kente Labs', country: 'GH', currencies: ['USD', 'USDT'], wallet: 'wlt_vendor_3', kycStatus: 'verified' as const, capabilities: ['payments', 'payouts', 'multi_currency'], commission: 'Dynamique pays + vendeur' },
+];
+
+export const escrowHolds = [
+  { id: 'esc_1', paymentId: 'pay_market_1', vendor: 'Atelier Baoulé', amount: 85000, currency: 'XOF', status: 'held' as const, autoReleaseAt: '2026-06-02T10:00:00Z' },
+  { id: 'esc_2', paymentId: 'pay_market_2', vendor: 'Sahel Electronics', amount: 420000, currency: 'XOF', status: 'disputed' as const },
+  { id: 'esc_3', paymentId: 'pay_market_3', vendor: 'Kente Labs', amount: 150, currency: 'USDT', status: 'released' as const },
+];
+
+export const ledgerEntries = [
+  { id: 'le_1', transactionId: 'txn_split_1', account: 'Escrow liability', direction: 'credit' as const, type: 'reserve', amount: 85000, currency: 'XOF', createdAt: '2026-05-30T09:00:00Z' },
+  { id: 'le_2', transactionId: 'txn_split_1', account: 'Platform revenue', direction: 'credit' as const, type: 'fee', amount: 10000, currency: 'XOF', createdAt: '2026-05-30T09:00:01Z' },
+  { id: 'le_3', transactionId: 'txn_split_1', account: 'Diapay fee revenue', direction: 'credit' as const, type: 'fee', amount: 5000, currency: 'XOF', createdAt: '2026-05-30T09:00:02Z' },
+  { id: 'le_4', transactionId: 'txn_release_1', account: 'Vendor liability', direction: 'credit' as const, type: 'credit', amount: 85000, currency: 'XOF', createdAt: '2026-05-30T12:30:00Z' },
+];
+
+export const commissionRules = [
+  { id: 'com_1', scope: 'platform', rule: '10% commission marketplace par défaut', priority: 100, active: true },
+  { id: 'com_2', scope: 'vendor', rule: 'Atelier Baoulé: 8% si volume mensuel > 5M XOF', priority: 50, active: true },
+  { id: 'com_3', scope: 'country', rule: 'Ghana USD: +1.5% FX settlement', priority: 70, active: true },
+  { id: 'com_4', scope: 'category', rule: 'Électronique: commission fixe 2 500 XOF + 6%', priority: 60, active: true },
+];
+
+export const marketplaceAnalytics = {
+  totalVolume: 98240000,
+  commissions: 9840000,
+  payoutsCompleted: 22600000,
+  vendorBalances: 18420500,
+  escrowBalances: 5050000,
+  platformRevenue: 12450000,
+};

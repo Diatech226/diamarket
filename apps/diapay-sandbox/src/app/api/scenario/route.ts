@@ -11,6 +11,11 @@ const scenarios: Record<string, Record<string, unknown>> = {
   'mobile-money': { type: 'payment', method: 'mobile-money', phone: '70000000' },
   crypto: { type: 'payment', method: 'crypto' },
   payout: { type: 'payout' },
+  'simple-marketplace-payment': { type: 'marketplace_split', variant: 'simple' },
+  'multi-vendor-split': { type: 'marketplace_split', variant: 'multi' },
+  'escrow-release': { type: 'escrow_release' },
+  'automatic-payout': { type: 'marketplace_payout' },
+  'vendor-refund': { type: 'vendor_refund' },
   webhook: { type: 'webhook' },
   refund: { type: 'refund' },
   'marketplace-simple-payment': { type: 'marketplace-simple-payment' },
@@ -57,6 +62,32 @@ export async function POST(request: NextRequest) {
   }
 
   if (scenario.type === 'payout') return NextResponse.json(await api('/payouts', { amount: 90000, currency: 'XOF', destination: 'sandbox_bank' }));
+  if (scenario.type === 'marketplace_split') {
+    const vendor = await api('/marketplace/vendors', { businessName: scenario.variant === 'multi' ? 'Sandbox Vendor A' : 'Sandbox Vendor', country: 'CI', currencies: ['XOF'] });
+    const vendorId = typeof vendor.body === 'object' && vendor.body && 'id' in vendor.body ? String(vendor.body.id) : undefined;
+    const splits = scenario.variant === 'multi' ? [{ vendorId, percentage: 60, holdInEscrow: true }, { label: 'Vendor B fallback wallet', walletId: undefined, percentage: 25, fallback: true }] : [{ vendorId, percentage: 85, holdInEscrow: true }];
+    return NextResponse.json({ vendor, split: await api('/marketplace/split-payment', { amount: 100000, currency: 'XOF', splits: splits.filter((split) => split.vendorId || split.walletId), commission: { percentage: 10 }, diapayFee: { percentage: 5 }, escrow: { enabled: true } }) });
+  }
+  if (scenario.type === 'escrow_release') {
+    const vendor = await api('/marketplace/vendors', { businessName: 'Sandbox Release Vendor', country: 'CI', currencies: ['XOF'] });
+    const vendorId = typeof vendor.body === 'object' && vendor.body && 'id' in vendor.body ? String(vendor.body.id) : undefined;
+    const split = await api('/marketplace/split-payment', { amount: 100000, currency: 'XOF', splits: [{ vendorId, percentage: 85, holdInEscrow: true }], commission: { percentage: 10 }, diapayFee: { percentage: 5 }, escrow: { enabled: true } });
+    const escrowId = typeof split.body === 'object' && split.body && 'escrowHolds' in split.body && Array.isArray(split.body.escrowHolds) ? String(split.body.escrowHolds[0]?.id) : undefined;
+    return NextResponse.json({ vendor, split, release: await api('/marketplace/escrow/release', { escrowId, amount: 85000 }) });
+  }
+  if (scenario.type === 'marketplace_payout') {
+    const vendor = await api('/marketplace/vendors', { businessName: 'Sandbox Payout Vendor', country: 'CI', currencies: ['XOF'] });
+    const vendorId = typeof vendor.body === 'object' && vendor.body && 'id' in vendor.body ? String(vendor.body.id) : undefined;
+    const split = await api('/marketplace/split-payment', { amount: 100000, currency: 'XOF', splits: [{ vendorId, percentage: 85 }], commission: { percentage: 10 }, diapayFee: { percentage: 5 } });
+    return NextResponse.json({ vendor, split, payout: await api('/marketplace/payouts', { vendorId, amount: 50000, currency: 'XOF', method: 'mobile_money', schedule: 'automatic', threshold: 25000 }) });
+  }
+  if (scenario.type === 'vendor_refund') {
+    const vendor = await api('/marketplace/vendors', { businessName: 'Sandbox Refund Vendor', country: 'CI', currencies: ['XOF'] });
+    const vendorId = typeof vendor.body === 'object' && vendor.body && 'id' in vendor.body ? String(vendor.body.id) : undefined;
+    const split = await api('/marketplace/split-payment', { amount: 100000, currency: 'XOF', splits: [{ vendorId, percentage: 85, holdInEscrow: true }], commission: { percentage: 10 }, diapayFee: { percentage: 5 }, escrow: { enabled: true } });
+    const escrowId = typeof split.body === 'object' && split.body && 'escrowHolds' in split.body && Array.isArray(split.body.escrowHolds) ? String(split.body.escrowHolds[0]?.id) : undefined;
+    return NextResponse.json({ vendor, split, refund: await api('/marketplace/escrow/refund', { escrowId, amount: 25000, reason: 'sandbox_vendor_refund' }) });
+  }
   if (scenario.type === 'webhook') return NextResponse.json(await api('/webhooks', { url: 'http://localhost:3102/api/sandbox-webhook', events: ['payment.succeeded', 'payment.failed', 'checkout.completed', 'refund.succeeded', 'payout.completed'] }));
   if (scenario.type === 'refund') {
     const payment = await api('/payments', { amount: 25000, currency: 'XOF', method: 'bank-card', cardNumber: '4242424242424242' });

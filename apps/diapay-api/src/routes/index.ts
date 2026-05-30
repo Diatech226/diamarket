@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { cancelSession, completeSession, createSession, listSessions, publicConfig, retrieveSession } from '../controllers/checkout';
 import { createPayment, getPayment, cancelPayment, refundPayment, listTransactions, listMethods, createWebhook, getBalance, createPayout, listWebhookEventsController, listProviderConfigs } from '../controllers/payments';
-import { createPayoutController, createVendor, getVendorWalletController, marketplaceLedger, marketplaceOverview, refundEscrowController, releaseEscrowController, splitPayment } from '../controllers/marketplace';
+import { createMarketplacePayout, createSplitPayment, createVendor, getMarketplaceAnalytics, getMarketplaceLedger, getVendorWallet, listEscrowHolds, listMarketplacePayouts, listMarketplaceTimeline, listMarketplaceWallets, listVendors, refundEscrow, releaseEscrow } from '../controllers/marketplace';
 
 export const apiRouter = Router();
 apiRouter.get('/config', publicConfig);
@@ -22,11 +22,16 @@ apiRouter.post('/payouts', createPayout);
 apiRouter.get('/payment-methods', listMethods);
 apiRouter.get('/providers', listProviderConfigs);
 
-apiRouter.get('/marketplace', marketplaceOverview);
-apiRouter.post('/marketplace/split-payment', splitPayment);
+apiRouter.post('/marketplace/split-payment', createSplitPayment);
 apiRouter.post('/marketplace/vendors', createVendor);
-apiRouter.get('/marketplace/vendors/:id/wallet', getVendorWalletController);
-apiRouter.post('/marketplace/payouts', createPayoutController);
-apiRouter.post('/marketplace/escrow/release', releaseEscrowController);
-apiRouter.post('/marketplace/escrow/refund', refundEscrowController);
-apiRouter.get('/marketplace/ledger', marketplaceLedger);
+apiRouter.get('/marketplace/vendors', listVendors);
+apiRouter.get('/marketplace/vendors/:id/wallet', getVendorWallet);
+apiRouter.post('/marketplace/payouts', createMarketplacePayout);
+apiRouter.get('/marketplace/payouts', listMarketplacePayouts);
+apiRouter.post('/marketplace/escrow/release', releaseEscrow);
+apiRouter.post('/marketplace/escrow/refund', refundEscrow);
+apiRouter.get('/marketplace/escrow', listEscrowHolds);
+apiRouter.get('/marketplace/ledger', getMarketplaceLedger);
+apiRouter.get('/marketplace/wallets', listMarketplaceWallets);
+apiRouter.get('/marketplace/timeline', listMarketplaceTimeline);
+apiRouter.get('/marketplace/analytics', getMarketplaceAnalytics);

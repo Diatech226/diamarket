@@ -1,19 +1,27 @@
 # Split Payments
 
-`POST /api/v1/marketplace/split-payment` captures a marketplace payment, computes allocations and posts ledger entries.
+Endpoint: `POST /api/v1/marketplace/split-payment`.
 
-## Example
+Diapay répartit automatiquement un paiement capturé entre vendeurs, marketplace, frais Diapay, réserve et fallback.
 
-For a `100000 FCFA` payment:
+## Exemple 100 000 FCFA
 
-- vendor net: `85000 FCFA`
-- marketplace commission: `10000 FCFA`
-- Diapay fee: `5000 FCFA`
+```json
+{
+  "amount": 100000,
+  "currency": "XOF",
+  "splits": [{ "vendorId": "vnd_...", "percentage": 85, "holdInEscrow": true }],
+  "commission": { "percentage": 10 },
+  "diapayFee": { "percentage": 5 },
+  "escrow": { "enabled": true }
+}
+```
 
-## Rules
+Résultat: vendeur 85 000, commission marketplace 10 000, frais Diapay 5 000.
 
-Splits support fixed amounts, percentages, multiple vendors, priority ordering and fallback rules for unallocated remainder. Commission rules may be fixed, percentage-based, category-specific, vendor-specific, country-specific or dynamic.
+## Support
 
-## Timeline
-
-Marketplace payments expose `payment_created`, `payment_authorized`, `payment_captured`, `split_processed`, `wallet_updated`, `escrow_held`, `payout_created`, `payout_completed` and `refund_processed` events.
+- split fixe (`amount`), pourcentage (`percentage`), multi-vendeurs;
+- priorité (`priority`) et fallback du reste;
+- escrow par allocation vendeur;
+- timeline: `payment_created`, `payment_authorized`, `payment_captured`, `split_processed`, `wallet_updated`, `escrow_held`.

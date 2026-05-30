@@ -1,8 +1,8 @@
 # Diapay Marketplace
 
-Diapay Marketplace provides Stripe Connect-like primitives for African and global marketplaces: vendor accounts, wallets, split payments, escrow, commissions, payouts, ledger, timeline and analytics.
+Diapay fournit une architecture Stripe Connect-like pour marketplaces africaines et globales.
 
-## Endpoints
+## APIs
 
 - `POST /api/v1/marketplace/split-payment`
 - `POST /api/v1/marketplace/vendors`
@@ -11,16 +11,26 @@ Diapay Marketplace provides Stripe Connect-like primitives for African and globa
 - `POST /api/v1/marketplace/escrow/release`
 - `POST /api/v1/marketplace/escrow/refund`
 - `GET /api/v1/marketplace/ledger`
-- `GET /api/v1/marketplace`
+- `GET /api/v1/marketplace/wallets`
+- `GET /api/v1/marketplace/analytics`
 
 ## VendorAccount
 
-Vendor accounts include `businessName`, `country`, `currencies`, `payoutMethods`, `wallet`, `kycStatus`, `commissions` and `capabilities`.
+Champs: `businessName`, `country`, `currencies`, `payoutMethods`, `wallet`, `kycStatus`, `commissions`, `capabilities`.
 
-## Analytics
+## Multi-devise
 
-The dashboard tracks total volume, generated commissions, completed payouts, vendor balances, escrow balances and platform revenue.
+Devises initiales: FCFA (`XOF`), `USD`, `EUR`, `USDT`. Les modèles conservent `currency` par wallet et ledger entry pour préparer conversion FX, settlement currency et comptes de clearing.
 
-## Sandbox scenarios
+## Dashboard
 
-The sandbox includes simple payment, multi-vendor split, escrow release, automatic payout and vendor refund flows for integration testing.
+Pages ajoutées: Wallets, Balances, Vendor Accounts, Escrow, Payouts, Ledger, Commissions, Marketplace Analytics.
+
+## Tests recommandés
+
+- split payments mono/multi-vendeur;
+- intégrité ledger et balances;
+- payout manuel/auto/seuil;
+- escrow release/refund partiel;
+- commissions par vendeur/pays/catégorie;
+- multi-devise et settlement.

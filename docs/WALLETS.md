@@ -1,19 +1,19 @@
 # Diapay Wallets
 
-Diapay Marketplace uses internal wallets to isolate balances by owner, currency and settlement state.
+Diapay utilise des wallets internes par propriétaire et par devise pour isoler les fonds marketplace.
 
-## Wallet types
+## Types
 
-- `merchant_wallet`: temporary collection wallet for the merchant or marketplace receiving a payment.
-- `vendor_wallet`: seller balance used for available, pending and payout-ready funds.
-- `platform_wallet`: marketplace and Diapay revenue wallet for commissions and fees.
-- `escrow_wallet`: mirrored held funds while delivery, dispute or release conditions are pending.
-- `reserve_wallet`: rolling reserve, failed payout return and refund protection wallet.
+- `merchant_wallet` — solde marchand direct.
+- `vendor_wallet` — solde vendeur marketplace.
+- `platform_wallet` — commissions marketplace.
+- `escrow_wallet` — fonds bloqués avant livraison/release.
+- `reserve_wallet` — réserves risque, chargebacks et rolling reserve.
 
-## Balance fields
+## Champs
 
-Every wallet stores `balance`, `availableBalance`, `pendingBalance`, `currency`, `status`, `owner` and append-only `ledgerEntries`. `balance = availableBalance + pendingBalance`; operational code must update balances only by posting ledger entries and balance snapshots.
+Chaque wallet expose `balance`, `availableBalance`, `pendingBalance`, `currency`, `status`, `owner` et `ledgerEntries`.
 
-## Supported currencies
+## Règle de cohérence
 
-`FCFA`, `XOF`, `USD`, `EUR` and `USDT` are accepted. Settlement currency and FX rates are modeled as future conversion metadata so cross-currency settlement can be introduced without changing wallet semantics.
+Le wallet est une projection du ledger: le solde courant peut être recalculé depuis les écritures immutables. Les updates de balance doivent être transactionnels avec l'ajout d'une écriture ledger et d'un `balance_snapshot`.

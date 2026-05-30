@@ -1,0 +1,7 @@
+import { marketplaceAnalytics } from '../../../lib/api';
+import { PageHeader, StatCard, formatMoney } from '../../../components/ui';
+
+export default function MarketplaceAnalyticsPage() {
+  return <><PageHeader title="Marketplace Analytics" description="KPIs financiers: volume total, commissions générées, payouts, balances vendeurs, escrow et revenus plateforme." />
+  <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3"><StatCard label="Volume total" value={formatMoney(marketplaceAnalytics.totalVolume)} detail="Paiements marketplace capturés" /><StatCard label="Commissions" value={formatMoney(marketplaceAnalytics.commissions)} detail="Marketplace + règles dynamiques" accent="from-emerald-500 to-teal-400" /><StatCard label="Payouts effectués" value={formatMoney(marketplaceAnalytics.payoutsCompleted)} detail="Mobile money, banque et crypto" accent="from-blue-500 to-cyan-400" /><StatCard label="Balances vendeurs" value={formatMoney(marketplaceAnalytics.vendorBalances)} detail="Disponible + pending" accent="from-purple-500 to-indigo-400" /><StatCard label="Escrow balances" value={formatMoney(marketplaceAnalytics.escrowBalances)} detail="Held/disputed avant release" accent="from-amber-500 to-orange-400" /><StatCard label="Revenus plateforme" value={formatMoney(marketplaceAnalytics.platformRevenue)} detail="Net revenue Diapay/Diamarket" accent="from-rose-500 to-pink-400" /></div></>;
+}

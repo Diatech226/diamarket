@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
-import { createMarketplacePayout, createSplitPayment, createVendorAccount, getVendorWallet, listMarketplaceLedger, listMarketplaceState, refundEscrow, releaseEscrow } from '../services/marketplace-store';
-import { sandboxState } from '../services/checkout-store';
+import { marketplaceService } from '../services/marketplace.service';
 
 function handle(error: unknown, res: Response) {
   const status = typeof error === 'object' && error !== null && 'status' in error ? Number((error as { status: number }).status) : 500;
@@ -8,58 +7,40 @@ function handle(error: unknown, res: Response) {
   res.status(status).json({ error: { message } });
 }
 
-function merchantFrom(req: Request) {
-  return sandboxState.resolveMerchant(req.header('authorization') ?? undefined);
-}
-
-export const marketplaceOverview = async (_req: Request, res: Response) => res.json(listMarketplaceState());
-
-export const splitPayment = async (req: Request, res: Response) => {
-  try {
-    res.status(201).json(await createSplitPayment(req.body, merchantFrom(req)));
-  } catch (error) {
-    handle(error, res);
-  }
+export const createSplitPayment = (req: Request, res: Response) => {
+  try { res.status(201).json(marketplaceService.processSplitPayment(req.body)); } catch (error) { handle(error, res); }
 };
 
-export const createVendor = async (req: Request, res: Response) => {
-  try {
-    res.status(201).json(createVendorAccount(req.body));
-  } catch (error) {
-    handle(error, res);
-  }
+export const createVendor = (req: Request, res: Response) => {
+  try { res.status(201).json(marketplaceService.createVendor(req.body)); } catch (error) { handle(error, res); }
 };
 
-export const getVendorWalletController = async (req: Request, res: Response) => {
+export const listVendors = (_req: Request, res: Response) => res.json(Array.from(marketplaceService.vendors.values()));
+
+export const getVendorWallet = (req: Request, res: Response) => {
   try {
-    res.json(getVendorWallet(req.params.id));
-  } catch (error) {
-    handle(error, res);
-  }
+    const vendor = marketplaceService.vendors.get(req.params.id);
+    if (!vendor) throw Object.assign(new Error('Vendor not found'), { status: 404 });
+    const wallet = marketplaceService.wallets.get(vendor.wallet);
+    res.json({ vendor, wallet, ledgerEntries: wallet?.ledgerEntries.map((entryId) => marketplaceService.ledgerEntries.get(entryId)).filter(Boolean) ?? [] });
+  } catch (error) { handle(error, res); }
 };
 
-export const createPayoutController = async (req: Request, res: Response) => {
-  try {
-    res.status(201).json(createMarketplacePayout(req.body));
-  } catch (error) {
-    handle(error, res);
-  }
+export const createMarketplacePayout = (req: Request, res: Response) => {
+  try { res.status(201).json(marketplaceService.createPayout(req.body)); } catch (error) { handle(error, res); }
 };
 
-export const releaseEscrowController = async (req: Request, res: Response) => {
-  try {
-    res.json(releaseEscrow(req.body));
-  } catch (error) {
-    handle(error, res);
-  }
+export const releaseEscrow = (req: Request, res: Response) => {
+  try { res.json(marketplaceService.releaseEscrow(req.body)); } catch (error) { handle(error, res); }
 };
 
-export const refundEscrowController = async (req: Request, res: Response) => {
-  try {
-    res.json(refundEscrow(req.body));
-  } catch (error) {
-    handle(error, res);
-  }
+export const refundEscrow = (req: Request, res: Response) => {
+  try { res.json(marketplaceService.refundEscrow(req.body)); } catch (error) { handle(error, res); }
 };
 
-export const marketplaceLedger = async (_req: Request, res: Response) => res.json(listMarketplaceLedger());
+export const getMarketplaceLedger = (_req: Request, res: Response) => res.json(marketplaceService.listLedger());
+export const listMarketplaceWallets = (_req: Request, res: Response) => res.json(Array.from(marketplaceService.wallets.values()));
+export const listEscrowHolds = (_req: Request, res: Response) => res.json(Array.from(marketplaceService.escrowHolds.values()));
+export const listMarketplacePayouts = (_req: Request, res: Response) => res.json(Array.from(marketplaceService.payouts.values()));
+export const getMarketplaceAnalytics = (_req: Request, res: Response) => res.json(marketplaceService.analytics());
+export const listMarketplaceTimeline = (_req: Request, res: Response) => res.json(Array.from(marketplaceService.timeline.values()));

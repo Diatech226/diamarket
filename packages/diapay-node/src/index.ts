@@ -1,4 +1,4 @@
-import Diapay, { type CheckoutSessionCreateParams, type DiapayOptions, type MarketplacePayoutCreateParams, type MarketplaceSplitPaymentCreateParams, type MarketplaceVendorCreateParams, type PaymentCreateParams, type RequestOptions } from 'diapay-sdk-js';
+import Diapay, { type CheckoutSessionCreateParams, type DiapayOptions, type MarketplacePayoutCreateParams, type PaymentCreateParams, type RequestOptions, type SplitPaymentCreateParams, type VendorAccountCreateParams } from 'diapay-sdk-js';
 export * from 'diapay-sdk-js';
 
 let defaultClient: Diapay | null = null;
@@ -51,3 +51,16 @@ export function verifyWebhook(rawBody: string, signature: string, secret: string
 }
 
 export default Diapay;
+
+
+export function createMarketplaceVendor(payload: VendorAccountCreateParams, options?: DiapayOptions & RequestOptions) {
+  return client(options).marketplace.vendors.create(payload, options);
+}
+
+export function createSplitPayment(payload: SplitPaymentCreateParams, options?: DiapayOptions & RequestOptions) {
+  return client(options).marketplace.splitPayment(payload, options);
+}
+
+export function createMarketplacePayout(payload: MarketplacePayoutCreateParams, options?: DiapayOptions & RequestOptions) {
+  return client(options).marketplace.payouts.create(payload, options);
+}

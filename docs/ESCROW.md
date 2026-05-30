@@ -1,19 +1,25 @@
-# Marketplace Escrow
+# Escrow Marketplace
 
-Escrow holds vendor allocations until delivery, dispute resolution or a marketplace operator action.
+Les fonds vendeur peuvent être bloqués dans `escrow_wallet` jusqu'à confirmation de livraison.
 
-## Flow
+## Flux
 
-1. Payment is received.
-2. Vendor allocation is marked pending and mirrored in the escrow wallet.
-3. Delivery is confirmed.
-4. `POST /api/v1/marketplace/escrow/release` releases all or part of the held amount.
+1. paiement reçu;
+2. split traité;
+3. allocation vendeur créditée dans escrow;
+4. livraison confirmée;
+5. release total ou partiel vers `vendor_wallet`.
 
-## Statuses
+## Statuts
 
 - `held`
 - `released`
 - `refunded`
 - `disputed`
 
-Escrow supports automatic release, manual release and partial release. Refunds are posted as new ledger entries instead of editing the original hold.
+## Endpoints
+
+- `POST /api/v1/marketplace/escrow/release`
+- `POST /api/v1/marketplace/escrow/refund`
+
+Le release et le refund ajoutent des écritures ledger. Ils ne réécrivent jamais le hold initial.
