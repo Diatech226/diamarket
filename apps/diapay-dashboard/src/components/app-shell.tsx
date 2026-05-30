@@ -18,6 +18,13 @@ const nav = [
   ['Customers', '/customers'],
   ['Refunds', '/refunds'],
   ['Payouts', '/payouts'],
+  ['Wallets', '/marketplace/wallets'],
+  ['Balances', '/marketplace/balances'],
+  ['Vendors', '/marketplace/vendors'],
+  ['Escrow', '/marketplace/escrow'],
+  ['Ledger', '/marketplace/ledger'],
+  ['Commissions', '/marketplace/commissions'],
+  ['Analytics', '/marketplace/analytics'],
   ['Developers', '/developers'],
   ['Settings', '/settings'],
 ];

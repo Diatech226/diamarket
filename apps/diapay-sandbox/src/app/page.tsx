@@ -17,6 +17,11 @@ const scenarios = [
   { id: 'vendor-refund', label: 'Refund vendeur', type: 'marketplace' },
   { id: 'mobile-money', label: 'Mobile Money', type: 'payment', method: 'mobile-money', phone: '70000000' },
   { id: 'crypto', label: 'Crypto', type: 'payment', method: 'crypto' },
+  { id: 'marketplace-simple-payment', label: 'Marketplace paiement simple', type: 'marketplace' },
+  { id: 'marketplace-multi-vendor', label: 'Split multi-vendeurs', type: 'marketplace' },
+  { id: 'marketplace-escrow-release', label: 'Escrow release', type: 'marketplace' },
+  { id: 'marketplace-auto-payout', label: 'Payout automatique', type: 'marketplace' },
+  { id: 'marketplace-vendor-refund', label: 'Refund vendeur', type: 'marketplace' },
 ];
 
 export default function Home() {

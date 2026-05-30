@@ -13,6 +13,8 @@ const endpoints = [
   { name: 'Create payout', method: 'POST', path: '/payouts', body: { amount: 90000, currency: 'XOF', destination: 'bank_account_001' } },
   { name: 'Marketplace split', method: 'POST', path: '/marketplace/split-payment', body: { amount: 100000, currency: 'XOF', splits: [{ vendorId: 'vnd_123', percentage: 85, holdInEscrow: true }], commission: { percentage: 10 }, diapayFee: { percentage: 5 }, escrow: { enabled: true } } },
   { name: 'Register webhook', method: 'POST', path: '/webhooks', body: { url: 'https://example.com/webhooks/diapay', events: ['payment.succeeded', 'payment.failed'] } },
+  { name: 'Marketplace split payment', method: 'POST', path: '/marketplace/split-payment', body: { amount: 100000, currency: 'FCFA', splits: [{ type: 'percentage', percentage: 85, vendorId: 'vendor_123', priority: 1 }, { type: 'fallback', priority: 99 }], commission: { percentage: 10 }, escrow: true } },
+  { name: 'Marketplace vendor', method: 'POST', path: '/marketplace/vendors', body: { businessName: 'Kora Fashion', country: 'CI', currencies: ['FCFA'], payoutMethods: [{ type: 'mobile_money', label: 'Wave Business', currency: 'FCFA' }] } },
 ];
 
 const languages = ['curl', 'JavaScript', 'TypeScript', 'Node.js', 'Express', 'Next.js'] as const;
