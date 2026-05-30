@@ -12,6 +12,11 @@ const scenarios = [
   { id: 'payout', label: 'Payout', type: 'payout' },
   { id: 'mobile-money', label: 'Mobile Money', type: 'payment', method: 'mobile-money', phone: '70000000' },
   { id: 'crypto', label: 'Crypto', type: 'payment', method: 'crypto' },
+  { id: 'marketplace-simple-payment', label: 'Marketplace paiement simple', type: 'marketplace' },
+  { id: 'marketplace-multi-vendor', label: 'Split multi-vendeurs', type: 'marketplace' },
+  { id: 'marketplace-escrow-release', label: 'Escrow release', type: 'marketplace' },
+  { id: 'marketplace-auto-payout', label: 'Payout automatique', type: 'marketplace' },
+  { id: 'marketplace-vendor-refund', label: 'Refund vendeur', type: 'marketplace' },
 ];
 
 export default function Home() {
@@ -50,7 +55,7 @@ export default function Home() {
         </section>
         <section className="card">
           <h2>Scénarios sandbox améliorés</h2>
-          <p className="muted">Simulez success, failed, pending, expired, remboursement, webhook, payout, mobile money et crypto sans argent réel.</p>
+          <p className="muted">Simulez success, failed, pending, expired, remboursement, webhook, payout, mobile money, crypto et les scénarios marketplace (split, escrow, payout auto, refund vendeur) sans argent réel.</p>
           <div className="scenario-grid">{scenarios.map((scenario) => <button key={scenario.id} className="btn btn-secondary" onClick={() => runScenario(scenario.id)}>{scenario.label}</button>)}</div>
         </section>
         <section className="card">

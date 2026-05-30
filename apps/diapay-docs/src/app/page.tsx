@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 
 const sections = [
-  ['home', 'Home'], ['quick-start', 'Quick Start'], ['authentication', 'Authentication'], ['checkout', 'Checkout'], ['payments', 'Payments API'], ['refunds', 'Refunds'], ['payouts', 'Payouts'], ['mobile-money', 'Mobile Money'], ['crypto', 'Crypto'], ['webhooks', 'Webhooks'], ['sdk-js', 'SDK JavaScript'], ['sdk-node', 'SDK Node.js'], ['sandbox', 'Sandbox'], ['errors', 'Error Codes'], ['changelog', 'Changelog'],
+  ['home', 'Home'], ['quick-start', 'Quick Start'], ['authentication', 'Authentication'], ['checkout', 'Checkout'], ['payments', 'Payments API'], ['refunds', 'Refunds'], ['payouts', 'Payouts'], ['marketplace', 'Marketplace'], ['wallets', 'Wallets'], ['ledger', 'Ledger'], ['split-payments', 'Split Payments'], ['escrow', 'Escrow'], ['mobile-money', 'Mobile Money'], ['crypto', 'Crypto'], ['webhooks', 'Webhooks'], ['sdk-js', 'SDK JavaScript'], ['sdk-node', 'SDK Node.js'], ['sandbox', 'Sandbox'], ['errors', 'Error Codes'], ['changelog', 'Changelog'],
 ] as const;
 
 const endpoints = [
@@ -12,6 +12,8 @@ const endpoints = [
   { name: 'Refund payment', method: 'POST', path: '/payments/pay_test_123/refund', body: { amount: 25000, reason: 'requested_by_customer' } },
   { name: 'Create payout', method: 'POST', path: '/payouts', body: { amount: 90000, currency: 'XOF', destination: 'bank_account_001' } },
   { name: 'Register webhook', method: 'POST', path: '/webhooks', body: { url: 'https://example.com/webhooks/diapay', events: ['payment.succeeded', 'payment.failed'] } },
+  { name: 'Marketplace split payment', method: 'POST', path: '/marketplace/split-payment', body: { amount: 100000, currency: 'FCFA', splits: [{ type: 'percentage', percentage: 85, vendorId: 'vendor_123', priority: 1 }, { type: 'fallback', priority: 99 }], commission: { percentage: 10 }, escrow: true } },
+  { name: 'Marketplace vendor', method: 'POST', path: '/marketplace/vendors', body: { businessName: 'Kora Fashion', country: 'CI', currencies: ['FCFA'], payoutMethods: [{ type: 'mobile_money', label: 'Wave Business', currency: 'FCFA' }] } },
 ];
 
 const languages = ['curl', 'JavaScript', 'TypeScript', 'Node.js', 'Express', 'Next.js'] as const;
@@ -61,8 +63,15 @@ export default function DeveloperPortal() {
       <article id="mobile-money"><h2>Mobile Money</h2><p>Sandbox phone <code>70000000</code> succeeds, <code>70000001</code> fails, and forced statuses cover pending and expired flows.</p></article>
       <article id="crypto"><h2>Crypto</h2><p>Crypto sandbox simulates USDC wallet collection without moving real assets.</p></article>
       <article id="webhooks"><h2>Webhooks</h2><p>Listen to <code>payment.succeeded</code>, <code>payment.failed</code>, <code>checkout.completed</code>, <code>refund.succeeded</code> and <code>payout.completed</code>. Verify <code>Diapay-Signature</code> with your <code>whsec_</code> secret.</p><CodeBlock code={`const valid = diapay.webhooks.verify(rawBody, signature, process.env.DIAPAY_WEBHOOK_SECRET!);`} /></article>
-      <article id="sdk-js"><h2>SDK JavaScript</h2><p>The JS SDK exposes <code>checkout</code>, <code>payments</code>, <code>refunds</code>, <code>payouts</code>, <code>customers</code> and <code>webhooks</code> modules with retries, typed errors and payload validation.</p></article>
-      <article id="sdk-node"><h2>SDK Node.js</h2><p>The Node package provides helpers: <code>createPayment()</code>, <code>retrievePayment()</code>, <code>createCheckoutSession()</code>, <code>refundPayment()</code> and <code>verifyWebhook()</code>.</p></article>
+
+      <article id="marketplace"><h2>Marketplace</h2><p>Diapay Marketplace ajoute des wallets internes, un ledger double entrée immuable, des split payments multi-vendeurs, escrow, commissions et payouts Stripe Connect-like.</p><CodeBlock code={snippet('curl', endpoints[5], apiKey)} /></article>
+      <article id="wallets"><h2>Wallets</h2><p>Chaque wallet expose <code>balance</code>, <code>availableBalance</code>, <code>pendingBalance</code>, devise, statut, owner et IDs de ledger entries. Types: merchant_wallet, vendor_wallet, platform_wallet, escrow_wallet et reserve_wallet.</p></article>
+      <article id="ledger"><h2>Ledger</h2><p>Les collections <code>ledger_accounts</code>, <code>ledger_entries</code> et <code>balance_snapshots</code> gardent une trace append-only. Les corrections passent par reversal/refund/payout, jamais par modification d'historique.</p></article>
+      <article id="split-payments"><h2>Split Payments</h2><p>Les règles supportent montants fixes, pourcentages, priorités, fallback et multi-vendeurs. Exemple: 100 000 FCFA → vendeur 85 000, commission marketplace 10 000, frais Diapay 5 000.</p></article>
+      <article id="escrow"><h2>Escrow</h2><p>Les statuts <code>held</code>, <code>released</code>, <code>refunded</code> et <code>disputed</code> couvrent release automatique, release manuel et release partiel après confirmation de livraison.</p></article>
+
+      <article id="sdk-js"><h2>SDK JavaScript</h2><p>The JS SDK exposes <code>checkout</code>, <code>payments</code>, <code>refunds</code>, <code>payouts</code>, <code>customers</code>, <code>marketplace</code> and <code>webhooks</code> modules with retries, typed errors and payload validation.</p></article>
+      <article id="sdk-node"><h2>SDK Node.js</h2><p>The Node package provides helpers: <code>createPayment()</code>, <code>retrievePayment()</code>, <code>createCheckoutSession()</code>, <code>refundPayment()</code>, <code>createMarketplaceSplitPayment()</code>, <code>createMarketplacePayout()</code> and <code>verifyWebhook()</code>.</p></article>
       <article id="sandbox"><h2>Sandbox</h2><p>Use scenarios <code>success</code>, <code>failed</code>, <code>pending</code> and <code>expired</code> for payment, refund, webhook, payout, mobile money and crypto testing.</p></article>
       <article id="errors"><h2>Error Codes</h2><div className="grid"><span><b>invalid_api_key</b> — missing or malformed key.</span><span><b>invalid_amount</b> — amount must be a positive integer.</span><span><b>payment_failed</b> — provider declined the charge.</span><span><b>webhook_delivery_failed</b> — endpoint failed after retries.</span></div></article>
       <article id="changelog"><h2>Changelog</h2><p><b>2026-05-30</b> — Independent Diapay developer platform, SDK modules, playground, code generator and sandbox guides.</p></article>

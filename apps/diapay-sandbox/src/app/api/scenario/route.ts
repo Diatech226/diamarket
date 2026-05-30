@@ -13,6 +13,11 @@ const scenarios: Record<string, Record<string, unknown>> = {
   payout: { type: 'payout' },
   webhook: { type: 'webhook' },
   refund: { type: 'refund' },
+  'marketplace-simple-payment': { type: 'marketplace-simple-payment' },
+  'marketplace-multi-vendor': { type: 'marketplace-multi-vendor' },
+  'marketplace-escrow-release': { type: 'marketplace-escrow-release' },
+  'marketplace-auto-payout': { type: 'marketplace-auto-payout' },
+  'marketplace-vendor-refund': { type: 'marketplace-vendor-refund' },
 };
 
 async function api(path: string, body: Record<string, unknown>) {
@@ -24,6 +29,32 @@ export async function POST(request: NextRequest) {
   const { id } = await request.json();
   const scenario = scenarios[String(id)];
   if (!scenario) return NextResponse.json({ error: 'Unknown sandbox scenario' }, { status: 400 });
+
+
+  if (scenario.type === 'marketplace-simple-payment') return NextResponse.json(await api('/marketplace/split-payment', { amount: 100000, currency: 'FCFA', escrow: false }));
+  if (scenario.type === 'marketplace-multi-vendor') {
+    const vendorA = await api('/marketplace/vendors', { businessName: 'Sandbox Vendor A', country: 'CI', currencies: ['FCFA'], payoutMethods: [{ type: 'mobile_money', label: 'Wave A', currency: 'FCFA' }] });
+    const vendorB = await api('/marketplace/vendors', { businessName: 'Sandbox Vendor B', country: 'SN', currencies: ['FCFA'], payoutMethods: [{ type: 'bank_transfer', label: 'Bank B', currency: 'FCFA' }] });
+    const vendorAId = typeof vendorA.body === 'object' && vendorA.body && 'id' in vendorA.body ? String(vendorA.body.id) : 'vendor_a';
+    const vendorBId = typeof vendorB.body === 'object' && vendorB.body && 'id' in vendorB.body ? String(vendorB.body.id) : 'vendor_b';
+    return NextResponse.json({ vendorA, vendorB, split: await api('/marketplace/split-payment', { amount: 200000, currency: 'FCFA', splits: [{ type: 'percentage', percentage: 50, vendorId: vendorAId, priority: 1 }, { type: 'percentage', percentage: 35, vendorId: vendorBId, priority: 2 }, { type: 'fallback', priority: 99 }], escrow: true }) });
+  }
+  if (scenario.type === 'marketplace-escrow-release') {
+    const split = await api('/marketplace/split-payment', { amount: 100000, currency: 'FCFA', escrow: true });
+    const escrowId = typeof split.body === 'object' && split.body && 'escrowId' in split.body ? String(split.body.escrowId) : '';
+    return NextResponse.json({ split, release: await api('/marketplace/escrow/release', { escrowId }) });
+  }
+  if (scenario.type === 'marketplace-auto-payout') {
+    const vendor = await api('/marketplace/vendors', { businessName: 'Auto Payout Vendor', country: 'CI', currencies: ['FCFA'], payoutMethods: [{ type: 'mobile_money', label: 'Orange Money', currency: 'FCFA', details: { phone: '+2250700000000' } }] });
+    const vendorId = typeof vendor.body === 'object' && vendor.body && 'id' in vendor.body ? String(vendor.body.id) : '';
+    const split = await api('/marketplace/split-payment', { amount: 150000, currency: 'FCFA', splits: [{ type: 'percentage', percentage: 85, vendorId, priority: 1 }, { type: 'fallback', priority: 99 }], escrow: false });
+    return NextResponse.json({ vendor, split, payout: await api('/marketplace/payouts', { vendorId, minimumThreshold: 50000 }) });
+  }
+  if (scenario.type === 'marketplace-vendor-refund') {
+    const split = await api('/marketplace/split-payment', { amount: 80000, currency: 'FCFA', escrow: true });
+    const escrowId = typeof split.body === 'object' && split.body && 'escrowId' in split.body ? String(split.body.escrowId) : '';
+    return NextResponse.json({ split, refund: await api('/marketplace/escrow/refund', { escrowId, amount: 40000, reason: 'sandbox_vendor_refund' }) });
+  }
 
   if (scenario.type === 'payout') return NextResponse.json(await api('/payouts', { amount: 90000, currency: 'XOF', destination: 'sandbox_bank' }));
   if (scenario.type === 'webhook') return NextResponse.json(await api('/webhooks', { url: 'http://localhost:3102/api/sandbox-webhook', events: ['payment.succeeded', 'payment.failed', 'checkout.completed', 'refund.succeeded', 'payout.completed'] }));

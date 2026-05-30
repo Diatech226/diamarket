@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { cancelSession, completeSession, createSession, listSessions, publicConfig, retrieveSession } from '../controllers/checkout';
 import { createPayment, getPayment, cancelPayment, refundPayment, listTransactions, listMethods, createWebhook, getBalance, createPayout, listWebhookEventsController, listProviderConfigs } from '../controllers/payments';
+import { createPayoutController, createVendor, getVendorWalletController, marketplaceLedger, marketplaceOverview, refundEscrowController, releaseEscrowController, splitPayment } from '../controllers/marketplace';
 
 export const apiRouter = Router();
 apiRouter.get('/config', publicConfig);
@@ -20,3 +21,12 @@ apiRouter.get('/balance', getBalance);
 apiRouter.post('/payouts', createPayout);
 apiRouter.get('/payment-methods', listMethods);
 apiRouter.get('/providers', listProviderConfigs);
+
+apiRouter.get('/marketplace', marketplaceOverview);
+apiRouter.post('/marketplace/split-payment', splitPayment);
+apiRouter.post('/marketplace/vendors', createVendor);
+apiRouter.get('/marketplace/vendors/:id/wallet', getVendorWalletController);
+apiRouter.post('/marketplace/payouts', createPayoutController);
+apiRouter.post('/marketplace/escrow/release', releaseEscrowController);
+apiRouter.post('/marketplace/escrow/refund', refundEscrowController);
+apiRouter.get('/marketplace/ledger', marketplaceLedger);
