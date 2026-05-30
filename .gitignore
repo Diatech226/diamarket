@@ -23,3 +23,5 @@ ios/
 AccessKey.*
 dist
 diapay/.env
+
+*.tsbuildinfo

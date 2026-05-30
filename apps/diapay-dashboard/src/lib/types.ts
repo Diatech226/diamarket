@@ -1,7 +1,7 @@
 export type UserRole = 'merchant' | 'admin' | 'super_admin';
 export type EnvironmentMode = 'test' | 'live';
 export type PaymentStatus = 'succeeded' | 'processing' | 'requires_action' | 'failed' | 'refunded' | 'canceled';
-export type PaymentMethod = 'mobile-money' | 'bank-card' | 'bank-transfer' | 'crypto';
+export type PaymentMethod = 'mobile-money' | 'bank-card' | 'bank-transfer' | 'crypto' | 'mock';
 
 export type Payment = {
   id: string;
@@ -28,3 +28,5 @@ export type Payout = { id: string; amount: number; currency: string; status: 'pa
 export type CheckoutSessionStatus = 'created' | 'open' | 'completed' | 'cancelled' | 'expired';
 export type CheckoutSession = { id: string; merchant: string; payment?: string; amount: number; currency: string; customer?: { name?: string; email?: string }; items: Array<{ name: string; quantity?: number; amount?: number }>; successUrl: string; cancelUrl: string; status: CheckoutSessionStatus; expiresAt: string; metadata: Record<string, unknown>; createdAt: string };
 export type WebhookEvent = { id: string; type: string; merchant: string; payload: Record<string, unknown>; attempts: Array<{ id: string; url: string; status: 'pending' | 'delivered' | 'failed'; statusCode?: number }>; createdAt: string };
+
+export type ProviderDescriptor = { id: string; name: string; method: PaymentMethod; environment: EnvironmentMode; capabilities: string[]; currencies: string[]; countries: string[]; status: 'ready' | 'degraded' | 'disabled'; testMode: boolean; implementation: 'mock' | 'connector'; notes?: string };

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { cancelSession, completeSession, createSession, listSessions, publicConfig, retrieveSession } from '../controllers/checkout';
-import { createPayment, getPayment, cancelPayment, refundPayment, listTransactions, listMethods, createWebhook, getBalance, createPayout, listWebhookEventsController } from '../controllers/payments';
+import { createPayment, getPayment, cancelPayment, refundPayment, listTransactions, listMethods, createWebhook, getBalance, createPayout, listWebhookEventsController, listProviderConfigs } from '../controllers/payments';
 
 export const apiRouter = Router();
 apiRouter.get('/config', publicConfig);
@@ -19,3 +19,4 @@ apiRouter.get('/transactions', listTransactions);
 apiRouter.get('/balance', getBalance);
 apiRouter.post('/payouts', createPayout);
 apiRouter.get('/payment-methods', listMethods);
+apiRouter.get('/providers', listProviderConfigs);

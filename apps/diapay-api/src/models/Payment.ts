@@ -10,6 +10,13 @@ export interface Payment {
   method: PaymentMethod;
   status: PaymentStatus;
   provider: string;
+  providerPaymentId?: string;
+  actionRequired?: {
+    type: 'redirect' | 'otp' | 'bank_instructions' | 'wallet_address';
+    url?: string;
+    message?: string;
+    expiresAt?: string;
+  };
   failureCode?: string;
   failureMessage?: string;
   metadata?: Record<string, unknown>;
