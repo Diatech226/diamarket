@@ -1,0 +1,22 @@
+{
+  "name": "diapay-node",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "lint": "echo lint diapay-node",
+    "typecheck": "tsc --noEmit",
+    "prepare": "tsc -p tsconfig.json"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": ["dist", "README.md"],
+  "dependencies": {"diapay-sdk-js": "workspace:*"},
+  "devDependencies": {"@types/node": "^20.14.2"}
+}

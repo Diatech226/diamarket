@@ -1,14 +1,8 @@
 import type { ReactNode } from 'react';
+import './styles.css';
 
-export const metadata = {
-  title: 'Diapay Docs',
-  description: 'Documentation Diapay pour checkout, providers de paiement et webhooks.',
-};
+export const metadata = { title: 'Diapay Developer Portal', description: 'Premium Diapay docs, API playground, SDK guides and sandbox reference.' };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
-  return (
-    <html lang="fr">
-      <body style={{ margin: 0, background: '#f8fafc', color: '#0f172a' }}>{children}</body>
-    </html>
-  );
+  return <html lang="fr"><body>{children}</body></html>;
 }
