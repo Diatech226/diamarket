@@ -1,8 +1,9 @@
 import crypto from 'crypto';
 import type { CheckoutSession, CheckoutSessionStatus } from '../models/CheckoutSession';
-import type { Payment, PaymentMethod, PaymentStatus } from '../models/Payment';
+import type { Payment, PaymentMethod } from '../models/Payment';
 import type { WebhookEndpoint } from '../models/WebhookEndpoint';
 import type { WebhookDeliveryAttempt, WebhookEvent, WebhookEventType } from '../models/WebhookEvent';
+import { getProvider, listPaymentMethods, listProviders } from '../providers';
 
 const sessions = new Map<string, CheckoutSession>();
 const payments = new Map<string, Payment>();
@@ -106,27 +107,22 @@ export function createCheckoutSession(payload: Record<string, unknown>, headers:
   return session;
 }
 
-function scenario(method: PaymentMethod, details: Record<string, unknown>): { status: PaymentStatus; failureCode?: string; failureMessage?: string } {
-  if (details.forceStatus === 'pending') return { status: 'processing' };
-  if (details.forceStatus === 'expired') return { status: 'expired', failureCode: 'session_expired', failureMessage: 'Sandbox forced expiration' };
-  if (method === 'bank-card') {
-    const number = String(details.cardNumber ?? '').replace(/\s+/g, '');
-    if (number === '4000000000000002') return { status: 'failed', failureCode: 'card_declined', failureMessage: 'Sandbox card declined' };
-    if (number === '4242424242424242') return { status: 'succeeded' };
-  }
-  if (method === 'mobile-money') {
-    if (details.phone === '70000001') return { status: 'failed', failureCode: 'momo_declined', failureMessage: 'Sandbox mobile money failure' };
-    if (details.phone === '70000000') return { status: 'succeeded' };
-  }
-  if (method === 'crypto') return { status: details.forceStatus === 'failed' ? 'failed' : 'succeeded' };
-  return { status: details.forceStatus === 'failed' ? 'failed' : 'succeeded' };
-}
 
 export async function completeCheckoutSession(sessionId: string, payload: Record<string, unknown>, merchant?: string) {
   const session = getCheckoutSession(sessionId, merchant);
   ensureOpen(session);
   const method = (payload.method as PaymentMethod) ?? 'bank-card';
-  const result = scenario(method, payload);
+  const provider = getProvider(method);
+  const result = await provider.createPayment({
+    amount: session.amount,
+    currency: session.currency,
+    merchant: session.merchant,
+    method,
+    sessionId,
+    customer: session.customer,
+    metadata: session.metadata,
+    details: payload,
+  });
   const timestamp = now();
   const payment: Payment = {
     id: id('pay_test'),
@@ -136,7 +132,9 @@ export async function completeCheckoutSession(sessionId: string, payload: Record
     currency: session.currency,
     method,
     status: result.status,
-    provider: 'diapay-sandbox',
+    provider: result.provider,
+    providerPaymentId: result.providerPaymentId,
+    actionRequired: result.actionRequired,
     failureCode: result.failureCode,
     failureMessage: result.failureMessage,
     metadata: session.metadata,
@@ -170,11 +168,20 @@ export async function cancelCheckoutSession(sessionId: string, merchant?: string
   return session;
 }
 
-export function createDirectPayment(payload: Record<string, unknown>, merchant = defaultMerchant) {
+export async function createDirectPayment(payload: Record<string, unknown>, merchant = defaultMerchant) {
   validateAmountCurrency(payload.amount, payload.currency);
   const timestamp = now();
   const method = (payload.method as PaymentMethod) ?? 'mock';
-  const result = scenario(method, payload);
+  const provider = getProvider(method);
+  const result = await provider.createPayment({
+    amount: Number(payload.amount),
+    currency: String(payload.currency).toUpperCase(),
+    merchant,
+    method,
+    customer: typeof payload.customer === 'object' && payload.customer !== null ? payload.customer as Record<string, unknown> : undefined,
+    metadata: typeof payload.metadata === 'object' && payload.metadata !== null ? payload.metadata as Record<string, unknown> : {},
+    details: payload,
+  });
   const payment: Payment = {
     id: id('pay_test'),
     merchant,
@@ -182,7 +189,9 @@ export function createDirectPayment(payload: Record<string, unknown>, merchant =
     currency: String(payload.currency).toUpperCase(),
     method,
     status: result.status,
-    provider: 'diapay-sandbox',
+    provider: result.provider,
+    providerPaymentId: result.providerPaymentId,
+    actionRequired: result.actionRequired,
     failureCode: result.failureCode,
     failureMessage: result.failureMessage,
     metadata: typeof payload.metadata === 'object' && payload.metadata !== null ? payload.metadata as Record<string, unknown> : {},
@@ -196,6 +205,32 @@ export function createDirectPayment(payload: Record<string, unknown>, merchant =
 export function retrievePayment(id: string) {
   const payment = payments.get(id);
   if (!payment) throw Object.assign(new Error('payment not found'), { status: 404 });
+  return payment;
+}
+
+export async function cancelDirectPayment(id: string) {
+  const payment = retrievePayment(id);
+  const provider = getProvider(payment.method);
+  const result = provider.cancelPayment ? await provider.cancelPayment(payment.providerPaymentId ?? payment.id) : { status: 'cancelled' as const };
+  payment.status = result.status;
+  payment.updatedAt = now();
+  return payment;
+}
+
+export async function refundDirectPayment(id: string, payload: Record<string, unknown> = {}) {
+  const payment = retrievePayment(id);
+  const provider = getProvider(payment.method);
+  const result = provider.refundPayment
+    ? await provider.refundPayment({
+      paymentId: payment.providerPaymentId ?? payment.id,
+      amount: typeof payload.amount === 'number' ? payload.amount : payment.amount,
+      currency: payment.currency,
+      reason: typeof payload.reason === 'string' ? payload.reason : undefined,
+      metadata: typeof payload.metadata === 'object' && payload.metadata !== null ? payload.metadata as Record<string, unknown> : undefined,
+    })
+    : { status: 'refunded' as const };
+  payment.status = result.status;
+  payment.updatedAt = now();
   return payment;
 }
 
@@ -244,4 +279,4 @@ async function emitWebhook(type: WebhookEventType, merchant: string, data: Recor
   return event;
 }
 
-export const sandboxState = { apiBaseUrl, sessions, payments, webhookEndpoints, webhookEvents, resolveMerchant };
+export const sandboxState = { apiBaseUrl, sessions, payments, webhookEndpoints, webhookEvents, resolveMerchant, listProviders, listPaymentMethods };

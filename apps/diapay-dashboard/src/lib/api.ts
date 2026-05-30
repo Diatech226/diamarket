@@ -1,4 +1,4 @@
-import type { ApiKey, CheckoutSession, Customer, EnvironmentMode, Payment, Payout, Refund, Transaction, UserRole, WebhookEndpoint, WebhookEvent, WebhookLog } from './types';
+import type { ApiKey, CheckoutSession, Customer, EnvironmentMode, Payment, Payout, Refund, Transaction, UserRole, ProviderDescriptor, WebhookEndpoint, WebhookEvent, WebhookLog } from './types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_DIAPAY_API_URL ?? 'http://localhost:5100';
 
@@ -33,6 +33,7 @@ export const diapayApi = {
   listCheckoutSessions: () => request<CheckoutSession[]>('/checkout/sessions'),
   getCheckoutSession: (id: string) => request<CheckoutSession>(`/checkout/sessions/${id}`),
   listWebhookEvents: () => request<WebhookEvent[]>('/webhook-events'),
+  listProviders: () => request<ProviderDescriptor[]>('/providers'),
 };
 
 export function maskSecret(secret: string) {
@@ -114,6 +115,13 @@ export const payouts: Payout[] = [
   { id: 'po_1', amount: 12500000, currency: 'XOF', status: 'paid', destination: 'Ecobank •••• 4021', arrivalDate: '2026-05-29' },
   { id: 'po_2', amount: 8000000, currency: 'XOF', status: 'in_transit', destination: 'UBA •••• 7110', arrivalDate: '2026-05-31' },
   { id: 'po_3', amount: 2100000, currency: 'XOF', status: 'pending', destination: 'Wave Business', arrivalDate: '2026-06-01' },
+];
+
+export const providerDescriptors: ProviderDescriptor[] = [
+  { id: 'mock-mobile-money', name: 'Mobile Money Sandbox', method: 'mobile-money', environment: 'test', capabilities: ['payments', 'refunds', 'cancellations', 'webhooks'], currencies: ['XOF', 'GHS', 'NGN'], countries: ['CI', 'SN', 'BJ', 'TG', 'GH', 'NG'], status: 'ready', testMode: true, implementation: 'mock', notes: 'Remplaçable par Orange Money, MTN MoMo, Wave ou Moov.' },
+  { id: 'mock-bank-card', name: 'Card Sandbox', method: 'bank-card', environment: 'test', capabilities: ['payments', 'refunds', 'cancellations', 'webhooks'], currencies: ['XOF', 'USD', 'EUR', 'GHS', 'NGN'], countries: ['CI', 'SN', 'BJ', 'TG', 'GH', 'NG', 'FR', 'US'], status: 'ready', testMode: true, implementation: 'mock', notes: 'Prêt pour un acquéreur carte / PSP tokenisé.' },
+  { id: 'mock-bank-transfer', name: 'Bank Transfer Sandbox', method: 'bank-transfer', environment: 'test', capabilities: ['payments', 'webhooks'], currencies: ['XOF', 'USD', 'EUR'], countries: ['CI', 'SN', 'BJ', 'TG'], status: 'ready', testMode: true, implementation: 'mock', notes: 'Instructions de virement sandbox sans compte réel.' },
+  { id: 'mock-crypto', name: 'Crypto Sandbox', method: 'crypto', environment: 'test', capabilities: ['payments', 'refunds', 'webhooks'], currencies: ['USDC', 'USD', 'EUR'], countries: ['GLOBAL'], status: 'ready', testMode: true, implementation: 'mock', notes: 'Adresse sandbox non réutilisable; aucun wallet réel.' },
 ];
 
 export const environments: EnvironmentMode[] = ['test', 'live'];

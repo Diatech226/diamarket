@@ -1,6 +1,6 @@
 # diapay-sdk-js
 
-SDK JavaScript/Node.js pour Diapay Checkout.
+SDK JavaScript/Node.js pour Diapay Checkout et les paiements directs multi-providers.
 
 ## Installation workspace
 
@@ -26,6 +26,31 @@ const session = await diapay.checkout.sessions.create({
   metadata: { source: 'diamarket', orderId: '...', customerId: '...', environment: 'test' },
 });
 ```
+
+## Providers de paiement
+
+Diapay route les paiements via une interface commune côté API. Les providers livrés sont des mocks/test prêts à être remplacés par des connecteurs réels lorsque les credentials seront disponibles :
+
+- `mobile-money` → `mock-mobile-money`
+- `bank-card` → `mock-bank-card`
+- `bank-transfer` → `mock-bank-transfer`
+- `crypto` → `mock-crypto`
+- `mock` → provider générique de fallback
+
+```ts
+const providers = await diapay.listProviders();
+const methods = await diapay.listPaymentMethods();
+
+const payment = await diapay.createPayment({
+  amount: 125000,
+  currency: 'XOF',
+  method: 'mobile-money',
+  phone: '70000000', // succès sandbox; 70000001 force un échec
+  metadata: { orderId: 'ORD-123' },
+});
+```
+
+Cartes sandbox : `4242424242424242` réussit, `4000000000000002` échoue.
 
 ## Exemple Diamarket
 

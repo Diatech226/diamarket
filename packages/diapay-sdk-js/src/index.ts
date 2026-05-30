@@ -5,6 +5,53 @@ export type DiapayOptions = {
   baseUrl?: string;
 };
 
+
+export type PaymentMethod = 'mobile-money' | 'bank-card' | 'bank-transfer' | 'crypto' | 'mock';
+export type PaymentStatus = 'requires_action' | 'processing' | 'succeeded' | 'failed' | 'cancelled' | 'expired' | 'refunded';
+
+export type ProviderDescriptor = {
+  id: string;
+  name: string;
+  method: PaymentMethod;
+  environment: 'test' | 'live';
+  capabilities: Array<'payments' | 'refunds' | 'cancellations' | 'webhooks'>;
+  currencies: string[];
+  countries: string[];
+  status: 'ready' | 'degraded' | 'disabled';
+  testMode: boolean;
+  implementation: 'mock' | 'connector';
+  notes?: string;
+};
+
+export type PaymentCreateParams = {
+  amount: number;
+  currency: string;
+  method?: PaymentMethod;
+  customer?: Record<string, unknown>;
+  metadata?: Record<string, unknown>;
+  phone?: string;
+  network?: string;
+  cardNumber?: string;
+  forceStatus?: 'pending' | 'expired' | 'requires_action' | 'failed';
+  [key: string]: unknown;
+};
+
+export type PaymentResponse = {
+  id: string;
+  amount: number;
+  currency: string;
+  method: PaymentMethod;
+  status: PaymentStatus;
+  provider: string;
+  providerPaymentId?: string;
+  actionRequired?: { type: 'redirect' | 'otp' | 'bank_instructions' | 'wallet_address'; url?: string; message?: string; expiresAt?: string };
+  failureCode?: string;
+  failureMessage?: string;
+  metadata?: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type CheckoutSessionCreateParams = {
   amount: number;
   currency: string;
@@ -76,17 +123,25 @@ export class Diapay {
     return checkoutUrl;
   }
 
-  async createPayment(payload: Record<string, unknown>, options?: RequestOptions) {
-    return this.request('/payments', { ...options, method: 'POST', body: JSON.stringify(payload) });
+  async createPayment(payload: PaymentCreateParams, options?: RequestOptions) {
+    return this.request<PaymentResponse>('/payments', { ...options, method: 'POST', body: JSON.stringify(payload) });
   }
 
   async retrievePayment(id: string) {
-    return this.request(`/payments/${id}`);
+    return this.request<PaymentResponse>(`/payments/${id}`);
+  }
+
+  async listPaymentMethods() {
+    return this.request<PaymentMethod[]>('/payment-methods');
+  }
+
+  async listProviders() {
+    return this.request<ProviderDescriptor[]>('/providers');
   }
 
   async getPayment(id: string) { return this.retrievePayment(id); }
-  async refundPayment(id: string) { return this.request(`/payments/${id}/refund`, { method: 'POST' }); }
-  async cancelPayment(id: string) { return this.request(`/payments/${id}/cancel`, { method: 'POST' }); }
+  async refundPayment(id: string, payload: { amount?: number; reason?: string; metadata?: Record<string, unknown> } = {}) { return this.request<PaymentResponse>(`/payments/${id}/refund`, { method: 'POST', body: JSON.stringify(payload) }); }
+  async cancelPayment(id: string) { return this.request<PaymentResponse>(`/payments/${id}/cancel`, { method: 'POST' }); }
 
   static verifyWebhookSignature(rawBody: string, signature: string, secret: string) {
     if (!rawBody || !signature || !secret) return false;
