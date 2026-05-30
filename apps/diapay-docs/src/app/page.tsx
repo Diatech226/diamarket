@@ -1,45 +1,73 @@
-const providerMatrix = [
-  { method: 'mobile-money', provider: 'mock-mobile-money', useCase: 'Orange Money, MTN MoMo, Wave, Moov', sandbox: 'phone=70000000 succès, phone=70000001 échec' },
-  { method: 'bank-card', provider: 'mock-bank-card', useCase: 'Cartes tokenisées via PSP/acquéreur', sandbox: '4242 succès, 4000 0000 0000 0002 refus' },
-  { method: 'bank-transfer', provider: 'mock-bank-transfer', useCase: 'Instructions de virement et réconciliation', sandbox: 'processing avec instructions sandbox' },
-  { method: 'crypto', provider: 'mock-crypto', useCase: 'USDC / réseaux crypto futurs', sandbox: 'wallet_address sandbox, aucun wallet réel' },
+'use client';
+
+import { useMemo, useState } from 'react';
+
+const sections = [
+  ['home', 'Home'], ['quick-start', 'Quick Start'], ['authentication', 'Authentication'], ['checkout', 'Checkout'], ['payments', 'Payments API'], ['refunds', 'Refunds'], ['payouts', 'Payouts'], ['mobile-money', 'Mobile Money'], ['crypto', 'Crypto'], ['webhooks', 'Webhooks'], ['sdk-js', 'SDK JavaScript'], ['sdk-node', 'SDK Node.js'], ['sandbox', 'Sandbox'], ['errors', 'Error Codes'], ['changelog', 'Changelog'],
+] as const;
+
+const endpoints = [
+  { name: 'Create payment', method: 'POST', path: '/payments', body: { amount: 125000, currency: 'XOF', method: 'mobile-money', phone: '70000000', metadata: { orderId: 'ORD-1001' } } },
+  { name: 'Create checkout session', method: 'POST', path: '/checkout/sessions', body: { amount: 125000, currency: 'XOF', successUrl: 'https://example.com/success', cancelUrl: 'https://example.com/cancel', items: [{ name: 'Pro plan', quantity: 1, amount: 125000 }] } },
+  { name: 'Refund payment', method: 'POST', path: '/payments/pay_test_123/refund', body: { amount: 25000, reason: 'requested_by_customer' } },
+  { name: 'Create payout', method: 'POST', path: '/payouts', body: { amount: 90000, currency: 'XOF', destination: 'bank_account_001' } },
+  { name: 'Register webhook', method: 'POST', path: '/webhooks', body: { url: 'https://example.com/webhooks/diapay', events: ['payment.succeeded', 'payment.failed'] } },
 ];
 
-export default function DocsHome() {
-  return (
-    <main style={{ maxWidth: 960, margin: '0 auto', padding: 32, fontFamily: 'Inter, system-ui, sans-serif' }}>
-      <p style={{ color: '#0f766e', fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase' }}>Diapay Docs</p>
-      <h1>Architecture providers de paiement</h1>
-      <p>Diapay expose une interface commune pour connecter mobile money, carte bancaire, virement bancaire, crypto et des providers futurs. Les connecteurs actuels sont des mocks sandbox: aucune API sensible ni credential réel n’est intégré.</p>
+const languages = ['curl', 'JavaScript', 'TypeScript', 'Node.js', 'Express', 'Next.js'] as const;
+type Language = typeof languages[number];
 
-      <h2>Endpoints</h2>
-      <ul>
-        <li><code>GET /api/v1/payment-methods</code> liste les moyens supportés.</li>
-        <li><code>GET /api/v1/providers</code> retourne les descriptors des providers actifs.</li>
-        <li><code>POST /api/v1/payments</code> route le paiement vers le provider associé à <code>method</code>.</li>
-      </ul>
+function snippet(language: Language, endpoint: typeof endpoints[number], apiKey: string) {
+  const url = `https://api.diapay.com/api/v1${endpoint.path}`;
+  const json = JSON.stringify(endpoint.body, null, 2);
+  if (language === 'curl') return `curl -X ${endpoint.method} ${url} \\\n  -H "Authorization: Bearer ${apiKey || 'sk_test_xxx'}" \\\n  -H "Content-Type: application/json" \\\n  -d '${JSON.stringify(endpoint.body)}'`;
+  if (language === 'TypeScript') return `import Diapay, { type PaymentCreateParams } from 'diapay-sdk-js';\n\nconst diapay = new Diapay({ secretKey: '${apiKey || 'sk_test_xxx'}' });\nconst payload: PaymentCreateParams = ${json};\nconst result = await diapay.payments.create(payload);`;
+  if (language === 'Node.js') return `const { createClient, createPayment } = require('diapay-node');\n\ncreateClient({ secretKey: process.env.DIAPAY_SECRET_KEY });\nconst result = await createPayment(${json});`;
+  if (language === 'Express') return `app.post('/pay', async (req, res) => {\n  const payment = await diapay.payments.create(${json});\n  res.json(payment);\n});`;
+  if (language === 'Next.js') return `export async function POST() {\n  const payment = await diapay.payments.create(${json});\n  return Response.json(payment);\n}`;
+  return `import Diapay from 'diapay-sdk-js';\n\nconst diapay = new Diapay({ secretKey: '${apiKey || 'sk_test_xxx'}' });\nconst result = await diapay.payments.create(${json});`;
+}
 
-      <h2>Providers sandbox</h2>
-      <div style={{ display: 'grid', gap: 16 }}>
-        {providerMatrix.map((provider) => (
-          <section key={provider.provider} style={{ border: '1px solid #e2e8f0', borderRadius: 20, padding: 20 }}>
-            <h3 style={{ margin: 0 }}>{provider.method}</h3>
-            <p><strong>Provider:</strong> {provider.provider}</p>
-            <p><strong>Cas d’usage:</strong> {provider.useCase}</p>
-            <p><strong>Sandbox:</strong> {provider.sandbox}</p>
-          </section>
-        ))}
-      </div>
+function CodeBlock({ code }: { code: string }) {
+  const [copied, setCopied] = useState(false);
+  return <div className="code"><button onClick={() => navigator.clipboard.writeText(code).then(() => setCopied(true))}>{copied ? 'Copied' : 'Copy'}</button><pre><code>{code}</code></pre></div>;
+}
 
-      <h2>Exemple SDK</h2>
-      <pre style={{ background: '#020617', color: '#a7f3d0', padding: 20, borderRadius: 20, overflowX: 'auto' }}><code>{`const providers = await diapay.listProviders();
-const payment = await diapay.createPayment({
-  amount: 125000,
-  currency: 'XOF',
-  method: 'mobile-money',
-  phone: '70000000',
-  metadata: { orderId: 'ORD-123' },
-});`}</code></pre>
-    </main>
-  );
+export default function DeveloperPortal() {
+  const [query, setQuery] = useState('');
+  const [apiKey, setApiKey] = useState('sk_test_xxx');
+  const [endpointIndex, setEndpointIndex] = useState(0);
+  const [language, setLanguage] = useState<Language>('curl');
+  const [response, setResponse] = useState('');
+  const endpoint = endpoints[endpointIndex];
+  const code = useMemo(() => snippet(language, endpoint, apiKey), [language, endpoint, apiKey]);
+  const visibleSections = sections.filter(([, label]) => label.toLowerCase().includes(query.toLowerCase()));
+
+  function runDemo() {
+    setResponse(JSON.stringify({ id: endpoint.path.includes('checkout') ? 'cs_test_123' : 'pay_test_123', status: 'succeeded', mode: 'sandbox', requestId: 'req_test_abc', request: { method: endpoint.method, path: endpoint.path, body: endpoint.body } }, null, 2));
+  }
+
+  return <main className="portal">
+    <aside className="sidebar"><strong>Diapay Developers</strong><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search docs…" />{visibleSections.map(([id, label]) => <a key={id} href={`#${id}`}>{label}</a>)}</aside>
+    <section className="content" id="home">
+      <div className="hero"><p>Stripe-like payments for Africa and global commerce</p><h1>Integrate Diapay in under 10 minutes.</h1><p>Checkout, payments, refunds, payouts, mobile money, crypto, webhooks and TypeScript-first SDKs in one premium developer portal.</p><CodeBlock code={`npm install diapay-sdk-js\n\nconst diapay = new Diapay({ secretKey: 'sk_test_xxx' });\nawait diapay.payments.create({ amount: 125000, currency: 'XOF', method: 'mobile-money' });`} /></div>
+
+      <article id="quick-start"><h2>Quick Start</h2><ol><li>Create a test API key in the dashboard.</li><li>Install <code>diapay-sdk-js</code> or <code>diapay-node</code>.</li><li>Create a payment or checkout session.</li><li>Register a webhook endpoint and verify signatures.</li><li>Switch from <code>sk_test_</code> to <code>sk_live_</code> when approved for production.</li></ol></article>
+      <article id="authentication"><h2>Authentication</h2><p>Authenticate every server request with <code>Authorization: Bearer sk_test_xxx</code>. Use publishable keys only in browser checkout and secret keys only on servers.</p></article>
+      <article id="checkout"><h2>Checkout</h2><p>Create a hosted Checkout Session to redirect customers to a PCI-light Diapay page.</p><CodeBlock code={snippet('TypeScript', endpoints[1], apiKey)} /></article>
+      <article id="payments"><h2>Payments API</h2><p>Use direct payments when you own the UI and want fine-grained provider control.</p><CodeBlock code={snippet('curl', endpoints[0], apiKey)} /></article>
+      <article id="refunds"><h2>Refunds</h2><p>Refund full or partial payments with idempotency keys.</p><CodeBlock code={snippet('JavaScript', endpoints[2], apiKey)} /></article>
+      <article id="payouts"><h2>Payouts</h2><p>Move available balance to bank or mobile money destinations and track <code>pending</code>, <code>processing</code>, <code>completed</code> and <code>failed</code>.</p></article>
+      <article id="mobile-money"><h2>Mobile Money</h2><p>Sandbox phone <code>70000000</code> succeeds, <code>70000001</code> fails, and forced statuses cover pending and expired flows.</p></article>
+      <article id="crypto"><h2>Crypto</h2><p>Crypto sandbox simulates USDC wallet collection without moving real assets.</p></article>
+      <article id="webhooks"><h2>Webhooks</h2><p>Listen to <code>payment.succeeded</code>, <code>payment.failed</code>, <code>checkout.completed</code>, <code>refund.succeeded</code> and <code>payout.completed</code>. Verify <code>Diapay-Signature</code> with your <code>whsec_</code> secret.</p><CodeBlock code={`const valid = diapay.webhooks.verify(rawBody, signature, process.env.DIAPAY_WEBHOOK_SECRET!);`} /></article>
+      <article id="sdk-js"><h2>SDK JavaScript</h2><p>The JS SDK exposes <code>checkout</code>, <code>payments</code>, <code>refunds</code>, <code>payouts</code>, <code>customers</code> and <code>webhooks</code> modules with retries, typed errors and payload validation.</p></article>
+      <article id="sdk-node"><h2>SDK Node.js</h2><p>The Node package provides helpers: <code>createPayment()</code>, <code>retrievePayment()</code>, <code>createCheckoutSession()</code>, <code>refundPayment()</code> and <code>verifyWebhook()</code>.</p></article>
+      <article id="sandbox"><h2>Sandbox</h2><p>Use scenarios <code>success</code>, <code>failed</code>, <code>pending</code> and <code>expired</code> for payment, refund, webhook, payout, mobile money and crypto testing.</p></article>
+      <article id="errors"><h2>Error Codes</h2><div className="grid"><span><b>invalid_api_key</b> — missing or malformed key.</span><span><b>invalid_amount</b> — amount must be a positive integer.</span><span><b>payment_failed</b> — provider declined the charge.</span><span><b>webhook_delivery_failed</b> — endpoint failed after retries.</span></div></article>
+      <article id="changelog"><h2>Changelog</h2><p><b>2026-05-30</b> — Independent Diapay developer platform, SDK modules, playground, code generator and sandbox guides.</p></article>
+
+      <article className="playground"><h2>API Playground & Code Generator</h2><div className="controls"><input value={apiKey} onChange={(event) => setApiKey(event.target.value)} /><select value={endpointIndex} onChange={(event) => setEndpointIndex(Number(event.target.value))}>{endpoints.map((item, index) => <option value={index} key={item.path}>{item.name}</option>)}</select><select value={language} onChange={(event) => setLanguage(event.target.value as Language)}>{languages.map((item) => <option key={item}>{item}</option>)}</select><button onClick={runDemo}>Send Test Request</button></div><h3>Request</h3><CodeBlock code={code} /><h3>Response</h3><CodeBlock code={response || '{\n  "status": "ready",\n  "hint": "Click Send Test Request"\n}'} /></article>
+    </section>
+  </main>;
 }

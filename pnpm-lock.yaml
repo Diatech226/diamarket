@@ -282,6 +282,16 @@ importers:
         specifier: ^20.14.2
         version: 20.19.41
 
+  packages/diapay-node:
+    dependencies:
+      diapay-sdk-js:
+        specifier: workspace:*
+        version: link:../diapay-sdk-js
+    devDependencies:
+      '@types/node':
+        specifier: ^20.14.2
+        version: 20.19.41
+
   packages/eslint-config: {}
 
   packages/shared-utils: {}

@@ -2,9 +2,22 @@
 
 import { useState } from 'react';
 
+const scenarios = [
+  { id: 'payment-success', label: 'Paiement réussi', type: 'payment', forceStatus: '' },
+  { id: 'payment-failed', label: 'Paiement échoué', type: 'payment', forceStatus: 'failed' },
+  { id: 'payment-pending', label: 'Paiement pending', type: 'payment', forceStatus: 'pending' },
+  { id: 'payment-expired', label: 'Paiement expiré', type: 'payment', forceStatus: 'expired' },
+  { id: 'refund', label: 'Remboursement', type: 'refund' },
+  { id: 'webhook', label: 'Webhook', type: 'webhook' },
+  { id: 'payout', label: 'Payout', type: 'payout' },
+  { id: 'mobile-money', label: 'Mobile Money', type: 'payment', method: 'mobile-money', phone: '70000000' },
+  { id: 'crypto', label: 'Crypto', type: 'payment', method: 'crypto' },
+];
+
 export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [result, setResult] = useState('');
 
   async function pay() {
     setLoading(true);
@@ -14,6 +27,14 @@ export default function Home() {
     setLoading(false);
     if (!response.ok) return setError(session?.error?.message ?? 'Création session impossible');
     window.location.assign(session.checkoutUrl);
+  }
+
+  async function runScenario(id: string) {
+    setLoading(true);
+    const response = await fetch('/api/scenario', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
+    const data = await response.json();
+    setLoading(false);
+    setResult(JSON.stringify(data, null, 2));
   }
 
   return (
@@ -28,12 +49,18 @@ export default function Home() {
           {error && <p style={{ color: '#be123c' }}>{error}</p>}
         </section>
         <section className="card">
+          <h2>Scénarios sandbox améliorés</h2>
+          <p className="muted">Simulez success, failed, pending, expired, remboursement, webhook, payout, mobile money et crypto sans argent réel.</p>
+          <div className="scenario-grid">{scenarios.map((scenario) => <button key={scenario.id} className="btn btn-secondary" onClick={() => runScenario(scenario.id)}>{scenario.label}</button>)}</div>
+        </section>
+        <section className="card">
           <h2>Logs webhook reçus</h2>
-          <p className="muted">Endpoint de test: <code>/api/sandbox-webhook</code>. Enregistrez-le dans l’API Diapay pour voir les livraisons.</p>
+          <p className="muted">Endpoint de test: <code>/api/sandbox-webhook</code>. Événements: payment.succeeded, payment.failed, checkout.completed, refund.succeeded, payout.completed.</p>
           <pre style={{ whiteSpace: 'pre-wrap', background: '#0f172a', color: '#d1fae5', padding: 16, borderRadius: 18 }}>curl -X POST http://localhost:5100/api/v1/webhooks \
   -H 'Content-Type: application/json' \
-  -d '{'{'}"url":"http://localhost:3102/api/sandbox-webhook","events":["checkout.session.completed","payment.succeeded","payment.failed","payment.cancelled","payment.expired"]{'}'}'</pre>
+  -d '{'{'}"url":"http://localhost:3102/api/sandbox-webhook","events":["payment.succeeded","payment.failed","checkout.completed","refund.succeeded","payout.completed"]{'}'}'</pre>
         </section>
+        <section className="card"><h2>Résultat scénario</h2><pre style={{ whiteSpace: 'pre-wrap', background: '#0f172a', color: '#d1fae5', padding: 16, borderRadius: 18 }}>{result || 'Cliquez un scénario pour voir la réponse sandbox.'}</pre></section>
       </div>
     </main>
   );

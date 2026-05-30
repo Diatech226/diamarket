@@ -56,6 +56,11 @@ export const metrics = {
   pending: 3120000,
   volume: 98240000,
   successRate: 96.8,
+  apiRequests: 482910,
+  apiErrors: 1240,
+  responseTimeMs: 142,
+  webhooksSent: 18320,
+  paymentsCreated: 9214,
   refunds: 18,
   payouts: 7,
   chart: [42, 58, 51, 72, 68, 81, 96, 88, 104, 118, 111, 130],
@@ -86,7 +91,8 @@ export const transactions: Transaction[] = payments.map((payment, index) => ({ .
 export const apiKeys: ApiKey[] = [
   { id: 'key_1', name: 'Backend production', key: 'sk_live_Km28xYa932jjJwKeQp8812', environment: 'live', role: 'merchant', createdAt: '2026-02-14', lastUsed: 'Il y a 2 min', active: true },
   { id: 'key_2', name: 'Sandbox checkout', key: 'sk_test_Bb72nPa118zzLwFqEe4421', environment: 'test', role: 'admin', createdAt: '2026-04-08', lastUsed: 'Hier', active: true },
-  { id: 'key_3', name: 'Legacy mobile app', key: 'sk_live_Rr90pQa551aaTzJmCc3310', environment: 'live', role: 'merchant', createdAt: '2025-11-21', lastUsed: 'Jamais', active: false },
+  { id: 'key_3', name: 'Frontend publishable test', key: 'pk_test_Js81nPa118zzLwFqEe4421', environment: 'test', role: 'merchant', createdAt: '2026-05-20', lastUsed: 'Il y a 10 min', active: true },
+  { id: 'key_4', name: 'Legacy mobile app', key: 'sk_live_Rr90pQa551aaTzJmCc3310', environment: 'live', role: 'merchant', createdAt: '2025-11-21', lastUsed: 'Jamais', active: false },
 ];
 
 export const webhooks: WebhookEndpoint[] = [
