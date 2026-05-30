@@ -81,6 +81,14 @@ export type WebhookEndpoint = WebhookEndpointCreateParams & { id: string; secret
 export type DiapayWebhookEvent<T = Record<string, unknown>> = { id: string; type: WebhookEventType | string; data: T; created: string };
 export type ProviderDescriptor = { id: string; name: string; method: PaymentMethod; environment: DiapayEnvironment | 'live'; capabilities: string[]; currencies: string[]; countries: string[]; status: 'ready' | 'degraded' | 'disabled'; testMode: boolean; implementation: 'mock' | 'connector'; notes?: string };
 
+export type MarketplaceWallet = { id: string; type: 'merchant_wallet' | 'vendor_wallet' | 'platform_wallet' | 'escrow_wallet' | 'reserve_wallet'; balance: number; availableBalance: number; pendingBalance: number; currency: string; status: 'active' | 'frozen' | 'closed'; owner: { id: string; type: string; name?: string }; ledgerEntries: string[]; createdAt: string; updatedAt: string };
+export type VendorAccountCreateParams = { businessName: string; country: string; currencies?: string[]; payoutMethods?: Array<{ type: 'mobile_money' | 'bank_transfer' | 'crypto'; label: string; destination: string; currency: string; country?: string; default?: boolean }> };
+export type VendorAccount = VendorAccountCreateParams & { id: string; wallet: string; kycStatus: 'not_started' | 'pending' | 'verified' | 'rejected'; capabilities: string[]; commissions: unknown[]; createdAt: string; updatedAt: string };
+export type SplitPaymentCreateParams = { amount: number; currency: string; merchantId?: string; paymentId?: string; splits: Array<{ vendorId?: string; walletId?: string; amount?: number; percentage?: number; priority?: number; holdInEscrow?: boolean; fallback?: boolean }>; commission?: { amount?: number; percentage?: number }; diapayFee?: { amount?: number; percentage?: number }; escrow?: { enabled?: boolean; autoReleaseAt?: string } };
+export type SplitPayment = { id: string; paymentId: string; merchantId: string; amount: number; currency: string; status: string; allocations: unknown[]; escrowHolds: unknown[]; timeline: unknown[]; createdAt: string; updatedAt: string };
+export type MarketplacePayoutCreateParams = { vendorId?: string; walletId?: string; amount: number; currency?: string; method?: 'mobile_money' | 'bank_transfer' | 'crypto'; destination?: string; schedule?: 'manual' | 'automatic' | 'scheduled'; threshold?: number };
+export type MarketplaceLedger = { accounts: unknown[]; entries: unknown[]; balanceSnapshots: unknown[] };
+
 export class DiapayError extends Error {
   readonly status: number;
   readonly code?: string;
@@ -157,6 +165,28 @@ export class Diapay {
   customers = {
     create: (payload: CustomerCreateParams, options?: RequestOptions) => this.request<Customer>('/customers', { ...options, method: 'POST', body: JSON.stringify(payload) }),
     retrieve: (id: string, options?: RequestOptions) => this.request<Customer>(`/customers/${id}`, options),
+  };
+
+
+  marketplace = {
+    splitPayment: (payload: SplitPaymentCreateParams, options?: RequestOptions) => { assertAmountCurrency(payload); return this.request<SplitPayment>('/marketplace/split-payment', { ...options, method: 'POST', body: JSON.stringify(payload) }); },
+    vendors: {
+      create: (payload: VendorAccountCreateParams, options?: RequestOptions) => this.request<VendorAccount>('/marketplace/vendors', { ...options, method: 'POST', body: JSON.stringify(payload) }),
+      list: (options?: RequestOptions) => this.request<VendorAccount[]>('/marketplace/vendors', options),
+      wallet: (id: string, options?: RequestOptions) => this.request<{ vendor: VendorAccount; wallet: MarketplaceWallet; ledgerEntries: unknown[] }>(`/marketplace/vendors/${id}/wallet`, options),
+    },
+    payouts: {
+      create: (payload: MarketplacePayoutCreateParams, options?: RequestOptions) => { assertAmountCurrency(payload); return this.request<Payout>('/marketplace/payouts', { ...options, method: 'POST', body: JSON.stringify(payload) }); },
+      list: (options?: RequestOptions) => this.request<Payout[]>('/marketplace/payouts', options),
+    },
+    escrow: {
+      release: (payload: { escrowId?: string; paymentId?: string; amount?: number }, options?: RequestOptions) => this.request<unknown>('/marketplace/escrow/release', { ...options, method: 'POST', body: JSON.stringify(payload) }),
+      refund: (payload: { escrowId?: string; paymentId?: string; amount?: number; reason?: string }, options?: RequestOptions) => this.request<unknown>('/marketplace/escrow/refund', { ...options, method: 'POST', body: JSON.stringify(payload) }),
+      list: (options?: RequestOptions) => this.request<unknown[]>('/marketplace/escrow', options),
+    },
+    wallets: { list: (options?: RequestOptions) => this.request<MarketplaceWallet[]>('/marketplace/wallets', options) },
+    ledger: (options?: RequestOptions) => this.request<MarketplaceLedger>('/marketplace/ledger', options),
+    analytics: (options?: RequestOptions) => this.request<Record<string, unknown>>('/marketplace/analytics', options),
   };
 
   webhooks = {
