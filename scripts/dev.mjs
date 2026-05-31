@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 import { spawn } from 'node:child_process';
 
+const command = process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm';
+
 const apps = {
   diamarket: [
     { name: 'diamarket-web', path: 'apps/diamarket-web' },
@@ -37,9 +39,10 @@ const children = selectedApps.map((app) => {
   console.log(`[${app.name}] > pnpm --dir ${app.path} run dev`);
   return {
     ...app,
-    process: spawn('pnpm', ['--dir', app.path, 'run', 'dev'], {
+    process: spawn(`${command} --dir ${app.path} run dev`, {
       stdio: 'inherit',
       env: process.env,
+      shell: true,
     }),
   };
 });

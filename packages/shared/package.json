@@ -1,0 +1,11 @@
+{
+  "name": "@dia/shared",
+  "version": "0.1.0",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "build": "echo build shared",
+    "lint": "echo lint shared",
+    "typecheck": "echo typecheck shared"
+  }
+}
