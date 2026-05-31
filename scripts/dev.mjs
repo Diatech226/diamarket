@@ -1,0 +1,70 @@
+#!/usr/bin/env node
+import { spawn } from 'node:child_process';
+
+const apps = {
+  diamarket: [
+    { name: 'diamarket-web', path: 'apps/diamarket-web' },
+    { name: 'diamarket-cms', path: 'apps/diamarket-cms' },
+    { name: 'diamarket-api', path: 'apps/diamarket-api' },
+  ],
+  diapay: [
+    { name: 'diapay-api', path: 'apps/diapay-api' },
+    { name: 'diapay-dashboard', path: 'apps/diapay-dashboard' },
+    { name: 'diapay-docs', path: 'apps/diapay-docs' },
+    { name: 'diapay-sandbox', path: 'apps/diapay-sandbox' },
+  ],
+  diaexpress: [
+    { name: 'diaexpress-client', path: 'apps/diaexpress-client' },
+    { name: 'diaexpress-adminv2', path: 'apps/diaexpress-adminv2' },
+    { name: 'diaexpress-backend', path: 'apps/services/diaexpress-backend' },
+  ],
+};
+
+apps.all = [...apps.diamarket, ...apps.diapay, ...apps.diaexpress];
+
+const target = process.argv[2] ?? 'all';
+const selectedApps = apps[target];
+
+if (!selectedApps) {
+  console.error(`Unknown dev target "${target}".`);
+  console.error(`Usage: pnpm dev [${Object.keys(apps).join('|')}]`);
+  process.exit(1);
+}
+
+console.log(`Starting ${target} dev apps: ${selectedApps.map((app) => app.name).join(', ')}`);
+
+const children = selectedApps.map((app) => {
+  console.log(`[${app.name}] > pnpm --dir ${app.path} run dev`);
+  return {
+    ...app,
+    process: spawn('pnpm', ['--dir', app.path, 'run', 'dev'], {
+      stdio: 'inherit',
+      env: process.env,
+    }),
+  };
+});
+
+let shuttingDown = false;
+
+const stopAll = (signal = 'SIGTERM') => {
+  shuttingDown = true;
+  for (const child of children) {
+    if (!child.process.killed) child.process.kill(signal);
+  }
+};
+
+process.on('SIGINT', () => stopAll('SIGINT'));
+process.on('SIGTERM', () => stopAll('SIGTERM'));
+
+for (const child of children) {
+  child.process.on('exit', (code, signal) => {
+    if (shuttingDown) return;
+
+    const exitCode = code ?? (signal ? 1 : 0);
+    if (exitCode !== 0) {
+      console.error(`[${child.name}] dev process exited with ${signal ?? `code ${exitCode}`}. Stopping the remaining apps.`);
+      stopAll('SIGTERM');
+      process.exit(exitCode);
+    }
+  });
+}
