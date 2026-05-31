@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3000",
+    "dev": "NEXT_PUBLIC_DIAEXPRESS_API_BASE_URL=http://localhost:5200 NEXT_PUBLIC_API_BASE_URL=http://localhost:5200 NEXT_PUBLIC_BACKEND_URL=http://localhost:5200 BACKEND_URL=http://localhost:5200 NEXT_PUBLIC_ADMIN_API_BASE_URL=http://localhost:5200/api/v1/admin NEXT_PUBLIC_LOGISTICS_API_BASE_URL=http://localhost:5200 NEXT_PUBLIC_SITE_URL=http://localhost:3200 NEXT_PUBLIC_APP_URL=http://localhost:3200 NEXT_PUBLIC_ADMIN_APP_URL=http://localhost:3201 next dev -p 3200",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 3200",
     "lint": "next lint",
     "test": "echo \"No tests specified\""
   },

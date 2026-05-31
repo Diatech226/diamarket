@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-    "dev": "node scripts/dev-server.js",
+    "dev": "PORT=5200 CORS_ORIGINS=http://localhost:3200,http://localhost:3201 node scripts/dev-server.js",
     "build": "echo \"No build step configured\"",
     "lint": "echo 'No backend lint configured'",
     "test": "node --test --import tsx --import ./tests/setup/diapay.setup.ts",
-    "start": "node server.js",
+    "start": "PORT=5200 CORS_ORIGINS=http://localhost:3200,http://localhost:3201 node server.js",
     "migrate:payments": "node scripts/migratePaymentsToDiaPay.js",
     "seed:admin": "node scripts/seed-admin.js"
   },
