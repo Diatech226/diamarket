@@ -34,17 +34,7 @@ export function refundPayment(paymentId: string, payload: { amount?: number; rea
 }
 
 
-export function createMarketplaceVendor(payload: MarketplaceVendorCreateParams, options?: DiapayOptions & RequestOptions) {
-  return client(options).marketplace.createVendor(payload, options);
-}
 
-export function createMarketplaceSplitPayment(payload: MarketplaceSplitPaymentCreateParams, options?: DiapayOptions & RequestOptions) {
-  return client(options).marketplace.splitPayment(payload, options);
-}
-
-export function createMarketplacePayout(payload: MarketplacePayoutCreateParams, options?: DiapayOptions & RequestOptions) {
-  return client(options).marketplace.createPayout(payload, options);
-}
 
 export function verifyWebhook(rawBody: string, signature: string, secret: string) {
   return Diapay.verifyWebhookSignature(rawBody, signature, secret);

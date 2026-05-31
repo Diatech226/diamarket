@@ -1,0 +1,46 @@
+.sectionContainer {
+  margin: 0 auto;
+  width: min(1100px, calc(100% - 2rem));
+}
+
+.pageHeader {
+  display: grid;
+  gap: 0.7rem;
+  align-items: start;
+}
+
+.kicker {
+  color: #166534;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.title {
+  color: #111827;
+  font-size: clamp(1.45rem, 2.8vw, 2.2rem);
+  line-height: 1.2;
+  margin: 0;
+}
+
+.description {
+  color: #4b5563;
+  margin: 0;
+  max-width: 68ch;
+}
+
+.ctaSection {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.ctaActions {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}

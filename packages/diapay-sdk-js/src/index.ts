@@ -84,9 +84,9 @@ export type MarketplaceCurrency = 'FCFA' | 'XOF' | 'USD' | 'EUR' | 'USDT';
 export type MarketplaceSplitRule = { id?: string; vendorId?: string; walletId?: string; type: 'fixed' | 'percentage' | 'fallback'; amount?: number; percentage?: number; priority?: number; category?: string; description?: string };
 export type MarketplaceVendorCreateParams = { businessName: string; country?: string; currencies?: MarketplaceCurrency[]; payoutMethods?: Array<{ type: 'mobile_money' | 'bank_transfer' | 'crypto'; label?: string; currency?: MarketplaceCurrency; country?: string; details?: Record<string, unknown>; active?: boolean }>; commissions?: Array<{ fixedAmount?: number; percentage?: number; category?: string; country?: string; priority?: number; active?: boolean }>; capabilities?: string[] };
 export type MarketplaceSplitPaymentCreateParams = { amount: number; currency: MarketplaceCurrency; splits?: MarketplaceSplitRule[]; commission?: { fixedAmount?: number; percentage?: number }; reserveRate?: number; escrow?: boolean; autoRelease?: boolean; autoReleaseAt?: string; metadata?: Metadata };
-export type MarketplacePayoutCreateParams = { vendorId: string; amount?: number; method?: 'mobile_money' | 'bank_transfer' | 'crypto'; scheduledFor?: string; minimumThreshold?: number; destination?: Record<string, unknown> };
+
 export type MarketplaceEscrowActionParams = { escrowId: string; amount?: number; reason?: string };
-export type MarketplaceWallet = { id: string; type: string; owner: { id: string; type: string; name?: string }; balance: number; availableBalance: number; pendingBalance: number; currency: MarketplaceCurrency; status: string; ledgerEntries: string[]; createdAt: string; updatedAt: string };
+
 export type MarketplaceVendor = MarketplaceVendorCreateParams & { id: string; wallet: string; kycStatus: string; createdAt: string; updatedAt: string };
 export type MarketplacePayment = { id: string; paymentId: string; merchant: string; amount: number; currency: MarketplaceCurrency; allocations: Array<Record<string, unknown>>; escrowId?: string; timeline: Array<{ type: string; at: string; data?: Record<string, unknown> }>; createdAt: string; updatedAt: string };
 
