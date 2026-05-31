@@ -33,10 +33,26 @@ if (!selectedApps) {
   process.exit(1);
 }
 
+const spawnPnpm = (args) => {
+  if (pnpmCli) {
+    return spawn(process.execPath, [pnpmCli, ...args], {
+      stdio: 'inherit',
+      env: process.env,
+    });
+  }
+
+  return spawn(pnpmExecutable, args, {
+    stdio: 'inherit',
+    env: process.env,
+    shell: true,
+  });
+};
+
 console.log(`Starting ${target} dev apps: ${selectedApps.map((app) => app.name).join(', ')}`);
 
 const children = selectedApps.map((app) => {
-  console.log(`[${app.name}] > pnpm --dir ${app.path} run dev`);
+  const args = ['--dir', app.path, 'run', 'dev'];
+  console.log(`[${app.name}] > pnpm ${args.join(' ')}`);
   return {
     ...app,
     process: spawn(`${command} --dir ${app.path} run dev`, {
@@ -60,6 +76,14 @@ process.on('SIGINT', () => stopAll('SIGINT'));
 process.on('SIGTERM', () => stopAll('SIGTERM'));
 
 for (const child of children) {
+  child.process.on('error', (error) => {
+    if (shuttingDown) return;
+
+    console.error(`[${child.name}] failed to start pnpm dev process: ${error.message}`);
+    stopAll('SIGTERM');
+    process.exit(1);
+  });
+
   child.process.on('exit', (code, signal) => {
     if (shuttingDown) return;
 
