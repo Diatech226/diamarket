@@ -12,7 +12,7 @@
   "dependencies": {
     "@clerk/clerk-react": "^5.61.4",
     "@clerk/nextjs": "^6.39.1",
-    "@diaexpress/shared": "file:../../packages/diaexpress-shared",
+    "@diaexpress/shared": "workspace:*",
     "axios": "^1.11.0",
     "framer-motion": "^11.11.9",
     "html2canvas": "^1.4.1",
@@ -21,7 +21,9 @@
     "next": "14.2.25",
     "react": "18.3.1",
     "react-dom": "18.3.1",
-    "web3": "^4.16.0"
+    "web3": "^4.16.0",
+    "@dia/ui": "workspace:*",
+    "@dia/shared": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^20.14.11",
