@@ -6,7 +6,7 @@ import {
   formatStatusComment,
 } from '../constants/shipmentStatus';
 import { trackShipment } from '../api/shipments';
-import { ANALYTICS_EVENTS, trackEvent } from '../lib/analytics';
+import { ANALYTICS_EVENTS, trackEvent } from '../../../../src/lib/analytics/trackEvent';
 
 const STATUS_THEME = {
   delivered: 'success',

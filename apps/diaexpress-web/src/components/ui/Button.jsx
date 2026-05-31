@@ -6,10 +6,6 @@ const VARIANT_MAP = {
   primary: styles.buttonPrimary,
   secondary: styles.buttonSecondary,
   ghost: styles.buttonGhost,
-  outline: styles.buttonOutline,
-  danger: styles.buttonDanger,
-  success: styles.buttonSuccess,
-  icon: styles.buttonIcon,
 };
 
 const SIZE_MAP = {
@@ -50,8 +46,7 @@ const Button = ({
       aria-busy={loading}
       {...props}
     >
-      {loading ? <span className={styles.buttonLoader} aria-hidden="true" /> : null}
-      {loading ? 'Chargement...' : children}
+      {loading ? 'Loading...' : children}
     </Component>
   );
 };

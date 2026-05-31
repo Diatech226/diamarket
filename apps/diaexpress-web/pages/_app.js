@@ -62,7 +62,7 @@ const AppWithClerk = ({ Component, pageProps }) => {
         UserButtonComponent={resolvedUserButton}
         isAuthReady={canRenderAuthUI}
       />
-      <div id="main-content" className="dx-page-transition">
+      <div className="dx-page-transition">
         <Component {...pageProps} />
       </div>
     </AuthProvider>

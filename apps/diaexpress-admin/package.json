@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "NEXT_PUBLIC_API_BASE_URL=http://localhost:5200 NEXT_PUBLIC_ADMIN_API_BASE_URL=http://localhost:5200/api/v1/admin NEXT_PUBLIC_LOGISTICS_API_BASE_URL=http://localhost:5200 NEXT_PUBLIC_DIAPAY_ADMIN_API_BASE_URL=http://localhost:5200/api/v1/admin next dev -p 3201",
-    "dev:clean": "node -e \"require('fs').rmSync('.next', { recursive: true, force: true });\" && NEXT_PUBLIC_API_BASE_URL=http://localhost:5200 NEXT_PUBLIC_ADMIN_API_BASE_URL=http://localhost:5200/api/v1/admin NEXT_PUBLIC_LOGISTICS_API_BASE_URL=http://localhost:5200 NEXT_PUBLIC_DIAPAY_ADMIN_API_BASE_URL=http://localhost:5200/api/v1/admin next dev -p 3201",
+    "dev": "next dev -p 3001",
+    "dev:clean": "node -e \"require('fs').rmSync('.next', { recursive: true, force: true });\" && next dev -p 3001",
     "build": "next build",
-    "start": "next start -p 3201",
+    "start": "next start",
     "lint": "next lint",
     "test": "echo \"No tests specified\"",
     "deps:reset": "node -e \"require('fs').rmSync('node_modules', { recursive: true, force: true }); require('fs').rmSync('.next', { recursive: true, force: true });\""
