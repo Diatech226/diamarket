@@ -1,6 +1,11 @@
 #!/usr/bin/env node
 import { spawn } from 'node:child_process';
 
+const pnpmExecutable = process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm';
+const pnpmCli = process.env.npm_execpath?.toLowerCase().includes('pnpm')
+  ? process.env.npm_execpath
+  : undefined;
+
 const apps = {
   diamarket: [
     { name: 'diamarket-web', path: 'apps/diamarket-web' },
@@ -31,16 +36,29 @@ if (!selectedApps) {
   process.exit(1);
 }
 
+const spawnPnpm = (args) => {
+  if (pnpmCli) {
+    return spawn(process.execPath, [pnpmCli, ...args], {
+      stdio: 'inherit',
+      env: process.env,
+    });
+  }
+
+  return spawn(pnpmExecutable, args, {
+    stdio: 'inherit',
+    env: process.env,
+    shell: true,
+  });
+};
+
 console.log(`Starting ${target} dev apps: ${selectedApps.map((app) => app.name).join(', ')}`);
 
 const children = selectedApps.map((app) => {
-  console.log(`[${app.name}] > pnpm --dir ${app.path} run dev`);
+  const args = ['--dir', app.path, 'run', 'dev'];
+  console.log(`[${app.name}] > pnpm ${args.join(' ')}`);
   return {
     ...app,
-    process: spawn('pnpm', ['--dir', app.path, 'run', 'dev'], {
-      stdio: 'inherit',
-      env: process.env,
-    }),
+    process: spawnPnpm(args),
   };
 });
 
@@ -57,6 +75,14 @@ process.on('SIGINT', () => stopAll('SIGINT'));
 process.on('SIGTERM', () => stopAll('SIGTERM'));
 
 for (const child of children) {
+  child.process.on('error', (error) => {
+    if (shuttingDown) return;
+
+    console.error(`[${child.name}] failed to start pnpm dev process: ${error.message}`);
+    stopAll('SIGTERM');
+    process.exit(1);
+  });
+
   child.process.on('exit', (code, signal) => {
     if (shuttingDown) return;
 
