@@ -1,18 +1,17 @@
 import React from 'react';
 import Link from 'next/link';
-import { PublicReveal, PublicSection } from '../../../../../src/components/marketing/PublicPageSections';
 
 export const ClientAppShell = ({ eyebrow, title, subtitle, actions, children }) => (
   <div className="dx-dashboard-shell">
     <div className="dx-dashboard">
-      <PublicReveal>
+      <div className="dx-public-reveal is-revealed">
         <header className="dx-dashboard__header">
           <span className="dx-dashboard__eyebrow">{eyebrow}</span>
           <h1 className="dx-dashboard__title">{title}</h1>
           <p className="dx-dashboard__subtitle">{subtitle}</p>
           <div className="dx-dashboard__actions">{actions}</div>
         </header>
-      </PublicReveal>
+      </div>
       {children}
     </div>
   </div>
@@ -33,4 +32,9 @@ export const QuoteCard = ({ quote }) => <article className="dx-card"><div classN
 export const PaymentCard = ({ payment }) => <article className="dx-card"><div className="dx-quote-card__head"><strong>{payment.amount || payment.total || '-'} {payment.currency || ''}</strong><StatusBadge status={payment.status || payment.state} /></div><p className="dx-card__subtitle">Réf: {payment.transactionReference || payment.reference || payment._id || '—'}</p></article>;
 export const AddressCard = ({ address, onEdit, onDelete }) => <article className="dx-card"><h3 className="dx-card__title">{address.label || 'Sans libellé'}</h3><p className="dx-card__subtitle">{address.line1}</p><p className="dx-card__subtitle">{address.postalCode} {address.city} · {address.country}</p><div className="dx-actions"><button type="button" className="dx-button dx-button--outline dx-button--sm" onClick={onEdit}>Modifier</button><button type="button" className="dx-button dx-button--danger dx-button--sm" onClick={onDelete}>Supprimer</button></div></article>;
 
-export const ClientSection = ({ title, description, children }) => <PublicSection title={title} description={description}>{children}</PublicSection>;
+export const ClientSection = ({ title, description, children }) => (
+  <section className="dx-section">
+    <ClientPageHeader title={title} description={description} />
+    {children}
+  </section>
+);

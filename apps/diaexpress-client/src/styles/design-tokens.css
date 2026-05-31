@@ -1,38 +1,101 @@
 :root {
-  /* Colors - core */
-  --dx-color-charcoal-950: #0b1220;
-  --dx-color-charcoal-900: #111827;
-  --dx-color-graphite-700: #374151;
-  --dx-color-slate-500: #6b7280;
-  --dx-color-slate-300: #d1d5db;
-  --dx-color-slate-200: #e5e7eb;
-  --dx-color-slate-100: #f3f4f6;
+  /* DIA Express Foundation UI — core palette from the refonte brief */
+  --dx-color-primary-olive: #556b2f;
+  --dx-color-olive-light: #6b8e23;
+  --dx-color-gold: #d4af37;
+  --dx-color-soft-gold: #e6c76a;
+  --dx-color-black: #0f0f0f;
+  --dx-color-soft-black: #1b1b1b;
   --dx-color-white: #ffffff;
+  --dx-color-background: #f8f8f6;
+  --dx-color-success: #27ae60;
+  --dx-color-danger: #c0392b;
+  --dx-color-info: #3498db;
+  --dx-color-warning: #d4af37;
 
-  /* Colors - brand */
-  --dx-color-brand-700: #115e3b;
-  --dx-color-brand-600: #15803d;
-  --dx-color-brand-100: #dcfce7;
-  --dx-color-gold-500: #eab308;
-  --dx-color-gold-100: #fef9c3;
-  --dx-color-cyan-500: #06b6d4;
-  --dx-color-cyan-100: #cffafe;
-  --dx-color-danger-700: #b91c1c;
+  /* Semantic color tokens */
+  --dx-surface: #ffffff;
+  --dx-surface-muted: #f3f1ea;
+  --dx-surface-elevated: #ffffff;
+  --dx-surface-inverse: #0f0f0f;
+  --dx-border: rgba(15, 15, 15, 0.1);
+  --dx-border-hover: rgba(85, 107, 47, 0.34);
+  --dx-text-primary: #0f0f0f;
+  --dx-text-secondary: rgba(15, 15, 15, 0.72);
+  --dx-text-muted: rgba(15, 15, 15, 0.56);
+  --dx-text-inverse: #ffffff;
+  --dx-success: #27ae60;
+  --dx-warning: #d4af37;
+  --dx-danger: #c0392b;
+  --dx-info: #3498db;
 
-  /* Typography */
-  --dx-font-family-base: Inter, Manrope, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --dx-font-size-caption: 0.78rem;
-  --dx-font-size-sm: 0.87rem;
-  --dx-font-size-md: 0.94rem;
-  --dx-font-size-lg: 1rem;
-  --dx-font-size-h3: 1.25rem;
-  --dx-font-size-h2: 1.6rem;
-  --dx-font-size-h1: 2rem;
+  /* Compatibility aliases used by existing DiaExpress screens */
+  --dx-font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --dx-bg: var(--dx-color-background);
+  --dx-card: var(--dx-surface-elevated);
+  --dx-text: var(--dx-text-primary);
+  --dx-text-soft: var(--dx-text-muted);
+  --dx-muted: var(--dx-text-secondary);
+  --dx-primary: var(--dx-color-primary-olive);
+  --dx-color-primary: var(--dx-color-primary-olive);
+  --dx-color-primary-dark: #3f5122;
+  --dx-color-accent: var(--dx-color-gold);
+  --dx-color-navy: var(--dx-color-soft-black);
+  --dx-color-border: var(--dx-border);
+  --dx-color-border-strong: rgba(15, 15, 15, 0.18);
+  --dx-color-surface: var(--dx-surface);
+  --dx-gradient-background:
+    radial-gradient(circle at 12% 8%, rgba(85, 107, 47, 0.14), transparent 32%),
+    radial-gradient(circle at 88% 0%, rgba(212, 175, 55, 0.18), transparent 30%),
+    linear-gradient(180deg, #f8f8f6 0%, #ffffff 52%, #f5f2e9 100%);
+  --dx-gradient-card: linear-gradient(135deg, rgba(85, 107, 47, 0.1), rgba(230, 199, 106, 0.18));
+  --dx-success-surface: rgba(39, 174, 96, 0.12);
+  --dx-error-surface: rgba(192, 57, 43, 0.12);
+  --dx-warning-surface: rgba(212, 175, 55, 0.16);
+  --dx-info-surface: rgba(52, 152, 219, 0.12);
+
+  /* Legacy aliases kept to avoid visual regressions in older components */
+  --dx-color-charcoal-950: #0f0f0f;
+  --dx-color-charcoal-900: #1b1b1b;
+  --dx-color-graphite-700: rgba(15, 15, 15, 0.72);
+  --dx-color-slate-500: rgba(15, 15, 15, 0.56);
+  --dx-color-slate-300: rgba(15, 15, 15, 0.18);
+  --dx-color-slate-200: rgba(15, 15, 15, 0.1);
+  --dx-color-slate-100: #f3f1ea;
+  --dx-color-brand-700: #3f5122;
+  --dx-color-brand-600: var(--dx-color-primary-olive);
+  --dx-color-brand-100: rgba(107, 142, 35, 0.14);
+  --dx-color-gold-500: var(--dx-color-gold);
+  --dx-color-gold-100: rgba(230, 199, 106, 0.22);
+  --dx-color-cyan-500: var(--dx-color-info);
+  --dx-color-cyan-100: rgba(52, 152, 219, 0.12);
+  --dx-color-danger-700: var(--dx-color-danger);
+
+  /* Typography scale */
+  --dx-font-family-base: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --dx-font-size-12: 0.75rem;
+  --dx-font-size-14: 0.875rem;
+  --dx-font-size-16: 1rem;
+  --dx-font-size-18: 1.125rem;
+  --dx-font-size-20: 1.25rem;
+  --dx-font-size-24: 1.5rem;
+  --dx-font-size-30: 1.875rem;
+  --dx-font-size-36: 2.25rem;
+  --dx-font-size-48: 3rem;
+  --dx-font-size-60: 3.75rem;
+  --dx-font-size-caption: var(--dx-font-size-12);
+  --dx-font-size-sm: var(--dx-font-size-14);
+  --dx-font-size-md: var(--dx-font-size-16);
+  --dx-font-size-lg: var(--dx-font-size-18);
+  --dx-font-size-h3: var(--dx-font-size-20);
+  --dx-font-size-h2: var(--dx-font-size-30);
+  --dx-font-size-h1: var(--dx-font-size-48);
+  --dx-font-weight-regular: 400;
   --dx-font-weight-medium: 500;
   --dx-font-weight-semibold: 600;
   --dx-font-weight-bold: 700;
 
-  /* Spacing (4pt grid) */
+  /* 4px spacing system */
   --dx-space-1: 0.25rem;
   --dx-space-2: 0.5rem;
   --dx-space-3: 0.75rem;
@@ -41,23 +104,41 @@
   --dx-space-8: 2rem;
   --dx-space-12: 3rem;
   --dx-space-16: 4rem;
+  --dx-space-20: 5rem;
+  --dx-space-24: 6rem;
+  --dx-space-32: 8rem;
+  --dx-spacing-xs: var(--dx-space-2);
+  --dx-spacing-sm: var(--dx-space-4);
+  --dx-spacing-md: var(--dx-space-6);
+  --dx-spacing-lg: var(--dx-space-8);
+  --dx-spacing-xl: var(--dx-space-12);
 
-  /* Radius */
-  --dx-radius-sm: 10px;
-  --dx-radius-md: 14px;
-  --dx-radius-lg: 18px;
+  /* Radius system */
+  --dx-radius-sm: 8px;
+  --dx-radius-md: 12px;
+  --dx-radius-lg: 16px;
+  --dx-radius-xl: 24px;
+  --dx-radius-2xl: 32px;
   --dx-radius-pill: 999px;
 
-  /* Shadows */
-  --dx-shadow-sm: 0 1px 4px rgba(17, 24, 39, 0.06);
-  --dx-shadow-md: 0 12px 32px rgba(17, 24, 39, 0.08);
-  --dx-shadow-focus-brand: 0 0 0 3px rgba(21, 128, 61, 0.15);
+  /* Shadow system */
+  --dx-shadow-soft: 0 10px 30px rgba(15, 15, 15, 0.08);
+  --dx-shadow-medium: 0 18px 45px rgba(15, 15, 15, 0.12);
+  --dx-shadow-large: 0 28px 70px rgba(15, 15, 15, 0.16);
+  --dx-shadow-floating: 0 16px 40px rgba(85, 107, 47, 0.18);
+  --dx-shadow-premium: 0 24px 70px rgba(15, 15, 15, 0.14), 0 0 0 1px rgba(212, 175, 55, 0.12);
+  --dx-shadow-sm: var(--dx-shadow-soft);
+  --dx-shadow-md: var(--dx-shadow-medium);
+  --dx-shadow-card: var(--dx-shadow-medium);
+  --dx-shadow-hover: var(--dx-shadow-large);
+  --dx-shadow-focus-brand: 0 0 0 4px rgba(212, 175, 55, 0.28);
 
   /* Motion */
   --dx-duration-fast: 120ms;
   --dx-duration-base: 200ms;
-  --dx-duration-page: 220ms;
-  --dx-ease-standard: ease;
+  --dx-duration-page: 260ms;
+  --dx-ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dx-transition: var(--dx-duration-base) var(--dx-ease-standard);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -65,5 +146,6 @@
     --dx-duration-fast: 0ms;
     --dx-duration-base: 0ms;
     --dx-duration-page: 0ms;
+    --dx-transition: none;
   }
 }
