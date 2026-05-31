@@ -1,10 +1,7 @@
 #!/usr/bin/env node
 import { spawn } from 'node:child_process';
 
-const pnpmExecutable = process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm';
-const pnpmCli = process.env.npm_execpath?.toLowerCase().includes('pnpm')
-  ? process.env.npm_execpath
-  : undefined;
+const command = process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm';
 
 const apps = {
   diamarket: [
@@ -58,7 +55,11 @@ const children = selectedApps.map((app) => {
   console.log(`[${app.name}] > pnpm ${args.join(' ')}`);
   return {
     ...app,
-    process: spawnPnpm(args),
+    process: spawn(`${command} --dir ${app.path} run dev`, {
+      stdio: 'inherit',
+      env: process.env,
+      shell: true,
+    }),
   };
 });
 
