@@ -4,10 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3000",
-    "build": "next build",
+    "build": "pnpm --filter @diaexpress/shared build && next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "echo \"No tests specified\""
+    "test": "echo \"No tests specified\"",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.61.4",

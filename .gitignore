@@ -25,3 +25,6 @@ dist
 diapay/.env
 
 *.tsbuildinfo
+
+.turbo
+dist-types

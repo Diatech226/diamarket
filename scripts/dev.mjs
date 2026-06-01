@@ -4,22 +4,9 @@ import { spawn } from 'node:child_process';
 const command = process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm';
 
 const apps = {
-  diamarket: [
-    { name: 'diamarket-web', path: 'apps/diamarket-web' },
-    { name: 'diamarket-cms', path: 'apps/diamarket-cms' },
-    { name: 'diamarket-api', path: 'apps/diamarket-api' },
-  ],
-  diapay: [
-    { name: 'diapay-api', path: 'apps/diapay-api' },
-    { name: 'diapay-dashboard', path: 'apps/diapay-dashboard' },
-    { name: 'diapay-docs', path: 'apps/diapay-docs' },
-    { name: 'diapay-sandbox', path: 'apps/diapay-sandbox' },
-  ],
-  diaexpress: [
-    { name: 'diaexpress-client', path: 'apps/diaexpress-client' },
-    { name: 'diaexpress-adminv2', path: 'apps/diaexpress-adminv2' },
-    { name: 'diaexpress-backend', path: 'apps/services/diaexpress-backend' },
-  ],
+  diamarket: ['diamarket-web', 'diamarket-cms', 'diamarket-api'],
+  diapay: ['diapay-api', 'diapay-dashboard', 'diapay-docs', 'diapay-sandbox'],
+  diaexpress: ['diaexpress-web', 'diaexpress-admin', 'diaexpress-api'],
 };
 
 apps.all = [...apps.diamarket, ...apps.diapay, ...apps.diaexpress];
@@ -29,36 +16,21 @@ const selectedApps = apps[target];
 
 if (!selectedApps) {
   console.error(`Unknown dev target "${target}".`);
-  console.error(`Usage: pnpm dev [${Object.keys(apps).join('|')}]`);
+  console.error(`Usage: pnpm dev:${Object.keys(apps).filter((key) => key !== 'all').join('|dev:')} or pnpm dev:all`);
   process.exit(1);
 }
 
-const spawnPnpm = (args) => {
-  if (pnpmCli) {
-    return spawn(process.execPath, [pnpmCli, ...args], {
-      stdio: 'inherit',
-      env: process.env,
-    });
-  }
+console.log(`Starting ${target} dev apps: ${selectedApps.join(', ')}`);
 
-  return spawn(pnpmExecutable, args, {
-    stdio: 'inherit',
-    env: process.env,
-    shell: true,
-  });
-};
-
-console.log(`Starting ${target} dev apps: ${selectedApps.map((app) => app.name).join(', ')}`);
-
-const children = selectedApps.map((app) => {
-  const args = ['--dir', app.path, 'run', 'dev'];
-  console.log(`[${app.name}] > pnpm ${args.join(' ')}`);
+const children = selectedApps.map((appName) => {
+  const args = ['--filter', appName, 'dev'];
+  console.log(`[${appName}] > ${command} ${args.join(' ')}`);
   return {
-    ...app,
-    process: spawn(`${command} --dir ${app.path} run dev`, {
+    name: appName,
+    process: spawn(command, args, {
       stdio: 'inherit',
       env: process.env,
-      shell: true,
+      shell: process.platform === 'win32',
     }),
   };
 });

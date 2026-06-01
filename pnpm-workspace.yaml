@@ -1,5 +1,3 @@
 packages:
   - 'apps/*'
-  - 'apps/services/*'
-  - 'apps/*/packages/*'
   - 'packages/*'

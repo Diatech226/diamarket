@@ -282,6 +282,19 @@ importers:
 
   packages/config: {}
 
+  packages/diaexpress-shared:
+    dependencies:
+      react-hook-form:
+        specifier: ^7.49.2
+        version: 7.77.0(react@18.3.1)
+      zod:
+        specifier: ^3.22.4
+        version: 3.25.76
+    devDependencies:
+      typescript:
+        specifier: ^5.5.2
+        version: 5.9.3
+
   packages/diapay-node:
     dependencies:
       diapay-sdk-js:
