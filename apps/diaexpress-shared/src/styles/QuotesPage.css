@@ -1,0 +1,66 @@
+.quotes-page__notice {
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--dx-color-border);
+  font-weight: 500;
+}
+
+.quotes-page__notice--error {
+  border-color: rgba(185, 28, 28, 0.3);
+  background: var(--dx-error-surface);
+  color: #991b1b;
+}
+
+.quotes-page__notice--success {
+  border-color: rgba(22, 163, 74, 0.35);
+  background: var(--dx-success-surface);
+  color: #166534;
+}
+
+.quotes-page__table-wrap {
+  overflow-x: auto;
+}
+
+.quotes-page__table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 840px;
+}
+
+.quotes-page__table th,
+.quotes-page__table td {
+  text-align: left;
+  padding: 0.8rem;
+  border-bottom: 1px solid var(--dx-color-border);
+  vertical-align: top;
+}
+
+.quotes-page__table th {
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--dx-text-soft);
+}
+
+.quotes-page__status-cell {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.quotes-page__status-cell small,
+.quotes-page__muted {
+  color: var(--dx-text-muted);
+  font-size: 0.8rem;
+}
+
+.quotes-page__empty {
+  text-align: center;
+}
+
+.quotes-page__empty h2 {
+  margin: 0;
+}
+
+.quotes-page__empty p {
+  margin: 0;
+  color: var(--dx-text-muted);
+}
