@@ -15,13 +15,29 @@ const { validateStartupConfig } = require('./config/startupValidation');
 const { buildRateLimiter } = require('./middleware/rateLimit');
 
 const app = express();
+let httpServer = null;
+
+const shutdownAfterFatal = (eventName, fatalError) => {
+  logger.error('errors', eventName, {
+    errorMessage: fatalError?.message || String(fatalError),
+    stack: fatalError?.stack,
+  });
+
+  if (httpServer) {
+    httpServer.close(() => process.exit(1));
+    setTimeout(() => process.exit(1), 5000).unref();
+    return;
+  }
+
+  process.exit(1);
+};
 
 process.on('unhandledRejection', (reason) => {
-  logger.error('errors', 'process.unhandled_rejection', { reason: reason?.message || String(reason) });
+  shutdownAfterFatal('process.unhandled_rejection', reason instanceof Error ? reason : new Error(String(reason)));
 });
 
-process.on('uncaughtException', (error) => {
-  logger.error('errors', 'process.uncaught_exception', { errorMessage: error?.message, stack: error?.stack });
+process.on('uncaughtException', (fatalError) => {
+  shutdownAfterFatal('process.uncaught_exception', fatalError);
 });
 
 // Middleware global
@@ -114,8 +130,7 @@ const buildHealthPayload = () => {
 };
 
 app.get('/health', (_req, res) => {
-  const result = buildHealthPayload();
-  return res.status(result.statusCode).json(result.payload);
+  return res.status(200).json({ status: 'ok' });
 });
 
 app.get('/api/health', (_req, res) => {
@@ -191,38 +206,48 @@ app.use('/api/v1/public', require('./routes/v1/public'));
 app.use('/api/uploads', require('./routes/uploads'));
 app.use('/uploads', express.static('uploads')); // pour servir les images
 
-async function startServer() {
-  const PORT = appConfig.server.port;
-
-  const startupProfile = validateStartupConfig();
-  logger.info('startup', 'server.starting', { port: PORT, startupProfile });
+async function bootstrapServices(startupProfile) {
+  logger.info('startup', 'bootstrap.started', { startupProfile });
   const dbState = await connectDB();
   app.locals.db = dbState;
 
   if (dbState.connected) {
+    logger.info('startup', 'db.connected', { source: dbState.source, mode: dbState.mode, uriSummary: dbState.uriSummary });
     await seedAdminUser();
     logger.info('startup', 'admin.seed_checked');
-  } else {
-    logger.error('startup', 'server.db_unavailable', { reason: dbState.degradedReason || dbState.error?.message || 'unknown_db_error' });
-    logger.warn('startup', 'admin.seed_skipped_db_offline');
-    if (!startupProfile.degradedAllowed) {
-      throw new Error('MongoDB unavailable. Set a valid MONGODB_URI (Atlas) or explicitly enable local fallback with MONGODB_ALLOW_LOCAL_FALLBACK=true and MONGODB_LOCAL_URI.');
-    }
+    logger.info('startup', 'server.ready', { dbSource: dbState.source });
+    return;
   }
 
-  app.listen(PORT, () => {
-    logger.info('startup', 'server.listening', { url: `http://localhost:${PORT}` });
-    if (dbState.connected) {
-      logger.info('startup', 'server.ready', { dbSource: dbState.source });
-    } else {
-      logger.error('startup', 'server.ready_db_unavailable', { reason: dbState.degradedReason || dbState.error?.message || 'unknown_db_error' });
-    }
+  logger.error('startup', 'server.db_unavailable', { reason: dbState.degradedReason || dbState.error?.message || 'unknown_db_error' });
+  logger.warn('startup', 'admin.seed_skipped_db_offline');
+  if (!startupProfile.degradedAllowed) {
+    throw new Error('MongoDB unavailable. Set a valid MONGODB_URI (Atlas) or explicitly enable local fallback with MONGODB_ALLOW_LOCAL_FALLBACK=true and MONGODB_LOCAL_URI.');
+  }
+
+  logger.error('startup', 'server.ready_db_unavailable', { reason: dbState.degradedReason || dbState.error?.message || 'unknown_db_error' });
+}
+
+async function startServer() {
+  const PORT = appConfig.server.port;
+  const startupProfile = validateStartupConfig();
+
+  logger.info('startup', 'server.starting', { port: PORT, startupProfile });
+
+  httpServer = app.listen(PORT, () => {
+    logger.info('startup', 'server.listening', { url: `http://localhost:${PORT}`, port: PORT });
+    logger.info('startup', 'express.ready', { health: '/health', readiness: '/api/health/ready' });
   });
+
+  httpServer.on('error', (listenError) => {
+    shutdownAfterFatal('startup.server.listen_failed', listenError);
+  });
+
+  await bootstrapServices(startupProfile);
 }
 
 app.use(errorHandler);
 
-startServer().catch((error) => {
-  logger.error('startup', 'server.start_failed', { errorMessage: error?.message, stack: error?.stack });
-  process.exit(1);
+startServer().catch((startupError) => {
+  shutdownAfterFatal('startup.server.start_failed', startupError);
 });

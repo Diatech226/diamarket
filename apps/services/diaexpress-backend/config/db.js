@@ -4,6 +4,28 @@ const { metrics } = require('../src/shared/observability/metrics');
 const { logger } = require('../src/shared/observability/logger');
 
 const DEFAULT_LOCAL_MONGO_URI = 'mongodb://127.0.0.1:27017/diaexpress';
+const DEFAULT_MONGO_SERVER_SELECTION_TIMEOUT_MS = 5000;
+const DEFAULT_MONGO_CONNECT_TIMEOUT_MS = 8000;
+const DEFAULT_MONGO_SOCKET_TIMEOUT_MS = 20000;
+const DEFAULT_MONGO_DNS_TIMEOUT_MS = 3000;
+
+const toPositiveInteger = (value, fallback) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+};
+
+const withTimeout = (promise, timeoutMs, timeoutMessage) => {
+  let timer;
+  const timeout = new Promise((_, reject) => {
+    timer = setTimeout(() => {
+      const error = new Error(timeoutMessage);
+      error.code = 'ETIMEOUT';
+      reject(error);
+    }, timeoutMs);
+  });
+
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
+};
 
 const URI_PATTERN = /^mongodb(\+srv)?:\/\//i;
 const LOCAL_URI_PATTERN = /^mongodb:\/\//i;
@@ -229,7 +251,12 @@ const resolveSrvDiagnostics = async (uri) => {
   }
 
   try {
-    const records = await dns.resolveSrv(`_mongodb._tcp.${srvHost}`);
+    const dnsTimeoutMs = toPositiveInteger(process.env.MONGODB_DNS_TIMEOUT_MS, DEFAULT_MONGO_DNS_TIMEOUT_MS);
+    const records = await withTimeout(
+      dns.resolveSrv(`_mongodb._tcp.${srvHost}`),
+      dnsTimeoutMs,
+      `DNS SRV resolution timed out after ${dnsTimeoutMs}ms for ${srvHost}.`,
+    );
     return {
       status: 'ok',
       srvHost,
@@ -265,8 +292,12 @@ const formatMongoError = (error, uri, label) => ({
 
 const logEnvDiagnostics = ({ configuredUri, localUri, localFallbackEnabled }) => {
   logger.info('db', 'env.summary', {
+    nodeEnv: process.env.NODE_ENV || 'development',
+    port: process.env.PORT || '5000',
     mongodbUri: configuredUri ? 'set' : 'missing',
     mongodbLocalUri: process.env.MONGODB_LOCAL_URI ? 'set' : `missing (default disabled: ${DEFAULT_LOCAL_MONGO_URI})`,
+    localFallbackEnabled,
+    degradedModeAllowed: isTruthy(process.env.ALLOW_DEGRADED_MODE),
   });
   logger.info('db', 'env.effective_uri', {
     target: 'MONGODB_URI',
@@ -286,13 +317,38 @@ const logEnvDiagnostics = ({ configuredUri, localUri, localFallbackEnabled }) =>
 
 const tryConnect = async (uri) => {
   const startedAt = Date.now();
+  const serverSelectionTimeoutMS = toPositiveInteger(
+    process.env.MONGODB_SERVER_SELECTION_TIMEOUT_MS,
+    DEFAULT_MONGO_SERVER_SELECTION_TIMEOUT_MS,
+  );
+  const connectTimeoutMS = toPositiveInteger(process.env.MONGODB_CONNECT_TIMEOUT_MS, DEFAULT_MONGO_CONNECT_TIMEOUT_MS);
+  const socketTimeoutMS = toPositiveInteger(process.env.MONGODB_SOCKET_TIMEOUT_MS, DEFAULT_MONGO_SOCKET_TIMEOUT_MS);
+  const startupTimeoutMS = toPositiveInteger(
+    process.env.MONGODB_STARTUP_TIMEOUT_MS,
+    Math.max(serverSelectionTimeoutMS + 2000, connectTimeoutMS + 1000),
+  );
 
-  await mongoose.connect(uri, {
-    serverSelectionTimeoutMS: 5000,
-  });
+  await withTimeout(
+    mongoose.connect(uri, {
+      serverSelectionTimeoutMS,
+      connectTimeoutMS,
+      socketTimeoutMS,
+      retryWrites: true,
+      maxPoolSize: toPositiveInteger(process.env.MONGODB_MAX_POOL_SIZE, 10),
+      minPoolSize: toPositiveInteger(process.env.MONGODB_MIN_POOL_SIZE, 0),
+    }),
+    startupTimeoutMS,
+    `MongoDB startup connection timed out after ${startupTimeoutMS}ms.`,
+  );
 
   return {
     elapsedMs: Date.now() - startedAt,
+    timeouts: {
+      serverSelectionTimeoutMS,
+      connectTimeoutMS,
+      socketTimeoutMS,
+      startupTimeoutMS,
+    },
   };
 };
 
@@ -466,13 +522,14 @@ const connectDB = async () => {
         result: 'started',
       });
       const connection = await tryConnect(candidate.uri);
-      attempts.push({ mode: candidate.label, ok: true, uriSummary: summariseUri(candidate.uri), elapsedMs: connection.elapsedMs });
+      attempts.push({ mode: candidate.label, ok: true, uriSummary: summariseUri(candidate.uri), elapsedMs: connection.elapsedMs, timeouts: connection.timeouts });
       logger.info('db', 'connect_attempt', {
         action: 'connect_attempt',
         uriHost: extractMongoSrvHost(candidate.uri) || new URL(candidate.uri).hostname,
         source: candidate.label,
         result: 'success',
         elapsedMs: connection.elapsedMs,
+        timeouts: connection.timeouts,
       });
       return {
         connected: true,
