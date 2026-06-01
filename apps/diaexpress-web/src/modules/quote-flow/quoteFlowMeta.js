@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { fetchQuoteMeta } from '../../../packages/diaexpress-shared/src/api/logistics';
+import { fetchQuoteMeta } from '@diaexpress/shared/api/logistics';
 
 const normalizeArray = (value) => (Array.isArray(value) ? value : []);
 

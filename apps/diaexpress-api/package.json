@@ -9,7 +9,8 @@
     "test": "node --test --import tsx --import ./tests/setup/diapay.setup.ts",
     "start": "node server.js",
     "migrate:payments": "node scripts/migratePaymentsToDiaPay.js",
-    "seed:admin": "node scripts/seed-admin.js"
+    "seed:admin": "node scripts/seed-admin.js",
+    "typecheck": "echo \"No TypeScript typecheck configured for diaexpress-api\""
   },
   "keywords": [],
   "author": "",

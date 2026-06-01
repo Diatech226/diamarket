@@ -2,10 +2,8 @@ import { ClerkProvider } from '@clerk/nextjs';
 import { getClerkRuntimeConfig } from '@/lib/config/env';
 import type { ComponentType, PropsWithChildren } from 'react';
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
 import './globals.css';
 
-const inter = Inter({ subsets: ['latin'], display: 'swap' });
 const SyncClerkProvider = ClerkProvider as unknown as ComponentType<PropsWithChildren<{ publishableKey: string }>>;
 
 export const metadata: Metadata = {
@@ -15,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 function RootBody({ children }: { children: React.ReactNode }) {
-  return <body className={inter.className}>{children}</body>;
+  return <body className="diaexpress-admin">{children}</body>;
 }
 
 export default function RootLayout({

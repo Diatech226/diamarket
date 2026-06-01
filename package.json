@@ -14,7 +14,8 @@
     "lint": "turbo lint",
     "typecheck": "turbo typecheck",
     "test:mongo:dns": "npm --prefix apps/diamarket-api run test:mongo:dns --",
-    "build": "turbo build"
+    "build": "turbo build",
+    "build:diaexpress": "turbo run build --filter=diaexpress-web --filter=diaexpress-admin --filter=diaexpress-api"
   },
   "devDependencies": {
     "turbo": "^2.1.1",

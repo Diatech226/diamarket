@@ -1,4 +1,4 @@
-# DiaExpress Client (Next.js)
+# DiaExpress Web (Next.js)
 
 Portail client/public (quotes, tracking, paiements, dashboard).
 
@@ -11,9 +11,9 @@ Portail client/public (quotes, tracking, paiements, dashboard).
 
 ## Setup local
 ```bash
-cd /workspace/diaexpress_backend
-npm install
-npm run dev:client
+cd /workspace/diamarket
+pnpm install
+pnpm --filter diaexpress-web dev
 ```
 
 > Important: faites l'installation à la racine du monorepo pour garder des résolutions stables.
@@ -25,7 +25,7 @@ npm run dev:client
 
 ### Ports
 - Développement : `http://localhost:3000` (Next.js par défaut)
-- Production : `npm run build && npm start` (même port si `PORT` est défini)
+- Production : `pnpm --filter diaexpress-web build && pnpm --filter diaexpress-web start` (même port si `PORT` est défini)
 
 ## Auth client + stockage token
 
@@ -53,21 +53,21 @@ npm run dev:client
 - **Auth Clerk** : assurez-vous que `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` est défini.
 - **Imports partagés** : le package est local dans `packages/diaexpress-shared`.
 - **Erreur `Cannot find module 'next/dist/server/future/route-modules/pages/vendored/contexts/router-context'`** :
-  1. vérifiez que `next` est bien `14.2.25` dans `apps/diaexpress-client/package.json`,
+  1. vérifiez que `next` est bien `14.2.25` dans `apps/diaexpress-web/package.json`,
   2. supprimez `node_modules` + `.next` dans l'app,
   3. réinstallez via `npm run install:clean` depuis la racine monorepo,
-  4. relancez `npm run dev`.
+  4. relancez `pnpm --filter diaexpress-web dev`.
 
 ## Scripts
-- `npm run dev`
-- `npm run build`
-- `npm run start`
-- `npm run lint`
-- `npm run test`
+- `pnpm --filter diaexpress-web dev`
+- `pnpm --filter diaexpress-web build`
+- `pnpm --filter diaexpress-web start`
+- `pnpm --filter diaexpress-web lint`
+- `pnpm --filter diaexpress-web test`
 
 ## How to split into separate repos
-1. Copier le dossier `apps/diaexpress-client` dans un nouveau repo.
-2. Conserver `packages/diaexpress-shared` (vendored) pour conserver les imports `@diaexpress/shared`.
+1. Copier le dossier `apps/diaexpress-web` dans un nouveau repo.
+2. Conserver `packages/diaexpress-shared` (workspace ou vendored) pour conserver les imports `@diaexpress/shared`.
 3. Ajouter votre `.env` à partir de `.env.example`.
 4. Mettre à jour la CI/CD pour utiliser ce dossier comme racine du projet.
 
