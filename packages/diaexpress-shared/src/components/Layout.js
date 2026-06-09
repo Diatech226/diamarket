@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 
 const Layout = ({ children }) => {
   return (
@@ -6,9 +7,9 @@ const Layout = ({ children }) => {
       <aside className="sidebar">
         <h2>Dashboard</h2>
         <nav>
-          <a href="/">Accueil</a>
-          <a href="/admin">Admin</a>
-          <a href="/quote">Demander un devis</a>
+          <Link href="/">Accueil</Link>
+          <Link href="/admin">Admin</Link>
+          <Link href="/quote">Demander un devis</Link>
         </nav>
       </aside>
       <main className="main-content">

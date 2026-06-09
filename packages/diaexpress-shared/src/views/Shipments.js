@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useBackendAuth } from '../auth/useBackendAuth';
 import { API_BASE } from "../api/api";
 
@@ -19,7 +19,7 @@ const Shipments = () => {
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
 
-  const loadShipments = async () => {
+  const loadShipments = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -41,11 +41,11 @@ const Shipments = () => {
       setShipments([]);
     }
     setLoading(false);
-  };
+  }, [getToken]);
 
   useEffect(() => {
     loadShipments();
-  }, []);
+  }, [loadShipments]);
 
   const totalPages = Math.ceil(shipments.length / PAGE_SIZE);
   const paginated = shipments.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);

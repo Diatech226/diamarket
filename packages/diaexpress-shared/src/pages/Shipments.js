@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useBackendAuth } from '../auth/useBackendAuth';
 import { fetchClientShipments } from '../api/logistics';
@@ -67,7 +67,7 @@ const Shipments = () => {
   const [statusFilter, setStatusFilter] = useState('Tous');
   const [searchCode, setSearchCode] = useState('');
 
-  const loadShipments = async () => {
+  const loadShipments = useCallback(async () => {
     setLoading(true);
     try {
       const token = await getToken();
@@ -82,11 +82,11 @@ const Shipments = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [getToken]);
 
   useEffect(() => {
     if (isLoaded) loadShipments();
-  }, [isLoaded]);
+  }, [isLoaded, loadShipments]);
 
   const kpis = useMemo(() => dashboardKpis(shipments), [shipments]);
 

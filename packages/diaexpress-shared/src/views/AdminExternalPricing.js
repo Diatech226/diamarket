@@ -259,7 +259,7 @@ const AdminExternalPricing = () => {
               <input type="date" name="validFrom" value={filters.validFrom} onChange={handleFilterChange} />
             </label>
             <label className="filters__date">
-              <span>Valide jusqu'au</span>
+              <span>Valide jusqu&apos;au</span>
               <input type="date" name="validTo" value={filters.validTo} onChange={handleFilterChange} />
             </label>
           </div>
@@ -292,7 +292,7 @@ const AdminExternalPricing = () => {
                       Valide de {sortConfig.key === 'validFrom' && (sortConfig.direction === 'asc' ? '▲' : '▼')}
                     </th>
                     <th onClick={() => handleSort('validTo')}>
-                      Valide jusqu'à {sortConfig.key === 'validTo' && (sortConfig.direction === 'asc' ? '▲' : '▼')}
+                      Valide jusqu&apos;à {sortConfig.key === 'validTo' && (sortConfig.direction === 'asc' ? '▲' : '▼')}
                     </th>
                   </tr>
                 </thead>

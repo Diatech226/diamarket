@@ -325,7 +325,7 @@ const ProfileAddresses = () => {
         <form onSubmit={handleSubmit} className="address-form">
           <div className="form-row">
             <label>
-              Type d'adresse
+              Type d&apos;adresse
               <select name="type" value={form.type} onChange={handleChange} required>
                 <option value="sender">Expéditeur</option>
                 <option value="recipient">Destinataire</option>
@@ -448,7 +448,7 @@ const ProfileAddresses = () => {
                 />
               </label>
             </div>
-            <p className="geo-hint">Ces données resteront optionnelles et prépareront l'arrivée des services de géolocalisation.</p>
+            <p className="geo-hint">Ces données resteront optionnelles et prépareront l&apos;arrivée des services de géolocalisation.</p>
             </> : <p className="geo-hint">Les coordonnées GPS sont facultatives. Activez cette section uniquement si nécessaire.</p>}
           </div>
 

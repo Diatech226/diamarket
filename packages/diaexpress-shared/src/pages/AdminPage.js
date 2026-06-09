@@ -335,7 +335,7 @@ const AdminPage = () => {
                 <span className="dx-section__eyebrow">tarification</span>
                 <h2 className="dx-section__title">Vos routes configurées</h2>
                 <p className="dx-section__subtitle">
-                  Vérifiez en un coup d'œil les corridors couverts par vos grilles internes.
+                  Vérifiez en un coup d&apos;œil les corridors couverts par vos grilles internes.
                 </p>
               </div>
               {pricing.length === 0 ? (
