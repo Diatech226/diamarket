@@ -337,7 +337,7 @@ const AdminPricing = () => {
       <form onSubmit={handleSubmit} className={styles.pricingForm}>
         <div className={styles.addressSelectGroup}>
           <label>
-            Adresse d'origine sauvegardée
+            Adresse d&apos;origine sauvegardée
             <select
               value={form.originAddressId}
               onChange={(e) => handleSavedAddressChange('origin', e.target.value)}

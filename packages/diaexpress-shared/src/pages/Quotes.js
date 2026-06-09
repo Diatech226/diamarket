@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useBackendAuth } from '../auth/useBackendAuth';
 import { API_BASE } from '../api/api';
@@ -45,7 +45,7 @@ const Quotes = () => {
   const [paymentError, setPaymentError] = useState('');
   const [paymentReceipt, setPaymentReceipt] = useState(null);
 
-  const loadQuotes = async () => {
+  const loadQuotes = useCallback(async () => {
     setLoading(true);
     setError('');
 
@@ -61,11 +61,11 @@ const Quotes = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [getToken]);
 
   useEffect(() => {
     loadQuotes();
-  }, []);
+  }, [loadQuotes]);
 
   const kpis = useMemo(() => {
     const normalized = quotes.map((quote) => normalizeStatus(quote.status));

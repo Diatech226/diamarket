@@ -324,7 +324,7 @@ export const fetchShipmentById = async (shipmentId, token) => {
 
 export const fetchPublicPricingRoutes = () => apiRequest('/api/pricing/routes');
 
-export default {
+const logisticsApi = {
   apiRequest,
   fetchAdminQuotes,
   updateQuoteStatus,
@@ -347,3 +347,5 @@ export default {
   fetchShipmentById,
   fetchPublicPricingRoutes,
 };
+
+export default logisticsApi;

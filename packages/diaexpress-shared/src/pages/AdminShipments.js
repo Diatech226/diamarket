@@ -478,7 +478,7 @@ const AdminShipments = () => {
 
         <section className="dx-section">
           <div className="dx-section__header">
-            <span className="dx-section__eyebrow">tableau d'exécution</span>
+            <span className="dx-section__eyebrow">tableau d&apos;exécution</span>
             <h2 className="dx-section__title">Suivi détaillé des expéditions</h2>
             <p className="dx-section__subtitle">
               Consultez chaque expédition, mettez à jour son statut et ouvrez le suivi

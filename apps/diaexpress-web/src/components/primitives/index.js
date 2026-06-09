@@ -1,3 +1,3 @@
 export { Button, Card, Badge, Section } from '../ui';
-export { PageHeader } from '../layout';
+export { default as PageHeader } from '../layout/PageHeader';
 export { EmptyState, LoadingState, ErrorState } from '../feedback';
