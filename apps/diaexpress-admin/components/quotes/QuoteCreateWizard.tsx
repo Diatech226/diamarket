@@ -65,6 +65,8 @@ export function QuoteCreateWizard({ onQuoteCreated }: QuoteCreateWizardProps) {
     >();
 
     lines.forEach((line) => {
+      if (!line.origin || !line.destination) return;
+
       const transports = line.transportType ? [line.transportType] : line.transportTypes || [];
       const destinations = grouped.get(line.origin) ?? [];
       const existing = destinations.find((item) => item.destination === line.destination);

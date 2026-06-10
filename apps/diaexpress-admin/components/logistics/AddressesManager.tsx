@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ActiveBadge } from './ActiveBadge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -20,6 +20,7 @@ import type { PaginatedResult } from '@/src/types/pagination';
 export function AddressesManager() {
   const [marketPoints, setMarketPoints] = useState<MarketPoint[]>([]);
   const [filters, setFilters] = useState<AddressFilters>({ page: 1, pageSize: 10 });
+  const filtersRef = useRef(filters);
   const [pagination, setPagination] = useState<PaginatedResult<AdminAddress>>({ items: [], page: 1, pageSize: 10, total: 0 });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -36,31 +37,31 @@ export function AddressesManager() {
   });
   const [submitting, setSubmitting] = useState(false);
 
-  const loadMarketPoints = async () => {
+  const loadMarketPoints = useCallback(async () => {
     const data = await fetchMarketPoints({ page: 1, pageSize: 100, active: true });
     setMarketPoints(data.items || []);
-  };
+  }, []);
 
-  const load = async (params: Partial<AddressFilters> = {}) => {
+  const load = useCallback(async (params: Partial<AddressFilters> = {}) => {
     setLoading(true);
     setError(null);
     try {
-      const next = { ...filters, ...params } as AddressFilters;
+      const next = { ...filtersRef.current, ...params } as AddressFilters;
       const data = await fetchLogisticsAddresses(next);
       setPagination(data);
+      filtersRef.current = next;
       setFilters(next);
     } catch (err) {
       setError((err as Error).message);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     void load();
     void loadMarketPoints();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [load, loadMarketPoints]);
 
   useEffect(() => {
     setForm({
@@ -192,7 +193,7 @@ export function AddressesManager() {
                 items.map((address) => (
                   <tr key={address._id}>
                     <td>{address.label}</td>
-                    <td>{(address.marketPointId as MarketPoint)?.name || address.marketPointId || '—'}</td>
+                    <td>{typeof address.marketPointId === 'object' ? address.marketPointId?.name || '—' : address.marketPointId || '—'}</td>
                     <td>
                       <div className="stack">
                         <span>{address.contactName || '—'}</span>

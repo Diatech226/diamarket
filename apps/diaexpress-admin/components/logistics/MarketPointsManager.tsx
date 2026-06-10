@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ActiveBadge } from './ActiveBadge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -26,6 +26,7 @@ const TYPES: { value: string; label: string }[] = [
 export function MarketPointsManager() {
   const [countries, setCountries] = useState<Country[]>([]);
   const [filters, setFilters] = useState<MarketPointFilters>({ page: 1, pageSize: 10 });
+  const filtersRef = useRef(filters);
   const [pagination, setPagination] = useState<PaginatedResult<MarketPoint>>({ items: [], page: 1, pageSize: 10, total: 0 });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -42,31 +43,31 @@ export function MarketPointsManager() {
   });
   const [submitting, setSubmitting] = useState(false);
 
-  const loadCountries = async () => {
+  const loadCountries = useCallback(async () => {
     const data = await fetchCountries({ page: 1, pageSize: 100 });
     setCountries(data.items || []);
-  };
+  }, []);
 
-  const load = async (params: Partial<MarketPointFilters> = {}) => {
+  const load = useCallback(async (params: Partial<MarketPointFilters> = {}) => {
     setLoading(true);
     setError(null);
     try {
-      const next = { ...filters, ...params } as MarketPointFilters;
+      const next = { ...filtersRef.current, ...params } as MarketPointFilters;
       const data = await fetchMarketPoints(next);
       setPagination(data);
+      filtersRef.current = next;
       setFilters(next);
     } catch (err) {
       setError((err as Error).message);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     void load();
     void loadCountries();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [load, loadCountries]);
 
   useEffect(() => {
     setForm({

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ActiveBadge } from './ActiveBadge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -18,6 +18,7 @@ import type { PaginatedResult } from '@/src/types/pagination';
 
 export function CountriesManager() {
   const [filters, setFilters] = useState<CountryFilters>({ page: 1, pageSize: 10 });
+  const filtersRef = useRef(filters);
   const [pagination, setPagination] = useState<PaginatedResult<Country>>({ items: [], page: 1, pageSize: 10, total: 0 });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -25,25 +26,25 @@ export function CountriesManager() {
   const [form, setForm] = useState({ code: '', name: '', active: true });
   const [submitting, setSubmitting] = useState(false);
 
-  const load = async (params: Partial<CountryFilters> = {}) => {
+  const load = useCallback(async (params: Partial<CountryFilters> = {}) => {
     setLoading(true);
     setError(null);
     try {
-      const next = { ...filters, ...params } as CountryFilters;
+      const next = { ...filtersRef.current, ...params } as CountryFilters;
       const data = await fetchCountries(next);
       setPagination(data);
+      filtersRef.current = next;
       setFilters(next);
     } catch (err) {
       setError((err as Error).message);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     void load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [load]);
 
   useEffect(() => {
     setForm({

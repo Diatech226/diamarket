@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -30,6 +30,7 @@ function labelForLine(line?: TransportLine | string | null) {
 export function EmbarkmentsTable() {
   const [lines, setLines] = useState<TransportLine[]>([]);
   const [filters, setFilters] = useState<EmbarkmentFilters>({ page: 1, pageSize: 10 });
+  const filtersRef = useRef(filters);
   const [pagination, setPagination] = useState<PaginatedResult<Embarkment>>({ items: [], total: 0, page: 1, pageSize: 10 });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -48,16 +49,16 @@ export function EmbarkmentsTable() {
   const [submitting, setSubmitting] = useState(false);
   const { notify } = useToast();
 
-  const loadLines = async () => {
+  const loadLines = useCallback(async () => {
     const data = await fetchTransportLines({ page: 1, pageSize: 100, isActive: true });
     setLines(data.items || []);
-  };
+  }, []);
 
-  const load = async (params: Partial<EmbarkmentFilters> = {}) => {
+  const load = useCallback(async (params: Partial<EmbarkmentFilters> = {}) => {
     setLoading(true);
     setError(null);
     try {
-      const next = { ...filters, ...params } as EmbarkmentFilters;
+      const next = { ...filtersRef.current, ...params } as EmbarkmentFilters;
       const today = new Date().toISOString().slice(0, 10);
       if (view === 'upcoming') {
         next.departureFrom = today;
@@ -68,19 +69,19 @@ export function EmbarkmentsTable() {
       }
       const data = await fetchEmbarkments(next);
       setPagination(data);
+      filtersRef.current = next;
       setFilters(next);
     } catch (err) {
       setError(err as Error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [view]);
 
   useEffect(() => {
     void load();
     void loadLines();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [view]);
+  }, [load, loadLines]);
 
   useEffect(() => {
     setForm({

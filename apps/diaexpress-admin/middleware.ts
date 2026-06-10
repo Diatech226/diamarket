@@ -1,12 +1,12 @@
 import { getClerkRuntimeConfig } from '@/lib/config/env';
 import { clerkMiddleware } from '@clerk/nextjs/server';
-import { NextResponse, type NextRequest } from 'next/server';
+import { NextResponse, type NextFetchEvent, type NextRequest } from 'next/server';
 
 const runtimeClerkMiddleware = clerkMiddleware();
 
 let hasLoggedMiddlewareBypass = false;
 
-export default function middleware(request: NextRequest) {
+export default function middleware(request: NextRequest, event: NextFetchEvent) {
   const clerkConfig = getClerkRuntimeConfig();
   if (!clerkConfig.enabled) {
     if (!hasLoggedMiddlewareBypass && process.env.NODE_ENV !== 'production') {
@@ -16,7 +16,7 @@ export default function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  return runtimeClerkMiddleware(request);
+  return runtimeClerkMiddleware(request, event);
 }
 
 export const config = {

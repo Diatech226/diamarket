@@ -152,6 +152,7 @@ export interface Country {
   code: string;
   name: string;
   isActive?: boolean;
+  active?: boolean;
 }
 
 export type MarketPointType = 'agency' | 'hub' | 'relay' | string;

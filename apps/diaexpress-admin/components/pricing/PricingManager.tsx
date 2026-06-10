@@ -10,7 +10,7 @@ import { useToast } from '@/components/ui/toast';
 import { formatCurrency, toTitle } from '@/src/lib/format';
 import { createPricingRule, fetchPackageTypes, fetchPricingRules } from '@/src/services/api/logisticsPricing';
 import { fetchTransportLines } from '@/src/services/api/expeditions';
-import type { PackageType, PricingRule, TransportLine } from '@/src/types/logistics';
+import type { PackageType, PricingRule, TransportLine, TransportMode } from '@/src/types/logistics';
 
 const UNIT_OPTIONS = ['kg', 'm3'];
 
@@ -76,7 +76,7 @@ export function PricingManager() {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [notify]);
 
   const updateForm = (changes: Partial<PricingFormState>) => {
     setForm((prev) => ({ ...prev, ...changes }));
@@ -90,7 +90,7 @@ export function PricingManager() {
   const transportOptions = useMemo(() => selectedLine?.transportTypes || [], [selectedLine]);
 
   useEffect(() => {
-    if (form.transportType && transportOptions.includes(form.transportType)) return;
+    if (form.transportType && transportOptions.includes(form.transportType as TransportMode)) return;
     if (transportOptions.length) {
       setForm((prev) => ({ ...prev, transportType: transportOptions[0] }));
     }

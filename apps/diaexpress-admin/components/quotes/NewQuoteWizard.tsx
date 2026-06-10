@@ -89,9 +89,9 @@ export function NewQuoteWizard({ onQuoteCreated, onOpenList }: NewQuoteWizardPro
       for (const field of numericFields) {
         const value = payload[field];
         if (typeof value === 'string' && value.trim() === '') {
-          (payload as Record<string, unknown>)[field] = undefined;
+          (payload as unknown as Record<string, unknown>)[field] = undefined;
         } else if (typeof value === 'string') {
-          (payload as Record<string, unknown>)[field] = Number(value);
+          (payload as unknown as Record<string, unknown>)[field] = Number(value);
         }
       }
 
