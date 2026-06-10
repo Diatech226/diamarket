@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useBackendAuth } from '../auth/useBackendAuth';
 import { fetchAddresses, createAddress, updateAddress, deleteAddress } from '../api/addresses';
 import { normaliseCountry, validateCountry, validatePhone } from '../utils/addressValidation';
@@ -66,7 +66,7 @@ const ProfileAddresses = () => {
     );
   }, [addresses]);
 
-  const loadAddresses = async () => {
+  const loadAddresses = useCallback(async () => {
     setLoading(true);
     try {
       const token = await getToken();
@@ -78,12 +78,11 @@ const ProfileAddresses = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [getToken]);
 
   useEffect(() => {
-    loadAddresses();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    void loadAddresses();
+  }, [loadAddresses]);
 
   const resetForm = () => {
     setForm(createEmptyAddress());

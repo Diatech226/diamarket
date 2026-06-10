@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ActiveBadge } from '@/components/logistics/ActiveBadge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -29,6 +29,7 @@ function labelForMarketPoint(mp?: MarketPoint | string | null) {
 export function TransportLinesTable() {
   const [marketPoints, setMarketPoints] = useState<MarketPoint[]>([]);
   const [filters, setFilters] = useState<TransportLineFilters>({ page: 1, pageSize: 10 });
+  const filtersRef = useRef(filters);
   const [pagination, setPagination] = useState<PaginatedResult<TransportLine>>({ items: [], total: 0, page: 1, pageSize: 10 });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -44,31 +45,31 @@ export function TransportLinesTable() {
   const [submitting, setSubmitting] = useState(false);
   const { notify } = useToast();
 
-  const loadOptions = async () => {
+  const loadOptions = useCallback(async () => {
     const data = await fetchMarketPoints({ page: 1, pageSize: 100, active: true });
     setMarketPoints(data.items || []);
-  };
+  }, []);
 
-  const load = async (params: Partial<TransportLineFilters> = {}) => {
+  const load = useCallback(async (params: Partial<TransportLineFilters> = {}) => {
     setLoading(true);
     setError(null);
     try {
-      const nextParams = { ...filters, ...params } as TransportLineFilters;
+      const nextParams = { ...filtersRef.current, ...params } as TransportLineFilters;
       const data = await fetchTransportLines(nextParams);
       setPagination(data);
+      filtersRef.current = nextParams;
       setFilters(nextParams);
     } catch (err) {
       setError(err as Error);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     void load();
     void loadOptions();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [load, loadOptions]);
 
   useEffect(() => {
     setForm({

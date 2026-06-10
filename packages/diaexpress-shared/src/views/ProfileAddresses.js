@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useBackendAuth } from '../auth/useBackendAuth';
 import { fetchAddresses, createAddress, updateAddress, deleteAddress } from '../api/addresses';
 import { normaliseCountry, validateCountry, validatePhone } from '../utils/addressValidation';
@@ -58,7 +58,7 @@ const ProfileAddresses = () => {
     return acc;
   }, { sender: [], recipient: [], billing: [] }), [addresses]);
 
-  const loadAddresses = async () => {
+  const loadAddresses = useCallback(async () => {
     setLoading(true);
     try {
       const token = await getToken();
@@ -67,9 +67,9 @@ const ProfileAddresses = () => {
     } catch (err) {
       setError(err.message || 'Impossible de charger les adresses.');
     } finally { setLoading(false); }
-  };
+  }, [getToken]);
 
-  useEffect(() => { loadAddresses(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { void loadAddresses(); }, [loadAddresses]);
 
   const resetForm = () => { setForm(createEmptyAddress()); setFormErrors({}); setEditingId(null); };
 

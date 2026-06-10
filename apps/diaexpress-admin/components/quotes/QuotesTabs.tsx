@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/ui/page-header';
 import { PendingQuotesTable } from './PendingQuotesTable';
 import { QuoteCreateWizard } from './QuoteCreateWizard';
-import { QuotesTable } from './QuotesTable';
+import { QuotesPage } from './QuotesPage';
 
 type TabKey = 'all' | 'pending';
 
@@ -26,10 +26,6 @@ export function QuotesTabs() {
     setRefreshKey((value) => value + 1);
     setActiveTab('all');
     setShowCreate(false);
-  };
-
-  const handleActionComplete = () => {
-    setRefreshKey((value) => value + 1);
   };
 
   return (
@@ -58,11 +54,11 @@ export function QuotesTabs() {
       </div>
 
       {activeTab === 'all' ? (
-        <QuotesTable refreshKey={refreshKey} onRequestNewQuote={() => setShowCreate(true)} />
+        <QuotesPage key={refreshKey} />
       ) : null}
 
       {activeTab === 'pending' ? (
-        <PendingQuotesTable refreshKey={refreshKey} onActionComplete={handleActionComplete} />
+        <PendingQuotesTable key={refreshKey} />
       ) : null}
 
       {showCreate ? (

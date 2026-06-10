@@ -83,6 +83,7 @@ export interface CreateQuotePayload extends QuoteEstimateRequest {
   recipientContactName?: string;
   recipientContactEmail?: string;
   productLocation?: string;
+  pickupAddress?: string;
   userEmail?: string;
   notes?: string;
   transportLineId?: string;

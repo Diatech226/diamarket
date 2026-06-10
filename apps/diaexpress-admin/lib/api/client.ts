@@ -31,7 +31,7 @@ export type ApiRequestOptions = RequestInit & {
    * Pass a plain object to stringify as JSON. If you need to send FormData or a string body,
    * provide it directly via `body`.
    */
-  json?: Record<string, unknown>;
+  json?: object;
 };
 
 export class ApiError<T = unknown> extends Error {

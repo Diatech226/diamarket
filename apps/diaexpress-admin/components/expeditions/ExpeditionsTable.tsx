@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -33,6 +33,7 @@ function transportSummary(expedition: Expedition) {
 
 export function ExpeditionsTable() {
   const [filters, setFilters] = useState<ExpeditionFilters>({ page: 1, pageSize: 10 });
+  const filtersRef = useRef(filters);
   const [pagination, setPagination] = useState<PaginatedResult<Expedition>>({ items: [], total: 0, page: 1, pageSize: 10 });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -42,7 +43,7 @@ export function ExpeditionsTable() {
   const [transportLines, setTransportLines] = useState<TransportLine[]>([]);
   const { notify } = useToast();
 
-  const loadLines = async () => {
+  const loadLines = useCallback(async () => {
     try {
       const data = await fetchTransportLines({ page: 1, pageSize: 100 });
       setTransportLines(data.items);
@@ -51,15 +52,16 @@ export function ExpeditionsTable() {
       setError(new Error(message));
       notify({ title: 'Erreur lignes', message, type: 'error' });
     }
-  };
+  }, [notify]);
 
-  const load = async (params: Partial<ExpeditionFilters> = {}) => {
+  const load = useCallback(async (params: Partial<ExpeditionFilters> = {}) => {
     setLoading(true);
     setError(null);
     try {
-      const nextParams = { ...filters, ...params } as ExpeditionFilters;
+      const nextParams = { ...filtersRef.current, ...params } as ExpeditionFilters;
       const data = await fetchExpeditions(nextParams);
       setPagination(data);
+      filtersRef.current = nextParams;
       setFilters(nextParams);
     } catch (err) {
       const message = (err as Error).message || 'Impossible de charger les expéditions';
@@ -68,13 +70,12 @@ export function ExpeditionsTable() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [notify]);
 
   useEffect(() => {
     void load();
     void loadLines();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [load, loadLines]);
 
   const handleSubmitFilters = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();

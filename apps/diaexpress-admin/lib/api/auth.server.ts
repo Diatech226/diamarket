@@ -45,7 +45,7 @@ export async function resolveServerClerkTokenWithClerk(
     };
   } catch (error) {
     if (tokenOptions.template && isTemplateNotFoundError(error)) {
-      const fallbackToken = await authContext.getToken({ skipCache: tokenOptions.skipCache });
+      const fallbackToken = await authContext.getToken();
       return {
         token: fallbackToken || null,
         usedTemplate: fallbackToken ? null : tokenOptions.template,
