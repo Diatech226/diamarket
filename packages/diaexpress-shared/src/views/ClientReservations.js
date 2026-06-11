@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useBackendAuth } from '../auth/useBackendAuth';
 import { API_BASE } from "../api/api";
 
@@ -8,7 +8,7 @@ const ClientReservations = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const loadReservations = async () => {
+  const loadReservations = useCallback(async () => {
     setLoading(true);
     try {
       const token = await getToken();
@@ -22,11 +22,11 @@ const ClientReservations = () => {
       setError(err.message);
     }
     setLoading(false);
-  };
+  }, [getToken]);
 
   useEffect(() => {
     loadReservations();
-  }, []);
+  }, [loadReservations]);
 
   return (
     <div className="admin-container">

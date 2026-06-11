@@ -1,5 +1,5 @@
 // 📁 src/views/AdminSchedules.js
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { useBackendAuth } from '../auth/useBackendAuth';
 import { API_BASE } from "../api/api";
@@ -35,7 +35,7 @@ const AdminSchedules = () => {
     fetchRoutes();
   }, []);
 
-  const fetchSchedules = async () => {
+  const fetchSchedules = useCallback(async () => {
     try {
       const token = await getToken();
       const res = await axios.get(`${API_BASE}/api/schedules`, {
@@ -47,11 +47,11 @@ const AdminSchedules = () => {
     } catch (err) {
       console.error("Erreur chargement schedules", err);
     }
-  };
+  }, [getToken]);
 
   useEffect(() => {
     fetchSchedules();
-  }, [getToken]);
+  }, [fetchSchedules]);
 
   // Ajouter un schedule
   const handleAddSchedule = async (e) => {

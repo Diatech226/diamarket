@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useBackendAuth } from '../auth/useBackendAuth';
 import { API_BASE } from "../api/api";
 import {
@@ -18,7 +18,7 @@ const AdminShipments = () => {
   const [searchTrackingCode, setSearchTrackingCode] = useState("");
   const [toast, setToast] = useState(null);
 
-  const fetchShipments = async () => {
+  const fetchShipments = useCallback(async () => {
     try {
       const token = await getToken();
       const res = await fetch(`${API_BASE}/api/shipments`, {
@@ -34,11 +34,11 @@ const AdminShipments = () => {
     } catch (err) {
       console.error("Erreur réseau:", err);
     }
-  };
+  }, [getToken]);
 
   useEffect(() => {
     fetchShipments();
-  }, []);
+  }, [fetchShipments]);
 
   useEffect(() => {
     if (!toast) return;

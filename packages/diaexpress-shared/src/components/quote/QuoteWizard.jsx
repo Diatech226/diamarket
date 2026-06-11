@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FormProvider, useForm, useWatch } from 'react-hook-form';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -43,10 +43,10 @@ export function QuoteWizard({ initialOrigins=[] }) {
   const calcVolume = useMemo(()=>{ const l=Number(String(length).replace(',','.')); const w=Number(String(width).replace(',','.')); const h=Number(String(height).replace(',','.')); if(!l||!w||!h) return null; return (l*w*h)/1000000; },[length,width,height]);
   useEffect(()=>{ if(calcVolume && (!volume || transportType==='sea')) setValue('volume', calcVolume.toFixed(3), {shouldDirty:true}); },[calcVolume,volume,transportType,setValue]);
 
-  const clearAfterRouteChange = () => { setValue('transportType',''); setValue('transportLineId',''); setValue('packageTypeId',''); setValue('weight',''); setValue('volume',''); setValue('length',''); setValue('width',''); setValue('height',''); setEstimateState(s=>({...s,result:null,selected:false,status:'route_incomplete',signature:'',error:''})); };
-  useEffect(()=>{ setValue('destination',''); clearAfterRouteChange(); },[origin]);
-  useEffect(()=>{ clearAfterRouteChange(); },[destination]);
-  useEffect(()=>{ setValue('transportLineId',''); setValue('packageTypeId',''); setValue('weight',''); setValue('volume',''); setValue('length',''); setValue('width',''); setValue('height',''); setEstimateState(s=>({...s,result:null,selected:false,status:'cargo_incomplete',signature:'',error:''})); },[transportType]);
+  const clearAfterRouteChange = useCallback(() => { setValue('transportType',''); setValue('transportLineId',''); setValue('packageTypeId',''); setValue('weight',''); setValue('volume',''); setValue('length',''); setValue('width',''); setValue('height',''); setEstimateState(s=>({...s,result:null,selected:false,status:'route_incomplete',signature:'',error:''})); }, [setValue]);
+  useEffect(()=>{ setValue('destination',''); clearAfterRouteChange(); },[clearAfterRouteChange, origin, setValue]);
+  useEffect(()=>{ clearAfterRouteChange(); },[clearAfterRouteChange, destination]);
+  useEffect(()=>{ setValue('transportLineId',''); setValue('packageTypeId',''); setValue('weight',''); setValue('volume',''); setValue('length',''); setValue('width',''); setValue('height',''); setEstimateState(s=>({...s,result:null,selected:false,status:'cargo_incomplete',signature:'',error:''})); },[setValue, transportType]);
 
   const numericCargo = useMemo(() => ({ weight: toNumberOrNull(weight), volume: toNumberOrNull(volume), length: toNumberOrNull(length), width: toNumberOrNull(width), height: toNumberOrNull(height) }), [weight, volume, length, width, height]);
   const hasInvalidCargoInput = useMemo(() => [weight, volume, length, width, height].some((v) => String(v || '').trim() && toNumberOrNull(v) == null), [weight, volume, length, width, height]);

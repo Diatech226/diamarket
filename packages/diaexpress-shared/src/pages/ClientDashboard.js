@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { useBackendAuth } from '../auth/useBackendAuth';
 import Link from 'next/link';
 import { normaliseCountry } from '../utils/addressValidation';
@@ -13,7 +13,7 @@ const ClientDashboard = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       const token = await getToken();
@@ -39,7 +39,7 @@ const ClientDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [getToken]);
 
   useEffect(() => {
     if (!isLoaded) {
@@ -47,7 +47,7 @@ const ClientDashboard = () => {
     }
 
     fetchData();
-  }, [isLoaded]);
+  }, [fetchData, isLoaded]);
 
   const handleCreateShipment = async (quoteId) => {
     try {

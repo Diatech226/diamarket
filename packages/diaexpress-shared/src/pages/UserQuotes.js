@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useBackendAuth } from '../auth/useBackendAuth';
 import {
   createShipmentFromQuote,
@@ -12,7 +12,7 @@ const UserQuotes = () => {
   const [selectedQuote, setSelectedQuote] = useState(null);
   const [error, setError] = useState('');
 
-  const fetchQuotes = async () => {
+  const fetchQuotes = useCallback(async () => {
     try {
       const token = await getToken();
       const list = await fetchClientQuotes(token);
@@ -21,7 +21,7 @@ const UserQuotes = () => {
     } catch (err) {
       setError(err.message || 'Erreur de chargement');
     }
-  };
+  }, [getToken]);
 
   const handleCreateShipment = async (quoteId) => {
     try {
@@ -50,7 +50,7 @@ const UserQuotes = () => {
 
   useEffect(() => {
     fetchQuotes();
-  }, []);
+  }, [fetchQuotes]);
 
   return (
     <div className="user-quotes">
