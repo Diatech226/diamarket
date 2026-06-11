@@ -1,14 +1,14 @@
 import React from 'react';
 import { useRouter } from 'next/router';
 import { ClerkProvider, SignInButton, UserButton } from '@clerk/nextjs';
-import Header from '@diaexpress/shared/components/Header';
-import { AuthProvider } from '@diaexpress/shared/auth/AuthContext';
-import '@diaexpress/shared/styles/App.css';
+import Header from '@/components/Header';
+import { AuthProvider } from '@/auth/AuthContext';
+import '@/styles/App.css';
 import '../src/styles/diaexpress-theme.css';
 import '../src/styles/design-tokens.css';
 import '../src/styles/public-design-tokens.css';
-import { useBackendAuth } from '@diaexpress/shared/auth/useBackendAuth';
-import { useSafeClerk, useSafeUser } from '@diaexpress/shared/auth/useSafeClerk';
+import { useBackendAuth } from '@/auth/useBackendAuth';
+import { useSafeClerk, useSafeUser } from '@/auth/useSafeClerk';
 
 const clerkPubKey = 'pk_test_YWxsb3dpbmctcG9sbGl3b2ctMjYuY2xlcmsuYWNjb3VudHMuZGV2JA';
 

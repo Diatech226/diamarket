@@ -1,7 +1,7 @@
 import React from 'react';
-import ProtectedRoute from '@diaexpress/shared/components/ProtectedRoute';
-import ClientPage from '@diaexpress/shared/pages/ClientPage';
-import RoleProtected from '@diaexpress/shared/components/RoleProtected';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import ClientPage from '@/pages/ClientPage';
+import RoleProtected from '@/components/RoleProtected';
 
 const ClientHomePage = () => (
   <ProtectedRoute>

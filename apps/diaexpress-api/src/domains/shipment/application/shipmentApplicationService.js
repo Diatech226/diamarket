@@ -8,8 +8,8 @@ const {
   applyLifecycleDates,
 } = require('../../../../services/shipmentService');
 const { applyShipmentLifecycleToQuote } = require('../../quote/application/quoteOwnershipService');
-const { publishDomainEvent } = require('../../../shared/events/domainEventPublisher');
-const { DOMAIN_EVENT_NAMES } = require('../../../shared/events/domainEventCatalog');
+const { publishDomainEvent } = require('../../../lib/events/domainEventPublisher');
+const { DOMAIN_EVENT_NAMES } = require('../../../lib/events/domainEventCatalog');
 
 async function convertQuoteToShipment({ quoteId, identity, notes }) {
   const result = await createShipmentFromQuote({ quoteId, identity, notes });

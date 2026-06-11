@@ -1,20 +1,47 @@
-// StepLocationSelector.js
 import React from 'react';
-export default function StepLocationSelector({ formData, setFormData }) {
+
+const StepLocationSelector = ({ formData, setFormData, onNext }) => {
+  const origin = formData.origin ?? '';
+  const destination = formData.destination ?? '';
+  const canProceed = origin.trim() && destination.trim();
+
   return (
-    <div>
-      <input
-        type="text"
-        placeholder="Origine"
-        value={formData.origin}
-        onChange={(e) => setFormData({ ...formData, origin: e.target.value })}
-      />
-      <input
-        type="text"
-        placeholder="Destination"
-        value={formData.destination}
-        onChange={(e) => setFormData({ ...formData, destination: e.target.value })}
-      />
+    <div className="step-location-selector">
+      <h2>Itinéraire</h2>
+      <label>
+        Origine
+        <input
+          type="text"
+          placeholder="Ex: Paris"
+          value={origin}
+          onChange={(e) =>
+            setFormData({ ...formData, origin: e.target.value })
+          }
+        />
+      </label>
+      <label>
+        Destination
+        <input
+          type="text"
+          placeholder="Ex: Abidjan"
+          value={destination}
+          onChange={(e) =>
+            setFormData({ ...formData, destination: e.target.value })
+          }
+        />
+      </label>
+
+      <div className="buttons">
+        <button
+          type="button"
+          onClick={onNext}
+          disabled={!canProceed}
+        >
+          Continuer
+        </button>
+      </div>
     </div>
   );
-}
+};
+
+export default StepLocationSelector;

@@ -16,7 +16,14 @@
       "default": "./dist/index.js"
     }
   },
-  "files": ["dist", "README.md"],
-  "dependencies": {"diapay-sdk-js": "workspace:*"},
-  "devDependencies": {"@types/node": "^20.14.2"}
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "dependencies": {
+    "diapay-sdk-js": "file:../diapay-sdk-js"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.2"
+  }
 }

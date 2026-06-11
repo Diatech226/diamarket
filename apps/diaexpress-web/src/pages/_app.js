@@ -1,5 +1,6 @@
 import { ClerkProvider } from '@clerk/nextjs';
 
+import '../styles/DashboardTheme.css';
 import '../styles/AdminCommon.css';
 import '../styles/AdminExternalPricing.css';
 import '../styles/AdminPackageType.css';

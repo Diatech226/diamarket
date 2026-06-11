@@ -7,17 +7,10 @@ const PricingList = () => {
   useEffect(() => {
     const fetchData = async () => {
       const res = await fetch(buildApiUrl('/api/pricing'));
-      if (!res.ok) {
-        throw new Error(`Erreur de chargement des tarifs (${res.status})`);
-      }
-
       const data = await res.json();
       setPricings(data);
     };
-
-    fetchData().catch((error) => {
-      console.error('Erreur lors du chargement des tarifs :', error);
-    });
+    fetchData();
   }, []);
 
   return (

@@ -1,6 +1,6 @@
 const crypto = require('crypto');
-const { runWithContext, getRequestContext } = require('../src/shared/observability/requestContext');
-const { logger } = require('../src/shared/observability/logger');
+const { runWithContext, getRequestContext } = require('../src/lib/observability/requestContext');
+const { logger } = require('../src/lib/observability/logger');
 
 function generateId() {
   return crypto.randomUUID();

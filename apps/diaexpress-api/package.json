@@ -30,9 +30,7 @@
     "multer": "^2.0.1",
     "nodemailer": "^7.0.3",
     "shortid": "^2.2.17",
-    "uuid": "^11.1.0",
-    "@dia/ui": "workspace:*",
-    "@dia/shared": "workspace:*"
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "tsx": "^4.15.7"

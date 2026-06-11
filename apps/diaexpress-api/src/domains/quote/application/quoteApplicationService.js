@@ -6,9 +6,9 @@ const {
   assertValidTransition,
   buildLifecyclePatch,
 } = require('../../../../services/quoteDomainService');
-const { publishDomainEvent } = require('../../../shared/events/domainEventPublisher');
+const { publishDomainEvent } = require('../../../lib/events/domainEventPublisher');
 const { resolveRouteContext } = require('../../network/application/masterDataService');
-const { DOMAIN_EVENT_NAMES } = require('../../../shared/events/domainEventCatalog');
+const { DOMAIN_EVENT_NAMES } = require('../../../lib/events/domainEventCatalog');
 
 async function requestQuote({ body, identity }) {
   await syncUserFromIdentity(identity);

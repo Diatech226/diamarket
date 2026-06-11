@@ -542,7 +542,7 @@ Backend now starts moving to a **modular monolith** with explicit domain seams:
 - `src/domains/shipment/application/*`: quote→shipment conversion and shipment lifecycle orchestration.
 - `src/domains/tracking/application/*`: tracking synchronization orchestration.
 - `src/domains/network/application/masterDataService.js`: network/master-data access seam.
-- `src/shared/events/*`: in-process domain event bus and publisher for extractable workflows.
+- `src/lib/events/*`: in-process domain event bus and publisher for extractable workflows.
 
 This keeps one deployable backend while reducing cross-domain write leakage.
 

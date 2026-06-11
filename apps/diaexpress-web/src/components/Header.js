@@ -1,82 +1,104 @@
-// 📁 src/components/Header.js
-import React from "react";
-import { SignInButton, UserButton } from "@clerk/nextjs";
-import { useSafeClerk, useSafeUser } from "@diaexpress/shared/auth/useSafeClerk";
-import Link from "next/link";
+import React from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { ANALYTICS_EVENTS, trackEvent } from '../analytics/trackEvent';
 
-const Header = () => {
-  const { user } = useSafeUser();
-  const { signOut } = useSafeClerk();
+const NAV_LINKS = [
+  { href: '/', label: 'Accueil', match: 'exact' },
+  { href: '/services', label: 'Services' },
+  { href: '/track-shipment', label: 'Suivi' },
+  { href: '/about', label: 'À propos' },
+  { href: '/contact', label: 'Contact' },
+];
+
+const Header = ({ user, onSignOut, SignInButtonComponent, UserButtonComponent, isAuthReady = false }) => {
+  const router = useRouter();
+  const [isClientReady, setIsClientReady] = React.useState(false);
+  const [isScrolled, setIsScrolled] = React.useState(false);
+  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsClientReady(true);
+  }, []);
+
+  React.useEffect(() => {
+    const onScroll = () => setIsScrolled(window.scrollY > 20);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  React.useEffect(() => {
+    setIsMenuOpen(false);
+  }, [router.pathname]);
+
+  const canRenderAuth = isClientReady && isAuthReady;
+  const resolvedUser = canRenderAuth ? user : null;
+
+  const isActiveLink = React.useCallback(
+    (link) => {
+      if (link.match === 'exact') return router.pathname === link.href;
+      return router.pathname === link.href || router.pathname.startsWith(`${link.href}/`);
+    },
+    [router.pathname]
+  );
 
   return (
-    <header
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        padding: "1rem 2rem",
-        backgroundColor: "#f5f5f5",
-        borderBottom: "1px solid #ddd",
-      }}
-    >
-      {/* Navigation */}
-      <nav style={{ display: "flex", gap: "1rem" }}>
-        <Link href="/">🏠 Dashboard</Link>
-        <Link href="/quote-request">💼 Demander un devis</Link>
-        <Link href="/track-shipment">📦 Suivi</Link>
-        {user && <Link href="/profile/addresses">📇 Mes adresses</Link>}
+    <header className={`dx-header ${isScrolled ? 'dx-header--scrolled' : ''}`}>
+      <div className="dx-header__inner">
+        <Link href="/" className="dx-header__logo" aria-label="Accueil DiaExpress">
+          DiaExpress
+        </Link>
 
-        {user?.publicMetadata?.role === "admin" && (
-          <Link href="/admin">⚙️ Admin</Link>
-        )}
-        {user?.publicMetadata?.role === "client" && (
-          <Link href="/client">👤 Client</Link>
-        )}
-        {user?.publicMetadata?.role === "delivery" && (
-          <Link href="/delivery">🚚 Livraison</Link>
-        )}
-      </nav>
+        <button
+          type="button"
+          className="dx-header__menu-toggle"
+          aria-expanded={isMenuOpen}
+          aria-controls="dx-main-navigation"
+          onClick={() => setIsMenuOpen((open) => !open)}
+        >
+          Menu
+        </button>
 
-      {/* Zone utilisateur */}
-      <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-        {user ? (
-          <>
-            <span>
-              Connecté :{" "}
-              <strong>
-                {user.primaryEmailAddress?.emailAddress || "Utilisateur"}
-              </strong>
-            </span>
-            <UserButton />
-            <button
-              onClick={() => signOut(() => (window.location.href = "/"))}
-              style={{
-                padding: "0.5rem 1rem",
-                border: "1px solid #ccc",
-                borderRadius: "6px",
-                cursor: "pointer",
-                backgroundColor: "#fff",
-              }}
-            >
-              Déconnexion
-            </button>
-          </>
-        ) : (
-          <SignInButton mode="modal">
-            <button
-              style={{
-                padding: "0.5rem 1rem",
-                border: "1px solid #007bff",
-                borderRadius: "6px",
-                cursor: "pointer",
-                backgroundColor: "#007bff",
-                color: "#fff",
-              }}
-            >
-              Connexion
-            </button>
-          </SignInButton>
-        )}
+        <nav
+          id="dx-main-navigation"
+          className={`dx-header__nav ${isMenuOpen ? 'dx-header__nav--open' : ''}`}
+          aria-label="Navigation principale"
+        >
+          {NAV_LINKS.map((link) => {
+            const isActive = isActiveLink(link);
+            return (
+              <Link key={link.href} href={link.href} aria-current={isActive ? 'page' : undefined}>
+                {link.label}
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className={`dx-header__actions ${isMenuOpen ? 'dx-header__actions--open' : ''}`} suppressHydrationWarning>
+          <Link
+            href="/quote-request"
+            className="dx-button-inline"
+            onClick={() => trackEvent(ANALYTICS_EVENTS.SEND_PACKAGE_CLICK, { location: 'header' })}
+          >
+            Envoyer un colis
+          </Link>
+          {!canRenderAuth ? null : resolvedUser ? (
+            <>
+              <Link href="/mes-colis" className="dx-button-inline dx-button-inline--ghost">
+                Mes colis
+              </Link>
+              {UserButtonComponent ? <UserButtonComponent /> : null}
+              <button type="button" className="dx-button-inline dx-button-inline--ghost" onClick={onSignOut}>
+                Déconnexion
+              </button>
+            </>
+          ) : SignInButtonComponent ? (
+            <SignInButtonComponent mode="modal">
+              <button type="button" className="dx-button-inline dx-button-inline--ghost">Connexion</button>
+            </SignInButtonComponent>
+          ) : null}
+        </div>
       </div>
     </header>
   );

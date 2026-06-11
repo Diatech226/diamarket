@@ -1,7 +1,7 @@
 const fs = require('fs');
 const crypto = require('crypto');
 const { createClerkClient, verifyToken } = require('@clerk/backend');
-const { logger } = require('../src/shared/observability/logger');
+const { logger } = require('../src/lib/observability/logger');
 
 const config = require('../config/diaexpressAuth');
 

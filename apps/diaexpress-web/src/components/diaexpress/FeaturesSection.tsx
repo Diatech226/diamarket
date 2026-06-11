@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { useSafeUser } from '@diaexpress/shared/auth/useSafeClerk';
+import { useSafeUser } from '@/auth/useSafeClerk';
 import { motion } from 'framer-motion';
 import { ClipboardList, FileText, Package, Ship, Truck } from 'lucide-react';
 import ChevronRight from './ChevronRight';

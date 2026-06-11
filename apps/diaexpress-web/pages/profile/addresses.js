@@ -1,6 +1,6 @@
 import React from 'react';
-import ProtectedRoute from '@diaexpress/shared/components/ProtectedRoute';
-import ProfileAddresses from '@diaexpress/shared/pages/ProfileAddresses';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import ProfileAddresses from '@/pages/ProfileAddresses';
 
 const ProfileAddressesPage = () => (
   <ProtectedRoute>

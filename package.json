@@ -1,7 +1,6 @@
 {
   "name": "diamarket-platform",
   "private": true,
-  "packageManager": "pnpm@9.12.0",
   "scripts": {
     "dev": "turbo dev",
     "dev:diamarket": "node scripts/dev.mjs diamarket",
@@ -15,7 +14,7 @@
     "typecheck": "turbo typecheck",
     "test:mongo:dns": "npm --prefix apps/diamarket-api run test:mongo:dns --",
     "build": "turbo build",
-    "build:diaexpress": "turbo run build --filter=diaexpress-web --filter=diaexpress-admin --filter=diaexpress-api"
+    "build:diaexpress": "npm --prefix apps/diaexpress-web run build && npm --prefix apps/diaexpress-admin run build && npm --prefix apps/diaexpress-api run build"
   },
   "devDependencies": {
     "turbo": "^2.1.1",
