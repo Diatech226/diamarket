@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { useAdminAuthGuard } from "../auth/useAdminAuthGuard";
 import {
   fetchAdminShipments as apiFetchAdminShipments,
@@ -93,12 +93,12 @@ const AdminShipments = () => {
   const [refreshing, setRefreshing] = useState(false);
   const PAGE_SIZE = 8;
 
-  const fetchShipments = async () => {
+  const fetchShipments = useCallback(async () => {
     const token = await requireAdminToken();
     return apiFetchAdminShipments(token);
-  };
+  }, [requireAdminToken]);
 
-  const loadShipments = async () => {
+  const loadShipments = useCallback(async () => {
     if (!isAdminReady) {
       return;
     }
@@ -113,7 +113,7 @@ const AdminShipments = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [fetchShipments, isAdminReady]);
 
   useEffect(() => {
     if (!isAdminReady) {
@@ -121,7 +121,7 @@ const AdminShipments = () => {
     }
 
     loadShipments();
-  }, [isAdminReady]);
+  }, [isAdminReady, loadShipments]);
 
   useEffect(() => {
     if (!toast) return;

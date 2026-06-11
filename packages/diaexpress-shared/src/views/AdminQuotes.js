@@ -149,7 +149,7 @@ const AdminQuotes = () => {
 
 export default AdminQuotes;*/
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useBackendAuth } from '../auth/useBackendAuth';
 import { API_BASE } from "../api/api";
 
@@ -161,7 +161,7 @@ const AdminQuotes = () => {
   const [page, setPage] = useState(1);
   const quotesPerPage = 4; // 👈 pagination limitée à 4 devis par page
 
-  const loadQuotes = async () => {
+  const loadQuotes = useCallback(async () => {
     setLoading(true);
     try {
       const token = await getToken();
@@ -175,11 +175,11 @@ const AdminQuotes = () => {
       setError(err.message);
     }
     setLoading(false);
-  };
+  }, [getToken]);
 
   useEffect(() => {
     loadQuotes();
-  }, []);
+  }, [loadQuotes]);
 
   const updateStatus = async (id, newStatus) => {
     if (newStatus === "confirmed") {

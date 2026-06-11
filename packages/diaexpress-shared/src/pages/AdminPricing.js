@@ -1,5 +1,5 @@
 // 📁 src/pages/AdminPricing.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAdminAuthGuard } from '../auth/useAdminAuthGuard';
 import {
   apiRequest,
@@ -33,15 +33,7 @@ const AdminPricing = () => {
   const [addresses, setAddresses] = useState([]);
   const [addressesLoading, setAddressesLoading] = useState(false);
 
-  // Fetch pricing + packageTypes au montage
-  useEffect(() => {
-    if (!isAdminReady) return;
-    fetchAll();
-    fetchPackageTypes();
-    loadAddresses();
-  }, [isAdminReady]);
-
-  const fetchAll = async () => {
+  const fetchAll = useCallback(async () => {
     try {
       const token = await requireAdminToken();
       const data = await apiFetchAdminPricing(token);
@@ -52,9 +44,9 @@ const AdminPricing = () => {
       setError(err.message || 'Impossible de charger les grilles de prix.');
       setSuccess('');
     }
-  };
+  }, [requireAdminToken]);
 
-  const fetchPackageTypes = async () => {
+  const fetchPackageTypes = useCallback(async () => {
     try {
       const res = await apiRequest('/api/package-types');
       setPackageTypes(Array.isArray(res?.packageTypes) ? res.packageTypes : []);
@@ -62,9 +54,9 @@ const AdminPricing = () => {
       console.error('Erreur chargement packageTypes', err);
       setPackageTypes([]);
     }
-  };
+  }, []);
 
-  const loadAddresses = async () => {
+  const loadAddresses = useCallback(async () => {
     setAddressesLoading(true);
     try {
       const token = await requireAdminToken();
@@ -78,7 +70,15 @@ const AdminPricing = () => {
     } finally {
       setAddressesLoading(false);
     }
-  };
+  }, [requireAdminToken]);
+
+  // Fetch pricing + packageTypes au montage
+  useEffect(() => {
+    if (!isAdminReady) return;
+    fetchAll();
+    fetchPackageTypes();
+    loadAddresses();
+  }, [fetchAll, fetchPackageTypes, isAdminReady, loadAddresses]);
 
   const resetForm = () => {
     setForm({ origin: '', destination: '', originAddressId: '', destinationAddressId: '', transportPrices: [] });

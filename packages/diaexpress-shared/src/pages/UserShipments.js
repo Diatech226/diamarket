@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useBackendAuth } from '../auth/useBackendAuth';
 import { fetchClientShipments } from '../api/logistics';
@@ -7,8 +7,8 @@ import { ClientAppShell, ClientEmptyState, ClientErrorState, ShipmentCard } from
 const UserShipments = () => {
   const { getToken } = useBackendAuth();
   const [shipments, setShipments] = useState([]); const [loading, setLoading] = useState(true); const [error, setError] = useState(''); const [status, setStatus] = useState('all');
-  const load = async () => { setLoading(true); setError(''); try { const token = await getToken(); setShipments(await fetchClientShipments(token)); } catch (e) { setError(e.message || 'Erreur'); } finally { setLoading(false); } };
-  useEffect(() => { load(); }, [getToken]);
+  const load = useCallback(async () => { setLoading(true); setError(''); try { const token = await getToken(); setShipments(await fetchClientShipments(token)); } catch (e) { setError(e.message || 'Erreur'); } finally { setLoading(false); } }, [getToken]);
+  useEffect(() => { load(); }, [load]);
   const statuses = useMemo(() => ['all', ...new Set(shipments.map((s) => String(s.status || 'inconnu').toLowerCase()))], [shipments]);
   const filtered = useMemo(() => status === 'all' ? shipments : shipments.filter((s) => String(s.status || 'inconnu').toLowerCase() === status), [shipments, status]);
   return <ClientAppShell eyebrow="espace client · expéditions" title="Mes colis" subtitle="Suivez vos expéditions, leurs statuts et les actions de tracking." actions={<><Link href="/quote-request" className="dx-button dx-button--primary">Nouvelle demande</Link><Link href="/track-shipment" className="dx-button dx-button--outline">Suivre un colis</Link></>}>

@@ -62,6 +62,7 @@ export const AuthProvider = ({
   const clerkUser = clerkUserOverride ?? hookUser;
   const isUserLoaded = isUserLoadedOverride ?? hookIsLoaded;
   const getToken = getTokenOverride ?? hookGetToken;
+  const clerkUserId = clerkUser?.id;
 
   const [dbUser, setDbUser] = useState(null);
   const [authState, setAuthState] = useState(INITIAL_AUTH_STATE);
@@ -73,7 +74,7 @@ export const AuthProvider = ({
       return;
     }
 
-    if (!clerkUser || !isSignedIn || !getToken) {
+    if (!clerkUserId || !isSignedIn || !getToken) {
       setDbUser(null);
       setAuthState({
         status: 'auth_error',
@@ -85,7 +86,7 @@ export const AuthProvider = ({
       return;
     }
 
-    const syncKey = `${clerkUser?.id || 'unknown'}:${isSignedIn ? 'signed-in' : 'signed-out'}`;
+    const syncKey = `${clerkUserId}:${isSignedIn ? 'signed-in' : 'signed-out'}`;
     const now = Date.now();
     const lastErrorKey = syncRef.current.lastErrorKey;
     if (syncRef.current.lastKey === syncKey || syncRef.current.inFlight) {
@@ -153,11 +154,12 @@ export const AuthProvider = ({
 
     syncUser();
 
+    const syncState = syncRef.current;
     return () => {
       isActive = false;
-      syncRef.current.inFlight = false;
+      syncState.inFlight = false;
     };
-  }, [clerkUser?.id, getToken, isSignedIn, isUserLoaded]);
+  }, [clerkUserId, getToken, isSignedIn, isUserLoaded]);
 
   const value = useMemo(
     () => ({

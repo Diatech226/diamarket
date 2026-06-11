@@ -35,7 +35,7 @@ const ClientPage = () => {
     };
 
     fetchData();
-  }, []);
+  }, [getToken]);
 
   if (loading) return <p>Chargement...</p>;
   if (error) return <p style={{ color: 'red' }}>{error}</p>;

@@ -1,5 +1,5 @@
 // 📁 src/views/AdminPricing.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useBackendAuth } from '../auth/useBackendAuth';
 import { API_BASE } from '../api/api';
 import axios from 'axios';
@@ -26,14 +26,7 @@ const AdminPricing = () => {
   const [addresses, setAddresses] = useState([]);
   const [addressesLoading, setAddressesLoading] = useState(false);
 
-  // Fetch pricing + packageTypes au montage
-  useEffect(() => {
-    fetchAll();
-    fetchPackageTypes();
-    loadAddresses();
-  }, []);
-
-  const fetchAll = async () => {
+  const fetchAll = useCallback(async () => {
     try {
       const token = await getToken();
       const res = await axios.get(`${API_BASE}/api/pricing`, {
@@ -45,9 +38,9 @@ const AdminPricing = () => {
       console.error('Erreur chargement pricing', err);
       setError(err.message || 'Impossible de charger les grilles de prix.');
     }
-  };
+  }, [getToken]);
 
-  const fetchPackageTypes = async () => {
+  const fetchPackageTypes = useCallback(async () => {
     try {
       const res = await axios.get(`${API_BASE}/api/package-types`);
       setPackageTypes(Array.isArray(res.data.packageTypes) ? res.data.packageTypes : []);
@@ -55,9 +48,9 @@ const AdminPricing = () => {
       console.error('Erreur chargement packageTypes', err);
       setPackageTypes([]);
     }
-  };
+  }, []);
 
-  const loadAddresses = async () => {
+  const loadAddresses = useCallback(async () => {
     setAddressesLoading(true);
     try {
       const token = await getToken();
@@ -70,7 +63,14 @@ const AdminPricing = () => {
     } finally {
       setAddressesLoading(false);
     }
-  };
+  }, [getToken]);
+
+  // Fetch pricing + packageTypes au montage
+  useEffect(() => {
+    fetchAll();
+    fetchPackageTypes();
+    loadAddresses();
+  }, [fetchAll, fetchPackageTypes, loadAddresses]);
 
   const resetForm = () => {
     setForm({ origin: '', destination: '', originAddressId: '', destinationAddressId: '', transportPrices: [] });

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useBackendAuth } from '../auth/useBackendAuth';
 import { myPayments } from '../api/payment';
@@ -70,7 +70,7 @@ const Payments = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [activePaymentId, setActivePaymentId] = useState(null);
 
-  const fetchPayments = async () => {
+  const fetchPayments = useCallback(async () => {
     setLoading(true);
     setError('');
     setActivePaymentId(null);
@@ -87,9 +87,9 @@ const Payments = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [getToken]);
 
-  useEffect(() => { fetchPayments(); }, [getToken]);
+  useEffect(() => { fetchPayments(); }, [fetchPayments]);
 
   const filteredPayments = useMemo(() => {
     if (statusFilter === 'all') return payments;

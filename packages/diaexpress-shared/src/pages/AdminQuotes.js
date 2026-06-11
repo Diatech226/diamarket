@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { useAdminAuthGuard } from "../auth/useAdminAuthGuard";
 import { fetchAdminQuotes as apiFetchAdminQuotes, updateQuoteStatus as apiUpdateQuoteStatus } from "../api/logistics";
 
@@ -114,12 +114,12 @@ const AdminQuotes = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const quotesPerPage = 6;
 
-  const fetchQuotes = async () => {
+  const fetchQuotes = useCallback(async () => {
     const token = await requireAdminToken();
     return apiFetchAdminQuotes(token);
-  };
+  }, [requireAdminToken]);
 
-  const loadQuotes = async (withSpinner = true) => {
+  const loadQuotes = useCallback(async (withSpinner = true) => {
     if (!isAdminReady) {
       return;
     }
@@ -141,7 +141,7 @@ const AdminQuotes = () => {
         setLoading(false);
       }
     }
-  };
+  }, [fetchQuotes, isAdminReady]);
 
   useEffect(() => {
     if (!isAdminReady) {
@@ -149,7 +149,7 @@ const AdminQuotes = () => {
     }
 
     loadQuotes(true);
-  }, [isAdminReady]);
+  }, [isAdminReady, loadQuotes]);
 
   const handleRefresh = async () => {
     setRefreshing(true);
