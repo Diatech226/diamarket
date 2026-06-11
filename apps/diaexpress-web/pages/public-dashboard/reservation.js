@@ -1,5 +1,5 @@
 import React from 'react';
-import PublicDashboardReservations from '@diaexpress/shared/pages/PublicDashboardReservations';
+import PublicDashboardReservations from '@/pages/PublicDashboardReservations';
 
 const ReservationPage = () => {
   return <PublicDashboardReservations />;

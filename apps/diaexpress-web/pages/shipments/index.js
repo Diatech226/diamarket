@@ -1,5 +1,5 @@
 import React from 'react';
-import Shipments from '@diaexpress/shared/pages/Shipments';
+import Shipments from '@/pages/Shipments';
 
 const ShipmentsPage = () => {
   return <Shipments />;

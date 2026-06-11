@@ -1,6 +1,6 @@
 import React from 'react';
-import ProtectedRoute from '@diaexpress/shared/components/ProtectedRoute';
-import Quotes from '@diaexpress/shared/pages/Quotes';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import Quotes from '@/pages/Quotes';
 
 const QuotesPage = () => (
   <ProtectedRoute>

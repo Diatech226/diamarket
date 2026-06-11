@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3000",
-    "build": "pnpm --filter @diaexpress/shared build && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "test": "echo \"No tests specified\"",
@@ -13,7 +13,6 @@
   "dependencies": {
     "@clerk/clerk-react": "^5.61.4",
     "@clerk/nextjs": "^6.39.1",
-    "@diaexpress/shared": "workspace:*",
     "axios": "^1.11.0",
     "framer-motion": "^11.11.9",
     "html2canvas": "^1.4.1",
@@ -22,9 +21,7 @@
     "next": "14.2.25",
     "react": "18.3.1",
     "react-dom": "18.3.1",
-    "web3": "^4.16.0",
-    "@dia/ui": "workspace:*",
-    "@dia/shared": "workspace:*"
+    "web3": "^4.16.0"
   },
   "devDependencies": {
     "@types/node": "^20.14.11",

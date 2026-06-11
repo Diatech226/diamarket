@@ -1,7 +1,7 @@
 // src/components/ProtectedRoute.js
 import React from 'react';
 import { RedirectToSignIn } from '@clerk/nextjs';
-import { useSafeUser } from '@diaexpress/shared/auth/useSafeClerk';
+import { useSafeUser } from '../auth/useSafeClerk';
 
 const ProtectedRoute = ({ children, role }) => {
   const { isLoaded, isSignedIn, user } = useSafeUser();

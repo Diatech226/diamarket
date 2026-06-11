@@ -1,4 +1,4 @@
-const { metrics } = require('../src/shared/observability/metrics');
+const { metrics } = require('../src/lib/observability/metrics');
 
 function deriveBusinessMetric(req, res) {
   const path = req.path || req.originalUrl || '';

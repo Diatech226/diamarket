@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const dns = require('node:dns').promises;
-const { metrics } = require('../src/shared/observability/metrics');
-const { logger } = require('../src/shared/observability/logger');
+const { metrics } = require('../src/lib/observability/metrics');
+const { logger } = require('../src/lib/observability/logger');
 
 const DEFAULT_LOCAL_MONGO_URI = 'mongodb://127.0.0.1:27017/diaexpress';
 const DEFAULT_MONGO_SERVER_SELECTION_TIMEOUT_MS = 5000;

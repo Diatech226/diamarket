@@ -5,8 +5,8 @@ const Address = require('../../../../models/Address');
 const TransportLine = require('../../../../models/TransportLine');
 const ExpeditionLine = require('../../../../models/ExpeditionLine');
 const Embarkment = require('../../../../models/Embarkment');
-const { publishDomainEvent } = require('../../../shared/events/domainEventPublisher');
-const { DOMAIN_EVENT_NAMES } = require('../../../shared/events/domainEventCatalog');
+const { publishDomainEvent } = require('../../../lib/events/domainEventPublisher');
+const { DOMAIN_EVENT_NAMES } = require('../../../lib/events/domainEventCatalog');
 
 const TRANSPORT_TYPES = ['air', 'sea', 'road'];
 const MARKET_POINT_TYPES = ['city', 'port', 'hub', 'airport', 'agency', 'relay', 'country_hub', 'pickup_point'];

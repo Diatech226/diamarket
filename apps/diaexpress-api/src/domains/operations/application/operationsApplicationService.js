@@ -7,8 +7,8 @@ const TransportLine = require('../../../../models/TransportLine');
 const OperationalException = require('../../../../models/OperationalException');
 const { ApiError } = require('../../../../utils/http');
 const { identityHasRole } = require('../../../../services/diaexpressAuthService');
-const { publishDomainEvent } = require('../../../shared/events/domainEventPublisher');
-const { DOMAIN_EVENT_NAMES } = require('../../../shared/events/domainEventCatalog');
+const { publishDomainEvent } = require('../../../lib/events/domainEventPublisher');
+const { DOMAIN_EVENT_NAMES } = require('../../../lib/events/domainEventCatalog');
 
 const ACTIVE_SCHEDULE_STATUSES = new Set(['planned', 'booking_open']);
 const ACTIVE_EMBARKMENT_STATUSES = new Set(['planned', 'booking_open', 'open']);

@@ -1,47 +1,15 @@
-import React from 'react';
-import styles from './styles.module.css';
-import { cx, mapSize, mapState } from './utils';
+import React, { forwardRef } from 'react';
+import { cn } from '../../utils/cn';
 
-const SIZE_MAP = {
-  sm: styles.controlSm,
-  md: styles.controlMd,
-  lg: styles.controlLg,
-};
-
-const STATE_MAP = {
-  error: styles.stateError,
-  success: styles.stateSuccess,
-  disabled: styles.stateDisabled,
-};
-
-const Input = ({
-  label,
-  hint,
-  error,
-  size = 'md',
-  state = 'default',
-  className,
-  ...props
-}) => {
-  const mergedState = error ? 'error' : state;
-
+export const Input = forwardRef(function Input({ className, ...props }, ref) {
   return (
-    <label className={styles.controlWrapper}>
-      {label ? <span className={styles.controlLabel}>{label}</span> : null}
-      <input
-        className={cx(
-          styles.input,
-          mapSize(size, SIZE_MAP),
-          mapState(mergedState, STATE_MAP),
-          className
-        )}
-        disabled={mergedState === 'disabled' || props.disabled}
-        {...props}
-      />
-      {error ? <span className={styles.controlError}>{error}</span> : null}
-      {!error && hint ? <span className={styles.controlHint}>{hint}</span> : null}
-    </label>
+    <input
+      ref={ref}
+      className={cn(
+        'w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm md:text-base shadow-sm placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-60',
+        className
+      )}
+      {...props}
+    />
   );
-};
-
-export default Input;
+});

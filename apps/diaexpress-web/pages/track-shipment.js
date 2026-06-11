@@ -1,4 +1,4 @@
-import TrackShipment from '@diaexpress/shared/pages/TrackShipment';
+import TrackShipment from '@/pages/TrackShipment';
 import SeoHead from '../src/components/seo/SeoHead';
 import { trackingSeo } from '../src/content/public/trackingContent';
 

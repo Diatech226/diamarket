@@ -11,7 +11,7 @@ const {
 } = require('../services/quoteDomainService');
 const { requestQuote, transitionQuoteStatus } = require('../src/domains/quote/application/quoteApplicationService');
 const { getMasterDataSummary, resolveRouteContext, listMarketPoints } = require('../src/domains/network/application/masterDataService');
-const { logger } = require('../src/shared/observability/logger');
+const { logger } = require('../src/lib/observability/logger');
 
 const resolveIdentity = (req) => req.identity || ensureRequestIdentity(req);
 

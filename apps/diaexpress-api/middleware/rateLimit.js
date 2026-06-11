@@ -1,5 +1,5 @@
 const { error } = require('../utils/http');
-const { logger } = require('../src/shared/observability/logger');
+const { logger } = require('../src/lib/observability/logger');
 
 function buildRateLimiter({ windowMs, maxRequests, keyPrefix }) {
   const buckets = new Map();

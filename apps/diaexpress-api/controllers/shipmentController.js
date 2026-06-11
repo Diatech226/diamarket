@@ -12,7 +12,7 @@ const {
   findShipmentOrThrow,
 } = require('../src/domains/shipment/application/shipmentApplicationService');
 const { assignShipmentToOperation } = require('../src/domains/operations/application/operationsApplicationService');
-const { logger } = require('../src/shared/observability/logger');
+const { logger } = require('../src/lib/observability/logger');
 
 function ensureIdentity(req) {
   const identity = ensureRequestIdentity(req);

@@ -11,9 +11,9 @@ Portail client/public (quotes, tracking, paiements, dashboard).
 
 ## Setup local
 ```bash
-cd /workspace/diamarket
-pnpm install
-pnpm --filter diaexpress-web dev
+cd /workspace/diamarket/apps/diaexpress-web
+npm install
+npm run dev
 ```
 
 > Important: faites l'installation à la racine du monorepo pour garder des résolutions stables.
@@ -25,7 +25,7 @@ pnpm --filter diaexpress-web dev
 
 ### Ports
 - Développement : `http://localhost:3000` (Next.js par défaut)
-- Production : `pnpm --filter diaexpress-web build && pnpm --filter diaexpress-web start` (même port si `PORT` est défini)
+- Production : `npm run build && npm start` (même port si `PORT` est défini)
 
 ## Auth client + stockage token
 
@@ -51,23 +51,22 @@ pnpm --filter diaexpress-web dev
 ## Troubleshooting
 - **API non joignable** : vérifiez `BACKEND_URL`, `NEXT_PUBLIC_API_BASE_URL` et `NEXT_PUBLIC_ADMIN_API_BASE_URL`.
 - **Auth Clerk** : assurez-vous que `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` est défini.
-- **Imports partagés** : le package est local dans `packages/diaexpress-shared`.
+- **Code autonome** : les composants, pages, hooks et utilitaires résident directement dans `src`.
 - **Erreur `Cannot find module 'next/dist/server/future/route-modules/pages/vendored/contexts/router-context'`** :
   1. vérifiez que `next` est bien `14.2.25` dans `apps/diaexpress-web/package.json`,
   2. supprimez `node_modules` + `.next` dans l'app,
   3. réinstallez via `npm run install:clean` depuis la racine monorepo,
-  4. relancez `pnpm --filter diaexpress-web dev`.
+  4. relancez `npm run dev`.
 
 ## Scripts
-- `pnpm --filter diaexpress-web dev`
-- `pnpm --filter diaexpress-web build`
-- `pnpm --filter diaexpress-web start`
-- `pnpm --filter diaexpress-web lint`
-- `pnpm --filter diaexpress-web test`
+- `npm run dev`
+- `npm run build`
+- `npm start`
+- `npm run lint`
+- `npm test`
 
 ## How to split into separate repos
 1. Copier le dossier `apps/diaexpress-web` dans un nouveau repo.
-2. Conserver `packages/diaexpress-shared` (workspace ou vendored) pour conserver les imports `@diaexpress/shared`.
 3. Ajouter votre `.env` à partir de `.env.example`.
 4. Mettre à jour la CI/CD pour utiliser ce dossier comme racine du projet.
 

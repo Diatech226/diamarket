@@ -3,11 +3,35 @@ import { buildApiUrl } from './api';
 
 // ✅ Admin - Liste de tous les devis
 export const fetchAdminQuotes = async (token) => {
-  const r = await fetch(buildApiUrl('/api/quotes'), {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  if (!r.ok) throw new Error(`Erreur fetch admin quotes: ${r.status}`);
-  return r.json();
+  const endpoints = ['/api/admin/quotes', '/api/quotes'];
+  let lastError;
+
+  for (let index = 0; index < endpoints.length; index += 1) {
+    const endpoint = endpoints[index];
+    const response = await fetch(buildApiUrl(endpoint), {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (response.ok) {
+      return response.json();
+    }
+
+    lastError = new Error(`Erreur fetch admin quotes: ${response.status}`);
+    lastError.status = response.status;
+
+    const isLast = index === endpoints.length - 1;
+    if (!isLast && [404, 405, 501].includes(response.status)) {
+      continue;
+    }
+
+    throw lastError;
+  }
+
+  if (lastError) {
+    throw lastError;
+  }
+
+  return { quotes: [] };
 };
 
 // ✅ Utilisateur (client ou admin) - Liste de ses propres devis

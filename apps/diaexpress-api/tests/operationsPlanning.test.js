@@ -6,7 +6,7 @@ const Schedule = require('../models/Schedule');
 const Shipment = require('../models/Shipment');
 const Embarkment = require('../models/Embarkment');
 const OperationalException = require('../models/OperationalException');
-const { subscribeDomainEvent } = require('../src/shared/events/domainEventPublisher');
+const { subscribeDomainEvent } = require('../src/lib/events/domainEventPublisher');
 const {
   createReservation,
   transitionReservationStatus,

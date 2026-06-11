@@ -1,91 +1,114 @@
-import React, { useState, useEffect } from "react";
+import React, { useMemo, useState } from "react";
 import StepLocationSelector from "./StepLocationSelector";
 import StepPackageDetails from "./StepPackageDetails";
 import StepContactInfo from "./StepContactInfo";
 import StepSummary from "./StepSummary";
 import { buildApiUrl } from "../../api/api";
 
+const initialFormData = {
+  origin: "",
+  destination: "",
+  transportType: "air",
+  length: "",
+  width: "",
+  height: "",
+  weight: "",
+  volume: "",
+  name: "",
+  email: "",
+  phone: "",
+  pickupAddress: "",
+};
+
 export default function QuoteRequest() {
   const [step, setStep] = useState(1);
-  const [loading, setLoading] = useState(false);
-  // ✅ Initialisation complète pour éviter undefined
-  const [formData, setFormData] = useState({
-    origin: "",
-    destination: "",
-    transportType: "air", // ou "sea"
-    length: "",
-    width: "",
-    height: "",
-    weight: "",
-    volume: "",
-    name: "",
-    email: "",
-    phone: "",
-  });
-
+  const [formData, setFormData] = useState(initialFormData);
   const [quote, setQuote] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  // ✅ Simulation du fetch (si API dispo, remplacer par fetch réel)
-  useEffect(() => {
-    console.log("Form Data actuel :", formData);
-  }, [formData]);
+  const apiEstimateUrl = useMemo(
+    () => buildApiUrl("/api/quotes/estimate"),
+    []
+  );
 
-  const nextStep = () => setStep((prev) => prev + 1);
-  const prevStep = () => setStep((prev) => prev - 1);
+  const nextStep = () => setStep((prev) => Math.min(prev + 1, 4));
+  const prevStep = () => setStep((prev) => Math.max(prev - 1, 1));
 
   const handleSubmit = async () => {
+    setLoading(true);
+    setError("");
     try {
-      setLoading(true);
-      const response = await fetch(buildApiUrl('/api/quotes/estimate'), {
+      const response = await fetch(apiEstimateUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
+      const data = await response.json().catch(() => null);
+
       if (!response.ok) {
-        throw new Error(`Erreur API: ${response.status}`);
+        const message =
+          data?.message || data?.error || `Erreur API: ${response.status}`;
+        throw new Error(message);
       }
 
-      const data = await response.json();
       setQuote(data);
-      setStep(4); // Aller à l'étape résultat
+      setStep(4);
     } catch (err) {
       console.error("Erreur fetch :", err);
-      alert("Impossible de récupérer le devis. Vérifie la connexion.");
+      setError(
+        err?.message || "Impossible de récupérer le devis. Vérifie la connexion."
+      );
     } finally {
       setLoading(false);
     }
   };
+
+  const handleRestart = () => {
+    setFormData(initialFormData);
+    setQuote(null);
+    setError("");
+    setStep(1);
+  };
+
   return (
     <div className="quote-request">
+      {error && <div className="alert alert-error">❌ {error}</div>}
+
       {step === 1 && (
         <StepLocationSelector
           formData={formData}
           setFormData={setFormData}
-          nextStep={nextStep}
+          onNext={nextStep}
         />
       )}
+
       {step === 2 && (
         <StepPackageDetails
           formData={formData}
           setFormData={setFormData}
-          nextStep={nextStep}
-          prevStep={prevStep}
+          onNext={nextStep}
+          onBack={prevStep}
         />
       )}
+
       {step === 3 && (
         <StepContactInfo
           formData={formData}
           setFormData={setFormData}
-          handleSubmit={handleSubmit}
-          prevStep={prevStep}
+          onBack={prevStep}
+          onSubmit={handleSubmit}
+          isSubmitting={loading}
         />
       )}
+
       {step === 4 && (
         <StepSummary
           formData={formData}
           quote={quote}
-          prevStep={prevStep}
+          onRestart={handleRestart}
+          onBack={prevStep}
         />
       )}
     </div>

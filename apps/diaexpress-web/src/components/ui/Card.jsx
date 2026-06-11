@@ -1,39 +1,45 @@
 import React from 'react';
-import styles from './styles.module.css';
-import { cx, mapSize } from './utils';
+import { cn } from '../../utils/cn';
 
-const VARIANT_MAP = {
-  default: styles.cardDefault,
-  outlined: styles.cardOutlined,
-  elevated: styles.cardElevated,
-};
+export function Card({ className, children, ...props }) {
+  return (
+    <div
+      className={cn('rounded-2xl border border-slate-200 bg-white shadow-sm', className)}
+      {...props}
+    >
+      {children}
+    </div>
+  );
+}
 
-const SIZE_MAP = {
-  sm: styles.cardSm,
-  md: styles.cardMd,
-  lg: styles.cardLg,
-};
+export function CardHeader({ className, children, ...props }) {
+  return (
+    <div className={cn('p-6 md:p-8 pb-4 md:pb-6', className)} {...props}>
+      {children}
+    </div>
+  );
+}
 
-const Card = ({
-  as: Component = 'div',
-  variant = 'default',
-  size = 'md',
-  className,
-  children,
-  ...props
-}) => (
-  <Component
-    className={cx(
-      styles.card,
-      styles.baseTransition,
-      VARIANT_MAP[variant] || VARIANT_MAP.default,
-      mapSize(size, SIZE_MAP),
-      className
-    )}
-    {...props}
-  >
-    {children}
-  </Component>
-);
+export function CardTitle({ className, children, ...props }) {
+  return (
+    <h2 className={cn('text-xl md:text-2xl font-semibold tracking-tight', className)} {...props}>
+      {children}
+    </h2>
+  );
+}
 
-export default Card;
+export function CardDescription({ className, children, ...props }) {
+  return (
+    <p className={cn('text-sm text-slate-500 md:text-base', className)} {...props}>
+      {children}
+    </p>
+  );
+}
+
+export function CardContent({ className, children, ...props }) {
+  return (
+    <div className={cn('p-6 pt-0 md:px-8 md:pt-0 md:pb-8', className)} {...props}>
+      {children}
+    </div>
+  );
+}

@@ -1,37 +1,23 @@
 import React from 'react';
-import styles from './styles.module.css';
-import { cx, mapSize } from './utils';
+import { cn } from '../../utils/cn';
 
-const VARIANT_MAP = {
-  default: styles.badgeDefault,
-  warning: styles.badgeWarning,
-  neutral: styles.badgeNeutral,
+const variants = {
+  default: 'bg-slate-100 text-slate-700',
+  sky: 'bg-sky-100 text-sky-700',
+  green: 'bg-green-100 text-green-700',
 };
 
-const SIZE_MAP = {
-  sm: styles.badgeSm,
-  md: styles.badgeMd,
-};
-
-const Badge = ({
-  as: Component = 'span',
-  variant = 'default',
-  size = 'md',
-  className,
-  children,
-  ...props
-}) => (
-  <Component
-    className={cx(
-      styles.badge,
-      VARIANT_MAP[variant] || VARIANT_MAP.default,
-      mapSize(size, SIZE_MAP),
-      className
-    )}
-    {...props}
-  >
-    {children}
-  </Component>
-);
-
-export default Badge;
+export function Badge({ className, variant = 'default', children, ...props }) {
+  return (
+    <span
+      className={cn(
+        'inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium',
+        variants[variant] || variants.default,
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </span>
+  );
+}

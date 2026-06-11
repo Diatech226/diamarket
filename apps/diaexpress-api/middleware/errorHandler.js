@@ -1,6 +1,6 @@
 const { ApiError, error } = require('../utils/http');
-const { classifyErrorCode } = require('../src/shared/errors/errorCatalog');
-const { logger } = require('../src/shared/observability/logger');
+const { classifyErrorCode } = require('../src/lib/errors/errorCatalog');
+const { logger } = require('../src/lib/observability/logger');
 
 const errorHandler = (err, req, res, _next) => {
   const status = err?.status || err?.statusCode || 500;

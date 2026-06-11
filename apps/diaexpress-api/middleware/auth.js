@@ -3,8 +3,8 @@ const appConfig = require('../config/appConfig');
 const { ensureRequestIdentityAsync, parseAuthorizationHeader } = require('../services/diaexpressAuthService');
 const { syncUserFromIdentity } = require('../services/userIdentityService');
 const { error: sendError } = require('../utils/http');
-const { logger } = require('../src/shared/observability/logger');
-const { getRequestContext } = require('../src/shared/observability/requestContext');
+const { logger } = require('../src/lib/observability/logger');
+const { getRequestContext } = require('../src/lib/observability/requestContext');
 
 const integrationKeyRegistry = (() => {
   const entries = new Map();

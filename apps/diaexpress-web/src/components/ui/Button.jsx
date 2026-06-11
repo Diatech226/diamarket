@@ -1,54 +1,33 @@
-import React from 'react';
-import styles from './styles.module.css';
-import { cx, mapSize, mapState } from './utils';
+import React, { forwardRef } from 'react';
+import { cn } from '../../utils/cn';
 
-const VARIANT_MAP = {
-  primary: styles.buttonPrimary,
-  secondary: styles.buttonSecondary,
-  ghost: styles.buttonGhost,
+const variants = {
+  default: 'bg-sky-500 text-white hover:bg-sky-600 focus-visible:ring-sky-500',
+  secondary:
+    'bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 focus-visible:ring-slate-400',
+  ghost: 'bg-transparent text-slate-600 hover:bg-slate-100 focus-visible:ring-slate-300',
+  outline:
+    'border border-slate-300 text-slate-600 bg-white hover:bg-slate-50 focus-visible:ring-slate-400',
 };
 
-const SIZE_MAP = {
-  sm: styles.buttonSm,
-  md: styles.buttonMd,
-  lg: styles.buttonLg,
+const sizes = {
+  sm: 'h-9 px-3 text-sm',
+  md: 'h-11 px-4 text-sm md:text-base',
+  lg: 'h-12 px-6 text-base',
 };
 
-const STATE_MAP = {
-  disabled: styles.buttonDisabled,
-};
+const baseClasses =
+  'inline-flex items-center justify-center rounded-xl font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-60 gap-2';
 
-const Button = ({
-  as: Component = 'button',
-  variant = 'primary',
-  size = 'md',
-  state = 'default',
-  className,
-  loading = false,
-  disabled = false,
-  children,
-  ...props
-}) => {
-  const isDisabled = disabled || loading || state === 'disabled';
-
+export const Button = forwardRef(function Button(
+  { className, variant = 'default', size = 'md', ...props },
+  ref
+) {
   return (
-    <Component
-      className={cx(
-        styles.button,
-        styles.baseTransition,
-        VARIANT_MAP[variant] || VARIANT_MAP.primary,
-        mapSize(size, SIZE_MAP),
-        mapState(state, STATE_MAP),
-        !isDisabled && styles.buttonHover,
-        className
-      )}
-      disabled={Component === 'button' ? isDisabled : undefined}
-      aria-busy={loading}
+    <button
+      ref={ref}
+      className={cn(baseClasses, variants[variant] || variants.default, sizes[size], className)}
       {...props}
-    >
-      {loading ? 'Loading...' : children}
-    </Component>
+    />
   );
-};
-
-export default Button;
+});

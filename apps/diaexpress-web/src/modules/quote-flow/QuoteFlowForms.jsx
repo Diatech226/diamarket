@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
-import { createQuote, estimateQuote } from '@diaexpress/shared/api/logistics';
-import { useBackendAuth } from '@diaexpress/shared/auth/useBackendAuth';
+import { createQuote, estimateQuote } from '@/api/logistics';
+import { useBackendAuth } from '@/auth/useBackendAuth';
 import { useQuoteFlow } from './QuoteFlowProvider';
 import { useQuoteFlowMeta } from './quoteFlowMeta';
 import { buildEstimateSignature } from './quoteFlowSelectors';

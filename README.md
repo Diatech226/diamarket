@@ -7,19 +7,19 @@
 - `docs/diamarket` et `docs/diapay`: documentation produit
 
 ## Lancement
-- `pnpm install`
-- `pnpm dev:diamarket` pour web/cms/api Diamarket
-- `pnpm dev:diapay` pour api/dashboard/docs/sandbox Diapay
-- `pnpm dev:all` pour tout
+- `npm install`
+- `npm run dev:diamarket` pour web/cms/api Diamarket
+- `npm run dev:diapay` pour api/dashboard/docs/sandbox Diapay
+- `npm run dev:all` pour tout
 
 ## Build
-- `pnpm build:diamarket`
-- `pnpm build:diapay`
-- `pnpm build:all`
+- `npm run build:diamarket`
+- `npm run build:diapay`
+- `npm run build:all`
 
 ## Qualité
-- `pnpm lint`
-- `pnpm typecheck`
+- `npm run lint`
+- `npm run typecheck`
 
 ## Variables d'environnement
 Chaque app contient un `.env.example`.
