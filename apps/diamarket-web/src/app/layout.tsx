@@ -1,5 +1,6 @@
 import './globals.css';
 import { ReactNode } from 'react';
+import { ClerkProvider } from '@clerk/nextjs';
 import { ClientHeader } from '@/components/header';
 import { StoreProvider } from '@/context/store';
 import type { Metadata } from 'next';
@@ -16,13 +17,15 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="fr">
+    <ClerkProvider>
+      <html lang="fr">
         <body className='bg-slate-50'>
           <StoreProvider>
             <ClientHeader />
             <main className="mx-auto max-w-7xl px-4 py-6 md:px-6 md:py-10">{children}</main>
           </StoreProvider>
         </body>
-    </html>
+      </html>
+    </ClerkProvider>
   );
 }

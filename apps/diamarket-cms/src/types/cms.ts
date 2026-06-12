@@ -1,4 +1,4 @@
-export type Role = "admin" | "editor" | "author";
+export type Role = "admin" | "super_admin" | "marketplace_point_focal";
 
 export type EntityStatus = "active" | "inactive" | "suspended" | "draft" | "archived";
 
