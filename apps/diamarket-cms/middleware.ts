@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 
-// Authentication and role decisions are made from the API session in CmsAccessGate.
-// Keeping this middleware role-neutral prevents valid normal-user sessions from being
-// misreported as missing sessions before the forbidden screen can be rendered.
+// The API owns the HttpOnly session cookie, which may live on a different host
+// from the CMS. The client-side CmsAccessGate validates /api/auth/me and redirects
+// unauthenticated or non-admin visitors before rendering any CMS content.
 export function middleware() {
   return NextResponse.next();
 }

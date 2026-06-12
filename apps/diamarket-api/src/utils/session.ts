@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions, TokenExpiredError } from 'jsonwebtoken';
 import { env } from '../config/env';
 
 export const SESSION_COOKIE_NAME = 'diamarket_session';
 export type SessionUser = { id: string; email: string; name?: string; role: string };
-
+export type SessionResult = { user: SessionUser | null; error?: 'expired' | 'invalid' };
 type SessionClaims = SessionUser & { type: 'session' };
 
 const cookieOptions = () => ({
@@ -12,12 +12,12 @@ const cookieOptions = () => ({
   secure: env.nodeEnv === 'production',
   sameSite: env.nodeEnv === 'production' ? ('none' as const) : ('lax' as const),
   path: '/',
-  maxAge: env.sessionTtlHours * 60 * 60 * 1000,
+  maxAge: env.sessionTtlMs,
 });
 
 export function createSessionToken(user: SessionUser) {
-  return jwt.sign({ ...user, type: 'session' } satisfies SessionClaims, env.authSessionSecret, {
-    expiresIn: `${env.sessionTtlHours}h`,
+  return jwt.sign({ ...user, type: 'session' } satisfies SessionClaims, env.jwtSecret, {
+    expiresIn: env.jwtExpiresIn as SignOptions['expiresIn'],
   });
 }
 
@@ -39,14 +39,19 @@ function parseCookies(header?: string) {
   );
 }
 
-export function readSession(req: Request): SessionUser | null {
+export function readSessionResult(req: Request): SessionResult {
   const bearer = req.header('authorization')?.replace(/^Bearer\s+/i, '');
   const token = bearer || parseCookies(req.header('cookie'))[SESSION_COOKIE_NAME];
-  if (!token) return null;
+  if (!token) return { user: null };
   try {
-    const claims = jwt.verify(token, env.authSessionSecret) as SessionClaims;
-    return claims.type === 'session' ? { id: claims.id, email: claims.email, name: claims.name, role: claims.role } : null;
-  } catch {
-    return null;
+    const claims = jwt.verify(token, env.jwtSecret) as SessionClaims;
+    if (claims.type !== 'session') return { user: null, error: 'invalid' };
+    return { user: { id: claims.id, email: claims.email, name: claims.name, role: claims.role } };
+  } catch (error) {
+    return { user: null, error: error instanceof TokenExpiredError ? 'expired' : 'invalid' };
   }
+}
+
+export function readSession(req: Request): SessionUser | null {
+  return readSessionResult(req).user;
 }
