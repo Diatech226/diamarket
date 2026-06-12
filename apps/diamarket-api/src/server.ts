@@ -1,9 +1,11 @@
 import { env } from './config/env';
 import { app } from './app';
 import { connectDatabase } from './config/db';
+import { seedDefaultAdmin } from './services/admin-seed.service';
 
 async function bootstrap() {
   await connectDatabase();
+  await seedDefaultAdmin();
   app.listen(env.port, () => {
     console.log(`API listening on port ${env.port}`);
   });

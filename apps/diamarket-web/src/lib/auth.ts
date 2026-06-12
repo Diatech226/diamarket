@@ -1,7 +1,7 @@
 export type AuthUser = { id: string; email: string; name?: string; role: string };
-export type AuthSession = { authenticated: boolean; user?: AuthUser; message?: string };
+export type AuthSession = { success: boolean; authenticated: boolean; user?: AuthUser; token?: string; message?: string };
 
-export const AUTH_API_URL = process.env.NEXT_PUBLIC_AUTH_API_URL || `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/v1/auth`;
+export const AUTH_API_URL = process.env.NEXT_PUBLIC_AUTH_API_URL || `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/auth`;
 
 async function authRequest(path: string, init?: RequestInit): Promise<AuthSession> {
   const response = await fetch(`${AUTH_API_URL}${path}`, {
@@ -16,7 +16,7 @@ async function authRequest(path: string, init?: RequestInit): Promise<AuthSessio
 }
 
 export const publicAuth = {
-  session: () => authRequest('/session'),
+  me: () => authRequest('/me'),
   register: (body: { name: string; email: string; password: string }) => authRequest('/register', { method: 'POST', body: JSON.stringify(body) }),
   login: (body: { email: string; password: string }) => authRequest('/login', { method: 'POST', body: JSON.stringify(body) }),
   logout: () => authRequest('/logout', { method: 'POST' }),

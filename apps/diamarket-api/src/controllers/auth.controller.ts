@@ -1,58 +1,76 @@
 import { Request, Response } from 'express';
 import { env } from '../config/env';
 import { User } from '../models/user.model';
+import { AuthContext } from '../middlewares/requireAuth';
 import { hashPassword, verifyPassword } from '../utils/password';
-import { clearSessionCookie, createSessionToken, readSession, SessionUser, setSessionCookie } from '../utils/session';
+import { clearSessionCookie, createSessionToken, SessionUser, setSessionCookie } from '../utils/session';
 
 const normalizeEmail = (value: unknown) => String(value ?? '').trim().toLowerCase();
+const isValidEmail = (email: string) => /^\S+@\S+\.\S+$/.test(email);
 const publicUser = (user: { _id: unknown; email?: string | null; name?: string | null; role?: string | null }): SessionUser => ({
   id: String(user._id),
   email: user.email ?? '',
   name: user.name ?? undefined,
-  role: user.role ?? env.defaultPublicRole,
+  role: user.role ?? 'user',
 });
 const establishSession = (res: Response, user: SessionUser, status = 200) => {
-  setSessionCookie(res, createSessionToken(user));
-  return res.status(status).json({ authenticated: true, user });
+  const token = createSessionToken(user);
+  setSessionCookie(res, token);
+  return res.status(status).json({ success: true, authenticated: true, user, token });
 };
+const isDuplicateKeyError = (error: unknown) => typeof error === 'object' && error !== null && 'code' in error && error.code === 11000;
 
 export const authController = {
   async register(req: Request, res: Response) {
-    if (!env.publicRegistrationEnabled) return res.status(403).json({ message: 'Public registration is disabled' });
-    if (!env.emailPasswordAuthEnabled) return res.status(403).json({ message: 'Email/password authentication is disabled' });
+    if (!env.publicRegistrationEnabled) return res.status(403).json({ success: false, message: 'Création de compte désactivée' });
+    if (!env.emailPasswordAuthEnabled) return res.status(403).json({ success: false, message: 'Authentification par e-mail désactivée' });
 
     const email = normalizeEmail(req.body.email);
     const password = String(req.body.password ?? '');
     const name = String(req.body.name ?? '').trim();
-    if (!email || !/^\S+@\S+\.\S+$/.test(email)) return res.status(400).json({ message: 'A valid email is required' });
-    if (password.length < 8) return res.status(400).json({ message: 'Password must contain at least 8 characters' });
-    if (await User.exists({ email })) return res.status(409).json({ message: 'An account already exists for this email' });
+    if (!isValidEmail(email)) return res.status(400).json({ success: false, message: 'Adresse e-mail invalide' });
+    if (!name) return res.status(400).json({ success: false, message: 'Le nom est requis' });
+    if (password.length < 8) return res.status(400).json({ success: false, message: 'Le mot de passe doit contenir au moins 8 caractères' });
+    if (await User.exists({ email })) return res.status(409).json({ success: false, message: 'Cet e-mail est déjà utilisé' });
 
-    // Public input never controls the role. Only the server-side normal-role default is used.
-    const user = await User.create({ email, name, passwordHash: await hashPassword(password), role: env.defaultPublicRole });
-    return establishSession(res, publicUser(user), 201);
+    try {
+      // Public input never controls the role, including when a malicious body contains role: "admin".
+      const user = await User.create({ email, name, passwordHash: await hashPassword(password), role: 'user' });
+      return establishSession(res, publicUser(user), 201);
+    } catch (error) {
+      if (isDuplicateKeyError(error)) return res.status(409).json({ success: false, message: 'Cet e-mail est déjà utilisé' });
+      throw error;
+    }
   },
 
   async login(req: Request, res: Response) {
-    if (!env.emailPasswordAuthEnabled) return res.status(403).json({ message: 'Email/password authentication is disabled' });
+    if (!env.emailPasswordAuthEnabled) return res.status(403).json({ success: false, message: 'Authentification par e-mail désactivée' });
     const email = normalizeEmail(req.body.email);
     const password = String(req.body.password ?? '');
+    if (!isValidEmail(email) || !password) return res.status(400).json({ success: false, message: 'E-mail et mot de passe requis' });
+
     const user = await User.findOne({ email }).select('+passwordHash');
-    if (!user?.passwordHash || user.disabled || !(await verifyPassword(password, user.passwordHash))) {
-      return res.status(401).json({ message: 'Invalid email or password' });
+    if (!user) return res.status(401).json({ success: false, message: 'Compte introuvable' });
+    if (user.disabled) return res.status(403).json({ success: false, message: 'Compte désactivé' });
+    if (!user.passwordHash || !(await verifyPassword(password, user.passwordHash))) {
+      return res.status(401).json({ success: false, message: 'Mot de passe incorrect' });
     }
     return establishSession(res, publicUser(user));
   },
 
-  session(req: Request, res: Response) {
-    const user = readSession(req);
-    if (!user) return res.status(401).json({ authenticated: false, message: 'Unauthenticated' });
-    return res.json({ authenticated: true, user });
+  async me(req: Request, res: Response) {
+    const auth = (req as Request & { auth: AuthContext }).auth;
+    const user = await User.findById(auth.userId);
+    if (!user || user.disabled) {
+      clearSessionCookie(res);
+      return res.status(401).json({ success: false, authenticated: false, message: 'Compte introuvable ou désactivé' });
+    }
+    return res.json({ success: true, authenticated: true, user: publicUser(user) });
   },
 
   logout(_req: Request, res: Response) {
     clearSessionCookie(res);
-    return res.json({ authenticated: false, message: 'Logged out' });
+    return res.json({ success: true, authenticated: false, message: 'Déconnexion réussie' });
   },
 
   providers(_req: Request, res: Response) {

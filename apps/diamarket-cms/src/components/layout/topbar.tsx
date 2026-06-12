@@ -21,7 +21,7 @@ export function Topbar() {
 
   const logout = async () => {
     await cmsAuth.logout();
-    window.location.assign("/dashboard");
+    window.location.assign("/login");
   };
 
   return <header className="flex items-center justify-between border-b border-zinc-200 bg-white px-6 py-4 dark:border-zinc-800 dark:bg-zinc-950"><p className="text-sm text-zinc-500">Administration marketplace</p><div className="flex items-center gap-3"><button onClick={toggle} className="rounded-lg border px-3 py-1.5 text-xs dark:border-zinc-700">{dark ? "☀️ Light" : "🌙 Dark"}</button><button onClick={logout} className="rounded-lg border px-3 py-1.5 text-xs dark:border-zinc-700">Se déconnecter</button></div></header>;

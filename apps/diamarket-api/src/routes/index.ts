@@ -15,6 +15,7 @@ import { validateRequest } from '../middlewares/validate-request.middleware';
 import { localImageUpload } from '../middlewares/local-upload.middleware';
 import { authRouter } from './auth.routes';
 import { requireCmsRole } from '../middlewares/requireCmsRole';
+import { requireAdmin } from '../middlewares/requireAdmin';
 
 const validateProduct = (req: Request) => {
   const required = ['name', 'slug', 'description', 'price', 'currency', 'category', 'vendor', 'stock'];
@@ -35,6 +36,7 @@ export const apiRouter = Router();
 apiRouter.use('/v1/auth', authRouter);
 apiRouter.use('/auth', authRouter);
 apiRouter.get('/health', (_req, res) => res.json({ ok: true }));
+apiRouter.use(['/admin', '/cms', '/dashboard/admin'], requireAuth, requireAdmin);
 apiRouter.get('/products', productsController.list);
 apiRouter.get('/products/:slug', productsController.getBySlug);
 apiRouter.post('/products', requireAuth, requireCmsRole, requirePermission('products:create'), ownershipGuard('product'), validateRequest(validateProduct), productsController.create);

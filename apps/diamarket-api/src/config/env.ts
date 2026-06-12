@@ -5,7 +5,7 @@ export const apiEnvPath = path.resolve(__dirname, '../../.env');
 
 dotenv.config({
   path: apiEnvPath,
-  override: true
+  override: false
 });
 
 console.info(`[env] Loaded API env from: ${apiEnvPath}`);
@@ -23,9 +23,14 @@ export const env = {
   clerkSecretKey: process.env.CLERK_SECRET_KEY ?? '',
   publicRegistrationEnabled: process.env.PUBLIC_REGISTRATION_ENABLED === 'true',
   emailPasswordAuthEnabled: process.env.ENABLE_EMAIL_PASSWORD_AUTH !== 'false',
-  defaultPublicRole: ['client', 'user'].includes(process.env.DEFAULT_PUBLIC_ROLE ?? '') ? process.env.DEFAULT_PUBLIC_ROLE! : 'client',
-  authSessionSecret: process.env.AUTH_SESSION_SECRET ?? 'change-me-in-production',
-  sessionTtlHours: Number(process.env.AUTH_SESSION_TTL_HOURS ?? 168),
+  defaultPublicRole: 'user',
+  jwtSecret: process.env.JWT_SECRET ?? process.env.AUTH_SESSION_SECRET ?? 'change-me-in-production',
+  jwtExpiresIn: process.env.JWT_EXPIRES_IN ?? '7d',
+  sessionTtlMs: Number(process.env.AUTH_SESSION_TTL_HOURS ?? 168) * 60 * 60 * 1000,
+  adminDefaultEmail: (process.env.ADMIN_DEFAULT_EMAIL ?? '').trim().toLowerCase(),
+  adminDefaultPassword: process.env.ADMIN_DEFAULT_PASSWORD ?? '',
+  adminDefaultName: process.env.ADMIN_DEFAULT_NAME ?? 'Admin Diamarket',
+  adminWhitelist: parseList(process.env.ADMIN_WHITELIST).map((email) => email.toLowerCase()),
   allowAuthHeaderBridge: process.env.AUTH_ALLOW_HEADER_BRIDGE === 'true',
   corsAllowedOrigins: parseList(process.env.CORS_ALLOWED_ORIGINS),
   shippingProvider: process.env.SHIPPING_PROVIDER ?? 'mock',
