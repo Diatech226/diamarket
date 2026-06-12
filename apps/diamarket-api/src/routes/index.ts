@@ -16,6 +16,7 @@ import { localImageUpload } from '../middlewares/local-upload.middleware';
 import { authRouter } from './auth.routes';
 import { requireCmsRole } from '../middlewares/requireCmsRole';
 import { requireAdmin } from '../middlewares/requireAdmin';
+import { systemRouter } from './system.routes';
 
 const validateProduct = (req: Request) => {
   const required = ['name', 'slug', 'description', 'price', 'currency', 'category', 'vendor', 'stock'];
@@ -35,7 +36,7 @@ const validateOrder = (req: Request) => {
 export const apiRouter = Router();
 apiRouter.use('/v1/auth', authRouter);
 apiRouter.use('/auth', authRouter);
-apiRouter.get('/health', (_req, res) => res.json({ ok: true }));
+apiRouter.use(systemRouter);
 apiRouter.use(['/admin', '/cms', '/dashboard/admin'], requireAuth, requireAdmin);
 apiRouter.get('/products', productsController.list);
 apiRouter.get('/products/:slug', productsController.getBySlug);
