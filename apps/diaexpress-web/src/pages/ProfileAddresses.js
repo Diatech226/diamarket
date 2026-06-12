@@ -3,7 +3,6 @@ import { useBackendAuth } from '../auth/useBackendAuth';
 import { fetchAddresses, createAddress, updateAddress, deleteAddress } from '../api/addresses';
 import { normaliseCountry, validateCountry, validatePhone } from '../utils/addressValidation';
 import { EmptyState, ErrorState, LoadingState, SuccessState } from '../components/ui/PageStates';
-import '../styles/ProfileAddresses.css';
 
 const createBlankGpsLocation = () => ({
   latitude: '',
