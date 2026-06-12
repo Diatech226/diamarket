@@ -1,4 +1,4 @@
-export const ROLES = ['client', 'vendeur', 'marketplace_point_focal', 'agent_logistique', 'admin', 'super_admin'] as const;
+export const ROLES = ['client', 'user', 'viewer', 'vendeur', 'marketplace_point_focal', 'agent_logistique', 'author', 'editor', 'admin', 'super_admin'] as const;
 export type Role = (typeof ROLES)[number];
 
 export const PERMISSIONS = {
@@ -24,9 +24,13 @@ export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
 
 export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
   client: [PERMISSIONS.ordersRead],
+  user: [PERMISSIONS.ordersRead],
+  viewer: [PERMISSIONS.ordersRead],
   vendeur: [PERMISSIONS.productsCreate, PERMISSIONS.productsUpdate, PERMISSIONS.projectsCreate, PERMISSIONS.projectsUpdate, PERMISSIONS.ordersRead, PERMISSIONS.ordersUpdate, PERMISSIONS.commissionsRead],
   marketplace_point_focal: [PERMISSIONS.ordersRead, PERMISSIONS.ordersUpdate, PERMISSIONS.shipmentsCreate],
   agent_logistique: [PERMISSIONS.ordersRead, PERMISSIONS.ordersUpdate, PERMISSIONS.shipmentsCreate],
+  author: [PERMISSIONS.productsCreate, PERMISSIONS.productsUpdate, PERMISSIONS.projectsCreate, PERMISSIONS.projectsUpdate, PERMISSIONS.mediaManage, PERMISSIONS.ordersRead],
+  editor: [PERMISSIONS.productsCreate, PERMISSIONS.productsUpdate, PERMISSIONS.productsDelete, PERMISSIONS.projectsCreate, PERMISSIONS.projectsUpdate, PERMISSIONS.projectsDelete, PERMISSIONS.mediaManage, PERMISSIONS.ordersRead, PERMISSIONS.ordersUpdate],
   admin: [
     PERMISSIONS.productsCreate,
     PERMISSIONS.productsUpdate,

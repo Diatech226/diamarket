@@ -10,6 +10,7 @@ export function ClientHeader() {
         <nav className="flex items-center gap-2 text-xs md:gap-3 md:text-sm">
           <Link href="/catalogue">Catalogue</Link>
           <Link href="/vendor-apply" className='hidden md:inline'>Devenir vendeur</Link>
+          <Link href="/account">Compte</Link>
           <LanguageSwitcher />
           <CurrencySwitcher />
           <CartDrawer />
