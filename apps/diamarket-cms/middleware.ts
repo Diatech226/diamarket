@@ -1,10 +1,18 @@
-import { NextResponse } from 'next/server';
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
 
-// Authentication and role decisions are made from the API session in CmsAccessGate.
-// Keeping this middleware role-neutral prevents valid normal-user sessions from being
-// misreported as missing sessions before the forbidden screen can be rendered.
-export function middleware() {
-  return NextResponse.next();
-}
+const isProtected = createRouteMatcher(["/((?!sign-in|unauthorized).*)"]);
+const allowed = ["admin", "super_admin", "marketplace_point_focal"];
 
-export const config = { matcher: ['/((?!.+\\.[\\w]+$|_next).*)'] };
+export default clerkMiddleware(async (auth, req) => {
+  if (!isProtected(req)) return;
+  const { userId, sessionClaims, redirectToSignIn } = await auth();
+  if (!userId) return redirectToSignIn();
+
+  const role = (sessionClaims?.metadata as { role?: string } | undefined)?.role;
+  if (!role || !allowed.includes(role)) {
+    return NextResponse.redirect(new URL("/unauthorized", req.url));
+  }
+});
+
+export const config = { matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"] };

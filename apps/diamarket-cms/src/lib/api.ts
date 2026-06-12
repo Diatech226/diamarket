@@ -3,6 +3,14 @@ export const API_ORIGIN = API_BASE_URL.replace(/\/api\/?$/, "");
 
 type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
+function cmsHeaders(contentType = "application/json") {
+  return {
+    "Content-Type": contentType,
+    "x-user-id": process.env.NEXT_PUBLIC_CMS_USER_ID || "000000000000000000000001",
+    "x-user-role": process.env.NEXT_PUBLIC_CMS_USER_ROLE || "super_admin",
+  };
+}
+
 export function resolveMediaUrl(url?: string) {
   if (!url) return "";
   if (/^https?:\/\//i.test(url) || url.startsWith("data:")) return url;
@@ -12,8 +20,7 @@ export function resolveMediaUrl(url?: string) {
 export async function apiRequest<T>(path: string, method: HttpMethod, body?: unknown): Promise<T> {
   const res = await fetch(`${API_BASE_URL}${path}`, {
     method,
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
+    headers: cmsHeaders(),
     body: body ? JSON.stringify(body) : undefined,
     cache: "no-store",
   });
