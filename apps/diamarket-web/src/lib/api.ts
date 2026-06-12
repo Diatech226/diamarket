@@ -1,17 +1,14 @@
 import { Category, Order, PaymentStatus, Product, ShippingOption, Slide } from '@/lib/types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5000/api';
-const WEB_USER_ID = process.env.NEXT_PUBLIC_DIAMARKET_WEB_USER_ID ?? '000000000000000000000001';
-
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API_BASE_URL}${path}`, {
     ...init,
     headers: {
       'Content-Type': 'application/json',
-      'x-user-id': WEB_USER_ID,
-      'x-user-role': 'client',
       ...(init?.headers ?? {}),
     },
+    credentials: 'include',
     cache: 'no-store',
   });
   if (!res.ok) throw new Error(`API error ${res.status}`);
