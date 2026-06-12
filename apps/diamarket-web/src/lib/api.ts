@@ -15,9 +15,14 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-const normalizeId = (value: any) => String(value?._id ?? value?.id ?? value ?? '');
-const normalizeOrder = (payload: any): Order => {
-  const order = payload?.data ?? payload;
+const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null;
+const normalizeId = (value: unknown) => {
+  if (!isRecord(value)) return String(value ?? '');
+  return String(value._id ?? value.id ?? '');
+};
+const normalizeOrder = (payload: unknown): Order => {
+  const response = isRecord(payload) ? payload : {};
+  const order = isRecord(response.data) ? response.data : response;
   return {
     id: normalizeId(order),
     items: order?.items ?? [],
@@ -30,7 +35,7 @@ const normalizeOrder = (payload: any): Order => {
     diapayPaymentId: order?.diapayPaymentId,
     checkoutUrl: order?.checkoutUrl,
     trackingNumber: order?.trackingNumber,
-  };
+  } as Order;
 };
 
 const mock = {

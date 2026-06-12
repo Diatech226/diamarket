@@ -1,0 +1,62 @@
+openapi: 3.0.3
+info:
+  title: Diamarket API
+  version: 0.1.0
+  description: Première spécification du contrat système exposé après l’Itération 1.
+servers:
+  - url: http://localhost:5000
+paths:
+  /health:
+    get:
+      summary: Vérifie que le processus API répond
+      operationId: getLiveness
+      responses:
+        '200':
+          description: Processus vivant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Liveness'
+  /ready:
+    get:
+      summary: Vérifie que l’API et MongoDB sont prêts
+      operationId: getReadiness
+      responses:
+        '200':
+          description: API prête
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Readiness'
+        '503':
+          description: Dépendance indisponible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Readiness'
+components:
+  schemas:
+    Liveness:
+      type: object
+      required: [status, service, check]
+      properties:
+        status: { type: string, enum: [ok] }
+        service: { type: string, enum: [diamarket-api] }
+        check: { type: string, enum: [liveness] }
+    Readiness:
+      type: object
+      required: [status, service, check, dependencies]
+      properties:
+        status: { type: string, enum: [ready, not_ready] }
+        service: { type: string, enum: [diamarket-api] }
+        check: { type: string, enum: [readiness] }
+        dependencies:
+          type: object
+          required: [database]
+          properties:
+            database:
+              type: object
+              required: [status, ready]
+              properties:
+                status: { type: string }
+                ready: { type: boolean }

@@ -10,14 +10,24 @@
     "build:diamarket": "turbo run build --filter=diamarket-web --filter=diamarket-cms --filter=diamarket-api",
     "build:diapay": "turbo run build --filter=diapay-api --filter=diapay-dashboard --filter=diapay-docs --filter=diapay-sandbox",
     "build:all": "turbo run build",
-    "lint": "turbo lint",
-    "typecheck": "turbo typecheck",
+    "lint": "turbo run lint --filter=diamarket-api --filter=diamarket-cms --filter=diamarket-web",
+    "typecheck": "turbo run typecheck --filter=diamarket-api --filter=diamarket-cms --filter=diamarket-web",
     "test:mongo:dns": "npm --prefix apps/diamarket-api run test:mongo:dns --",
-    "build": "turbo build",
-    "build:diaexpress": "npm --prefix apps/diaexpress-web run build && npm --prefix apps/diaexpress-admin run build && npm --prefix apps/diaexpress-api run build"
+    "build": "npm run build:diamarket",
+    "build:diaexpress": "npm --prefix apps/diaexpress-web run build && npm --prefix apps/diaexpress-admin run build && npm --prefix apps/diaexpress-api run build",
+    "test": "turbo run test --filter=diamarket-api --filter=diamarket-cms --filter=diamarket-web"
   },
   "devDependencies": {
     "turbo": "^2.1.1",
-    "typescript": "^5.5.2"
-  }
+    "typescript": "^5.5.2",
+    "eslint": "^8.57.1",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
+    "eslint-config-next": "14.2.5"
+  },
+  "packageManager": "npm@11.4.2",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
 }

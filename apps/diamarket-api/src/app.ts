@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import { apiRouter } from './routes';
 import { errorHandler } from './middlewares/error.middleware';
 import { env } from './config/env';
+import { systemRouter } from './routes/system.routes';
 
 const rateBucket = new Map<string, { count: number; resetAt: number }>();
 
@@ -15,7 +16,7 @@ const isAllowedOrigin = (origin: string | undefined) => {
     return env.corsAllowedOrigins.includes(origin);
   }
 
-  return /localhost|diamarket/.test(origin);
+  return env.nodeEnv === 'development' && /localhost|diamarket/.test(origin);
 };
 
 export const app = express();
@@ -53,5 +54,6 @@ app.use(express.json({
 }));
 app.use(morgan(env.nodeEnv === 'production' ? 'combined' : 'dev'));
 app.use('/uploads', express.static(path.resolve(__dirname, '../uploads')));
+app.use(systemRouter);
 app.use('/api', apiRouter);
 app.use(errorHandler);

@@ -6,13 +6,17 @@
 - `packages/*`: packages partagés (UI, config, types, SDK)
 - `docs/diamarket` et `docs/diapay`: documentation produit
 
-## Lancement
+## Installation et lancement
+
+Le monorepo utilise exclusivement npm ; les commandes racine par défaut ciblent le périmètre Diamarket. Les commandes `build`, `lint`, `typecheck` et `test` ciblent le périmètre Diamarket. Voir `docs/diamarket/OPERATIONS.md` pour le guide complet de validation et de déploiement.
+
 - `npm install`
 - `npm run dev:diamarket` pour web/cms/api Diamarket
 - `npm run dev:diapay` pour api/dashboard/docs/sandbox Diapay
 - `npm run dev:all` pour tout
 
 ## Build
+- `npm run build` (Diamarket)
 - `npm run build:diamarket`
 - `npm run build:diapay`
 - `npm run build:all`
@@ -20,6 +24,7 @@
 ## Qualité
 - `npm run lint`
 - `npm run typecheck`
+- `npm run test`
 
 ## Variables d'environnement
 Chaque app contient un `.env.example`.

@@ -28,3 +28,9 @@ diapay/.env
 
 .turbo
 dist-types
+
+# Local environment files (examples remain tracked)
+.env
+.env.*
+!.env.example
+!**/.env.example
