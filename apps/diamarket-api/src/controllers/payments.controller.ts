@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { Order } from '../models/order.model';
 import { diapayService } from '../services/diapay.service';
+import { getAuth } from '../middlewares/requireAuth';
+import { orderScope } from '../middlewares/resource-access';
 
 const extractSessionId = (session: Record<string, any>) => session.id || session.paymentSessionId;
 
@@ -9,7 +11,7 @@ export const paymentsController = {
     const orderId = req.body.orderId;
     if (!orderId) return res.status(400).json({ message: 'orderId is required' });
 
-    const order = await Order.findById(orderId);
+    const order = await Order.findOne({ _id: orderId, ...orderScope(getAuth(req)!) });
     if (!order) return res.status(404).json({ message: 'Order not found' });
     if (order.paymentStatus === 'paid') return res.status(409).json({ message: 'Order is already paid' });
 
@@ -26,12 +28,13 @@ export const paymentsController = {
         sessionId: order.diapaySessionId,
         checkoutUrl: order.checkoutUrl,
         paymentStatus: order.paymentStatus,
-        raw: session,
       },
     });
   },
 
   async retrieveDiapaySession(req: Request, res: Response) {
+    const order = await Order.findOne({ diapaySessionId: req.params.sessionId, ...orderScope(getAuth(req)!) });
+    if (!order) return res.status(404).json({ message: 'Payment session not found' });
     const session = await diapayService.retrieveCheckoutSession(req.params.sessionId);
     return res.json({ data: session });
   },

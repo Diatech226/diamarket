@@ -1,5 +1,5 @@
-export type AuthUser = { id: string; email: string; name?: string; role: string };
-export type AuthSession = { success: boolean; authenticated: boolean; user?: AuthUser; token?: string; message?: string };
+export type AuthUser = { id: string; email: string; name?: string; role: 'admin' | 'vendor' | 'user' };
+export type AuthSession = { success: boolean; authenticated: boolean; user?: AuthUser; message?: string };
 
 export const AUTH_API_URL = process.env.NEXT_PUBLIC_AUTH_API_URL || `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/auth`;
 

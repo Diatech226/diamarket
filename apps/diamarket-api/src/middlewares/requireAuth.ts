@@ -1,29 +1,27 @@
 import { NextFunction, Request, Response } from 'express';
 import { readSessionResult } from '../utils/session';
-import { env } from '../config/env';
 import { User } from '../models/user.model';
+import { Vendor } from '../models/vendor.model';
+import { Role, normalizeRole } from '../config/permissions';
 
-export type AuthContext = { userId: string; role: string; email?: string; vendorId?: string; marketplacePointId?: string; country?: string };
+export type AuthContext = { userId: string; role: Role; email?: string; vendorId?: string; marketplacePointId?: string };
+export const getAuth = (req: Request) => (req as Request & { auth?: AuthContext }).auth;
 
 export async function requireAuth(req: Request, res: Response, next: NextFunction) {
   try {
     const { user: session, error } = readSessionResult(req);
-    const bridgeUserId = env.allowAuthHeaderBridge ? req.header('x-user-id') : undefined;
-    if (!session && !bridgeUserId) return res.status(401).json({ message: error === 'expired' ? 'Token expiré' : 'Non authentifié' });
+    if (!session) return res.status(401).json({ success: false, message: error === 'expired' ? 'Token expired' : 'Unauthorized' });
 
-    const currentUser = session ? await User.findById(session.id) : null;
-    if (session && (!currentUser || currentUser.disabled)) return res.status(401).json({ message: 'Compte introuvable ou désactivé' });
-
+    const currentUser = await User.findById(session.id);
+    const role = normalizeRole(currentUser?.role);
+    if (!currentUser || currentUser.disabled || !role) {
+      return res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+    const vendor = role === 'vendor' ? await Vendor.findOne({ userId: currentUser.id, status: 'active', isActive: true }) : null;
     (req as Request & { auth: AuthContext }).auth = {
-      userId: session?.id ?? bridgeUserId!,
-      role: currentUser?.role ?? (env.allowAuthHeaderBridge ? req.header('x-user-role') : undefined) ?? 'user',
-      email: currentUser?.email ?? session?.email,
-      vendorId: req.header('x-vendor-id') || undefined,
-      marketplacePointId: req.header('x-marketplace-point-id') || undefined,
-      country: req.header('x-user-country') || undefined,
+      userId: currentUser.id, role, email: currentUser.email ?? undefined,
+      vendorId: vendor?.id, marketplacePointId: vendor?.marketplacePointId ? String(vendor.marketplacePointId) : undefined,
     };
     next();
-  } catch (error) {
-    next(error);
-  }
+  } catch (error) { next(error); }
 }

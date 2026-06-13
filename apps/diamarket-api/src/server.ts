@@ -4,6 +4,7 @@ import { connectDatabase } from './config/db';
 import { seedDefaultAdmin } from './services/admin-seed.service';
 
 async function bootstrap() {
+  if (!env.jwtSecret) throw new Error('JWT_SECRET is required before the API can start.');
   await connectDatabase();
   await seedDefaultAdmin();
   app.listen(env.port, () => {

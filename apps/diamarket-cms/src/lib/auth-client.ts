@@ -1,4 +1,4 @@
-export type CmsUser = { id: string; email: string; name?: string; role: string };
+export type CmsUser = { id: string; email: string; name?: string; role: 'admin' | 'vendor' | 'user' };
 export type CmsSession = { success: boolean; authenticated: boolean; user?: CmsUser; message?: string };
 const AUTH_API_URL = process.env.NEXT_PUBLIC_AUTH_API_URL || 'http://localhost:5000/api/auth';
 

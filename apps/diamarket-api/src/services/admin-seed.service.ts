@@ -4,6 +4,10 @@ import { hashPassword } from '../utils/password';
 
 export async function seedDefaultAdmin() {
   const email = env.adminDefaultEmail;
+  if (await User.exists({ role: 'admin' })) {
+    console.info('[admin-seed] An administrator account already exists.');
+    return;
+  }
   if (!email) {
     if (!(await User.exists({ role: 'admin' }))) console.warn('[admin-seed] Aucun administrateur trouvé et ADMIN_DEFAULT_EMAIL n’est pas défini.');
     return;
@@ -15,7 +19,7 @@ export async function seedDefaultAdmin() {
   const existing = await User.findOne({ email });
   if (existing) {
     if (existing.role !== 'admin') throw new Error('ADMIN_DEFAULT_EMAIL correspond à un compte existant non administrateur.');
-    console.info(`[admin-seed] Compte administrateur déjà présent pour ${email}.`);
+    console.info('[admin-seed] Administrator account already exists.');
     return;
   }
 
@@ -25,5 +29,5 @@ export async function seedDefaultAdmin() {
     passwordHash: await hashPassword(env.adminDefaultPassword),
     role: 'admin',
   });
-  console.info(`[admin-seed] Compte administrateur créé pour ${email}.`);
+  console.info('[admin-seed] Administrator account created.');
 }
