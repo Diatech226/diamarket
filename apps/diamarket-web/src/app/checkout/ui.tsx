@@ -14,25 +14,13 @@ export default function CheckoutClient(){
   const [paymentStatus,setPaymentStatus]=useState('unpaid'); const [checkoutUrl,setCheckoutUrl]=useState(''); const [error,setError]=useState('');
   const estimate = async()=> { setOpts(await api.estimateShipping({country, city, itemCount: cart.length})); setStep(2); };
   const ship = opts.find(o=>o.id===selected);
-  const buildOrderPayload = (paymentMode: 'cod' | 'diapay') => ({
-    customer: process.env.NEXT_PUBLIC_DIAMARKET_WEB_USER_ID ?? '000000000000000000000001',
-    vendor: cart[0]?.product.vendor.id ?? '000000000000000000000001',
-    country,
-    city,
-    phone,
-    currency: 'FCFA',
-    totalAmount: totalFcfa + (ship?.priceFcfa ?? 0),
-    items: cart.map((item) => ({
-      product: item.product.id.match(/^[a-f\d]{24}$/i) ? item.product.id : '000000000000000000000001',
-      name: item.product.name,
-      quantity: item.quantity,
-      unitPrice: item.product.priceFcfa,
-      totalPrice: item.product.priceFcfa * item.quantity,
-    })),
-    shippingOptionId:selected,
-    paymentMode,
+  const buildOrderPayload = (paymentMethod: 'cash_on_delivery' | 'diapay') => ({
+    items: cart.map((item) => ({ productId: item.product.id, quantity: item.quantity })),
+    address: { country, city, phone },
+    shippingOptionId: selected,
+    paymentMethod,
   });
-  const createCod = async()=> { const order=await api.createOrder(buildOrderPayload('cod')); setOrderId(order.id); setPaymentStatus(order.paymentStatus ?? 'unpaid'); setStep(3); };
+  const createCod = async()=> { const order=await api.createOrder(buildOrderPayload('cash_on_delivery')); setOrderId(order.id); setPaymentStatus(order.paymentStatus ?? 'unpaid'); setStep(3); };
   const payWithDiapay = async()=> {
     setError('');
     try {
