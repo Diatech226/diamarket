@@ -16,7 +16,7 @@ const publicUser = (user: { _id: unknown; email?: string | null; name?: string |
 const establishSession = (res: Response, user: SessionUser, status = 200) => {
   const token = createSessionToken(user);
   setSessionCookie(res, token);
-  return res.status(status).json({ success: true, authenticated: true, user, token });
+  return res.status(status).json({ success: true, authenticated: true, user });
 };
 const isDuplicateKeyError = (error: unknown) => typeof error === 'object' && error !== null && 'code' in error && error.code === 11000;
 
@@ -47,13 +47,14 @@ export const authController = {
     if (!env.emailPasswordAuthEnabled) return res.status(403).json({ success: false, message: 'Authentification par e-mail désactivée' });
     const email = normalizeEmail(req.body.email);
     const password = String(req.body.password ?? '');
-    if (!isValidEmail(email) || !password) return res.status(400).json({ success: false, message: 'E-mail et mot de passe requis' });
+    if (!email || !password) return res.status(400).json({ success: false, message: 'Email and password are required' });
+    if (!isValidEmail(email)) return res.status(400).json({ success: false, message: 'Invalid email address' });
 
     const user = await User.findOne({ email }).select('+passwordHash');
-    if (!user) return res.status(401).json({ success: false, message: 'Compte introuvable' });
+    if (!user) return res.status(401).json({ success: false, message: 'Invalid credentials' });
     if (user.disabled) return res.status(403).json({ success: false, message: 'Compte désactivé' });
     if (!user.passwordHash || !(await verifyPassword(password, user.passwordHash))) {
-      return res.status(401).json({ success: false, message: 'Mot de passe incorrect' });
+      return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
     return establishSession(res, publicUser(user));
   },

@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 import { Product } from '../models/product.model';
+import { getAuth } from '../middlewares/requireAuth';
+import { ownerScope } from '../middlewares/resource-access';
 
 export const productsController = {
   async list(req: Request, res: Response) {
@@ -29,18 +31,23 @@ export const productsController = {
   },
 
   async create(req: Request, res: Response) {
-    const created = await Product.create(req.body);
+    const auth = getAuth(req)!;
+    if (auth.role === 'vendor' && !auth.vendorId) return res.status(403).json({ message: 'Active vendor account required' });
+    const created = await Product.create({ ...req.body, vendor: auth.role === 'vendor' ? auth.vendorId : req.body.vendor, ownerUserId: auth.userId });
     return res.status(201).json({ data: created });
   },
 
   async update(req: Request, res: Response) {
-    const updated = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const auth = getAuth(req)!;
+    const payload = { ...req.body };
+    if (auth.role !== 'admin') { delete payload.vendor; delete payload.ownerUserId; }
+    const updated = await Product.findOneAndUpdate({ _id: req.params.id, ...ownerScope(auth) }, payload, { new: true, runValidators: true });
     if (!updated) return res.status(404).json({ message: 'Product not found' });
     return res.json({ data: updated });
   },
 
   async remove(req: Request, res: Response) {
-    const deleted = await Product.findByIdAndDelete(req.params.id);
+    const deleted = await Product.findOneAndDelete({ _id: req.params.id, ...ownerScope(getAuth(req)!) });
     if (!deleted) return res.status(404).json({ message: 'Product not found' });
     return res.status(204).send();
   },

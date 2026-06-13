@@ -26,11 +26,11 @@ export function AccountAuth({ initialMode = 'login' }: { initialMode?: 'login' |
         ? await publicAuth.register({ name: String(data.get('name') || ''), email: String(data.get('email') || ''), password: String(data.get('password') || '') })
         : await publicAuth.login({ email: String(data.get('email') || ''), password: String(data.get('password') || '') });
       if (session.user?.role === 'admin') {
-        window.location.assign(CMS_URL);
+        window.location.assign(`${CMS_URL.replace(/\/$/, '')}/admin`);
         return;
       }
-      setUser(session.user ?? null);
-      setMessage(mode === 'register' ? 'Compte créé avec succès.' : 'Connexion réussie.');
+      window.location.assign('/account');
+      return;
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Impossible de continuer');
     } finally {
@@ -59,7 +59,7 @@ export function AccountAuth({ initialMode = 'login' }: { initialMode?: 'login' |
         <h1 className="text-2xl font-bold">{user.name || user.email}</h1>
         <p className="mt-1 text-sm">{user.email} · rôle : {user.role}</p>
         <div className="mt-5 flex flex-wrap gap-3">
-          {user.role === 'admin' && <a className="rounded-full bg-slate-900 px-5 py-2 text-sm font-semibold text-white" href={CMS_URL}>Accéder au CMS</a>}
+          {user.role === 'admin' && <a className="rounded-full bg-slate-900 px-5 py-2 text-sm font-semibold text-white" href={`${CMS_URL.replace(/\/$/, '')}/admin`}>Accéder au CMS</a>}
           <button className="rounded-full border px-5 py-2 text-sm disabled:opacity-60" disabled={submitting} onClick={logout}>{submitting ? 'Déconnexion…' : 'Se déconnecter'}</button>
         </div>
       </div>

@@ -24,7 +24,7 @@ export const env = {
   publicRegistrationEnabled: process.env.PUBLIC_REGISTRATION_ENABLED === 'true',
   emailPasswordAuthEnabled: process.env.ENABLE_EMAIL_PASSWORD_AUTH !== 'false',
   defaultPublicRole: 'user',
-  jwtSecret: process.env.JWT_SECRET ?? process.env.AUTH_SESSION_SECRET ?? 'change-me-in-production',
+  jwtSecret: process.env.JWT_SECRET ?? process.env.AUTH_SESSION_SECRET ?? '',
   jwtExpiresIn: process.env.JWT_EXPIRES_IN ?? '7d',
   sessionTtlMs: Number(process.env.AUTH_SESSION_TTL_HOURS ?? 168) * 60 * 60 * 1000,
   adminDefaultEmail: (process.env.ADMIN_DEFAULT_EMAIL ?? '').trim().toLowerCase(),

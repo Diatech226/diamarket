@@ -10,12 +10,13 @@ type SessionClaims = SessionUser & { type: 'session' };
 const cookieOptions = () => ({
   httpOnly: true,
   secure: env.nodeEnv === 'production',
-  sameSite: env.nodeEnv === 'production' ? ('none' as const) : ('lax' as const),
+  sameSite: 'lax' as const,
   path: '/',
   maxAge: env.sessionTtlMs,
 });
 
 export function createSessionToken(user: SessionUser) {
+  if (!env.jwtSecret) throw new Error('JWT_SECRET is required');
   return jwt.sign({ ...user, type: 'session' } satisfies SessionClaims, env.jwtSecret, {
     expiresIn: env.jwtExpiresIn as SignOptions['expiresIn'],
   });
@@ -40,6 +41,7 @@ function parseCookies(header?: string) {
 }
 
 export function readSessionResult(req: Request): SessionResult {
+  if (!env.jwtSecret) return { user: null, error: 'invalid' };
   const bearer = req.header('authorization')?.replace(/^Bearer\s+/i, '');
   const token = bearer || parseCookies(req.header('cookie'))[SESSION_COOKIE_NAME];
   if (!token) return { user: null };
