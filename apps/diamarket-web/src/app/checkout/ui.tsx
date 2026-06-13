@@ -28,7 +28,7 @@ export default function CheckoutClient(){
       setOrderId(order.id);
       const session = await api.createDiapayCheckoutSession(order.id);
       setCheckoutUrl(session.checkoutUrl);
-      setPaymentStatus(session.paymentStatus);
+      setPaymentStatus('pending');
       window.location.assign(session.checkoutUrl);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Impossible de démarrer le paiement Diapay');

@@ -2,7 +2,7 @@ import { Schema, model } from 'mongoose';
 
 export const ORDER_STATUSES = ['pending', 'confirmed', 'paid', 'processing', 'shipped', 'delivered', 'cancelled'] as const;
 export const SHIPMENT_STATUSES = ['not_created', 'estimated', 'created', 'in_transit', 'delivered', 'failed'] as const;
-export const PAYMENT_STATUSES = ['unpaid', 'pending', 'paid', 'failed', 'cancelled', 'expired', 'refunded'] as const;
+export const PAYMENT_STATUSES = ['pending', 'processing', 'paid', 'failed', 'cancelled', 'expired', 'refunded', 'partially_refunded', 'disputed'] as const;
 export const PAYMENT_PROVIDERS = ['cash_on_delivery', 'diapay'] as const;
 
 const OrderItemSchema = new Schema(
@@ -27,7 +27,7 @@ const OrderSchema = new Schema(
     currency: { type: String, enum: ['FCFA', 'XOF', 'USD'], default: 'FCFA' },
     status: { type: String, enum: ORDER_STATUSES, default: 'pending', index: true },
     paymentProvider: { type: String, enum: PAYMENT_PROVIDERS, default: 'cash_on_delivery', index: true },
-    paymentStatus: { type: String, enum: PAYMENT_STATUSES, default: 'unpaid', index: true },
+    paymentStatus: { type: String, enum: PAYMENT_STATUSES, default: 'pending', index: true },
     paymentMethod: { type: String, required: true },
     shippingOptionId: { type: String, required: true },
     address: { country: { type: String, required: true }, city: { type: String, required: true }, phone: { type: String, required: true }, line1: String },
@@ -50,7 +50,8 @@ const OrderSchema = new Schema(
         eventId: String,
         type: String,
         receivedAt: { type: Date, default: Date.now },
-        payload: Schema.Types.Mixed,
+        processedAt: Date,
+        status: { type: String, enum: ['processing', 'processed', 'ignored', 'failed'], default: 'processing' },
       },
     ],
   },

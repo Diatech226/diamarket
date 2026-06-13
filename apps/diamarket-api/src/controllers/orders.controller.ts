@@ -34,7 +34,7 @@ export const ordersController = {
           const updated = await Product.findOneAndUpdate({ _id: item.productId, status: 'active', stock: { $gte: item.quantity } }, { $inc: { stock: -item.quantity } }, { session, new: true });
           if (!updated) throw new Error('INSUFFICIENT_STOCK');
         }
-        [created] = await Order.create([{ customer: auth.userId, vendor: products[0].vendor, items, subtotalAmount, shippingAmount, totalAmount: subtotalAmount + shippingAmount, currency: products[0].currency, address: req.body.address, shippingOptionId: req.body.shippingOptionId, paymentProvider: req.body.paymentMethod === 'diapay' ? 'diapay' : 'cash_on_delivery', paymentMethod: req.body.paymentMethod, status: 'pending', paymentStatus: 'unpaid', shipmentStatus: 'estimated', shippingEstimate }], { session });
+        [created] = await Order.create([{ customer: auth.userId, vendor: products[0].vendor, items, subtotalAmount, shippingAmount, totalAmount: subtotalAmount + shippingAmount, currency: products[0].currency, address: req.body.address, shippingOptionId: req.body.shippingOptionId, paymentProvider: req.body.paymentMethod === 'diapay' ? 'diapay' : 'cash_on_delivery', paymentMethod: req.body.paymentMethod, status: 'pending', paymentStatus: 'pending', shipmentStatus: 'estimated', shippingEstimate }], { session });
       });
       return res.status(201).json({ data: created });
     } catch (error) {

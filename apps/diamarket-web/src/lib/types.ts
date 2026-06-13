@@ -1,6 +1,6 @@
 export type Currency = 'FCFA' | 'USD';
 export type Locale = 'fr' | 'en' | 'zh';
-export type PaymentStatus = 'unpaid' | 'pending' | 'paid' | 'failed' | 'cancelled' | 'expired' | 'refunded';
+export type PaymentStatus = 'pending' | 'processing' | 'paid' | 'failed' | 'cancelled' | 'expired' | 'refunded' | 'partially_refunded' | 'disputed';
 
 export interface Slide { id: string; title: string; subtitle: string; imageUrl: string; cta: string; }
 export interface Category { id: string; name: string; imageUrl: string; productCount: number; }

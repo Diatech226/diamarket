@@ -45,6 +45,7 @@ export const env = {
   diapaySecretKey: process.env.DIAPAY_SECRET_KEY ?? '',
   diapayPublicKey: process.env.DIAPAY_PUBLIC_KEY ?? '',
   diapayWebhookSecret: process.env.DIAPAY_WEBHOOK_SECRET ?? '',
+  diapayWebhookToleranceMs: Number(process.env.DIAPAY_WEBHOOK_TOLERANCE_SECONDS ?? 300) * 1000,
   diapayApiTimeout: Number(process.env.DIAPAY_API_TIMEOUT ?? 15000),
   diamarketSuccessUrl: process.env.DIAMARKET_SUCCESS_URL ?? 'http://localhost:3000/orders/success',
   diamarketCancelUrl: process.env.DIAMARKET_CANCEL_URL ?? 'http://localhost:3000/orders/cancel',
