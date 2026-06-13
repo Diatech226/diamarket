@@ -1,5 +1,5 @@
 'use client';
-import { createContext, useContext, useMemo, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { CartItem, Currency, Locale, Product } from '@/lib/types';
 
 type StoreContext = {
@@ -19,6 +19,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [currency, setCurrency] = useState<Currency>('FCFA');
   const [locale, setLocale] = useState<Locale>('fr');
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => { try { setCart(JSON.parse(localStorage.getItem('diamarket-cart') || '[]')); } catch { setCart([]); } setHydrated(true); }, []);
+  useEffect(() => { if (hydrated) localStorage.setItem('diamarket-cart', JSON.stringify(cart)); }, [cart, hydrated]);
   const addToCart = (p: Product) => setCart((c) => {
     const ex = c.find((i) => i.product.id === p.id);
     return ex ? c.map((i) => (i.product.id === p.id ? { ...i, quantity: i.quantity + 1 } : i)) : [...c, { product: p, quantity: 1 }];

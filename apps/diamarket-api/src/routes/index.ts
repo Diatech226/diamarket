@@ -25,9 +25,14 @@ const validateProject = (req: Request) => (!req.body.title || !String(req.body.t
 const validateCategory = (req: Request) => (!req.body.name || !req.body.slug ? 'name and slug are required' : null);
 const validateVendorRequest = (req: Request) => (!req.body.businessName ? 'businessName is required' : null);
 const validateOrder = (req: Request) => {
-  const required = ['vendor', 'items', 'totalAmount'];
-  for (const field of required) if (req.body[field] === undefined) return `Missing field: ${field}`;
   if (!Array.isArray(req.body.items) || req.body.items.length === 0) return 'items must be a non-empty array';
+  for (const item of req.body.items) {
+    if (!item.productId || !/^[a-f\d]{24}$/i.test(String(item.productId))) return 'Each productId must be a valid ObjectId';
+    if (!Number.isInteger(item.quantity) || item.quantity <= 0) return 'Each quantity must be a positive integer';
+  }
+  if (!req.body.address?.country || !req.body.address?.city || !req.body.address?.phone) return 'address.country, address.city and address.phone are required';
+  if (!req.body.shippingOptionId) return 'shippingOptionId is required';
+  if (!['cash_on_delivery', 'diapay'].includes(req.body.paymentMethod)) return 'Invalid paymentMethod';
   return null;
 };
 

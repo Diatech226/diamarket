@@ -9,10 +9,9 @@ export const productsController = {
     const limit = Math.min(Number(req.query.limit || 20), 100);
     const skip = (page - 1) * limit;
 
-    const filter: Record<string, unknown> = {};
+    const filter: Record<string, unknown> = { status: 'active' };
     if (req.query.category) filter.category = req.query.category;
     if (req.query.vendor) filter.vendor = req.query.vendor;
-    if (req.query.status) filter.status = req.query.status;
     if (req.query.isFeatured) filter.isFeatured = req.query.isFeatured === 'true';
     if (req.query.search) filter.$text = { $search: String(req.query.search) };
 
@@ -25,7 +24,7 @@ export const productsController = {
   },
 
   async getBySlug(req: Request, res: Response) {
-    const item = await Product.findOne({ slug: req.params.slug }).populate('category vendor');
+    const item = await Product.findOne({ slug: req.params.slug, status: 'active' }).populate('category vendor');
     if (!item) return res.status(404).json({ message: 'Product not found' });
     return res.json({ data: item });
   },
