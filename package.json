@@ -2,7 +2,7 @@
   "name": "diamarket-platform",
   "private": true,
   "scripts": {
-    "dev": "turbo dev",
+    "dev": "npm run dev:diamarket",
     "dev:diamarket": "node scripts/dev.mjs diamarket",
     "dev:diapay": "node scripts/dev.mjs diapay",
     "dev:diaexpress": "node scripts/dev.mjs diaexpress",
