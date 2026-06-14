@@ -12,10 +12,12 @@ export const api = {
   getCategories: () => demoFallback(request<any>('/categories').then(r => (r.data ?? r).map((x: any) => ({ id: id(x), name: x.name, imageUrl: x.imageUrl ?? '', productCount: x.productCount ?? 0 }))), []),
   getProducts: () => demoFallback(request<any>('/products').then(r => (r.data ?? r).map(product)), []),
   getProduct: (slug: string) => request<any>(`/products/${encodeURIComponent(slug)}`).then(r => product(r.data ?? r)),
-  estimateShipping: (payload: { country: string; city: string; itemCount: number }) => demoFallback(request<ShippingOption[]>('/shipping/estimate', { method: 'POST', body: JSON.stringify(payload) }), []),
+  estimateShipping: (payload: { country: string; city: string; itemCount: number }) => demoFallback(request<any>('/shipping/estimate', { method: 'POST', body: JSON.stringify({ origin: 'Diamarket', destination: { country: payload.country, city: payload.city }, weight: Math.max(1, payload.itemCount), items: [] }) }).then(r => [{ id: r.serviceLevel, name: r.serviceLevel, priceFcfa: r.amount, etaDays: `${r.estimatedDeliveryDays} jours` }] as ShippingOption[]), []),
   createOrder: (payload: unknown) => request('/orders', { method: 'POST', body: JSON.stringify(payload) }).then(order),
   createDiapayCheckoutSession: (orderId: string) => request<{ success: true; orderId: string; sessionId: string; checkoutUrl: string }>('/payments/diapay/checkout-session', { method: 'POST', body: JSON.stringify({ orderId }) }),
   getPaymentStatus: (orderId: string) => request(`/orders/${orderId}/payment-status`).then(order),
   getOrders: () => request<any>('/orders').then(r => (r.data ?? r).map(order)),
+  getOrder: (orderId: string) => request<any>(`/orders/${orderId}`).then(order),
+  getOrderShipment: (orderId: string) => request<any>(`/orders/${orderId}/shipment`).then(r => r.data ?? r),
   submitVendorRequest: (payload: unknown) => request<{ status: string }>('/vendor-requests', { method: 'POST', body: JSON.stringify(payload) }),
 };

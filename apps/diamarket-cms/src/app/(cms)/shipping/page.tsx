@@ -1,9 +1,5 @@
-import { PageHeader } from "@/components/ui/page-header";
-import { DataTable } from "@/components/ui/data-table";
-import { FormInput } from "@/components/ui/form-input";
-import { StatusBadge } from "@/components/ui/status-badge";
-import { ConfirmModal } from "@/components/ui/confirm-modal";
-
-export default function Page() {
-  return <div className="space-y-6"><PageHeader title="shipping" subtitle="Gestion shipping" /><div className="grid gap-4 md:grid-cols-3"><FormInput label="Recherche" placeholder="Mot clé" /><FormInput label="Filtre" placeholder="Statut / catégorie" /><button className="rounded-md bg-olive-700 px-4 py-2 text-white">Créer</button></div><DataTable headers={["Nom","Statut","Action"]} rows={[["Exemple", <StatusBadge key='s' status='active' />, <ConfirmModal key='c' />]]} /></div>;
-}
+'use client';
+import { useEffect, useState } from 'react';
+import { PageHeader } from '@/components/ui/page-header';
+import { cmsService } from '@/services/cms-service';
+export default function Page() { const [items,setItems]=useState<any[]>([]); const [filter,setFilter]=useState(''); const [message,setMessage]=useState(''); const load=()=>cmsService.getShipping().then(setItems).catch(e=>setMessage(e.message)); useEffect(()=>{ void load(); },[]); const sync=async(x:any)=>{try{await cmsService.syncShipment(String(x.order?._id ?? x.order)); setMessage('Tracking synchronisé.'); load();}catch(e){setMessage(e instanceof Error?e.message:'Provider indisponible');}}; return <div className='space-y-6'><PageHeader title='Expéditions DiaExpress' subtitle='Suivi, statuts normalisés et synchronisation provider' />{message&&<p className='rounded-xl bg-blue-500/10 p-3'>{message}</p>}<select className='rounded-md border p-2' value={filter} onChange={e=>setFilter(e.target.value)}><option value=''>Tous les statuts</option>{['pending','created','picked_up','in_transit','out_for_delivery','delivered','failed','returned','cancelled'].map(x=><option key={x}>{x}</option>)}</select><div className='overflow-x-auto rounded-xl border'><table className='w-full text-sm'><thead><tr><th className='p-3 text-left'>Tracking</th><th>Commande</th><th>Statut</th><th>Dernier événement</th><th>Action</th></tr></thead><tbody>{items.filter(x=>!filter||x.status===filter).map(x=><tr key={x._id} className='border-t'><td className='p-3 font-mono'>{x.trackingNumber}</td><td>{x.order?._id??x.order}</td><td>{x.status}</td><td>{x.history?.at(-1)?.message??'—'}</td><td><button onClick={()=>sync(x)} className='rounded border px-3 py-1'>Synchroniser</button></td></tr>)}</tbody></table></div></div>; }
