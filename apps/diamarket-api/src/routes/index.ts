@@ -15,6 +15,7 @@ import { localImageUpload } from '../middlewares/local-upload.middleware';
 import { authRouter } from './auth.routes';
 import { requireAdmin } from '../middlewares/requireAdmin';
 import { systemRouter } from './system.routes';
+import { shippingController } from '../controllers/shipping.controller';
 
 const validateProduct = (req: Request) => {
   const required = ['name', 'slug', 'description', 'price', 'currency', 'category', 'vendor', 'stock'];
@@ -72,4 +73,10 @@ apiRouter.put('/orders/:id/status', requireAuth, requirePermission('orders:updat
 apiRouter.post('/payments/diapay/checkout-session', requireAuth, paymentsController.createDiapayCheckoutSession);
 apiRouter.get('/payments/diapay/session/:sessionId', requireAuth, paymentsController.retrieveDiapaySession);
 apiRouter.post('/payments/diapay/webhook', paymentsController.handleDiapayWebhook);
-apiRouter.post('/orders/:id/shipment/sync', requireAuth, requireRole('admin'), ordersController.syncShipmentStatus);
+apiRouter.get('/shipments', requireAuth, requireAdmin, shippingController.list);
+apiRouter.post('/shipping/estimate', shippingController.estimate);
+apiRouter.post('/shipping/diaexpress/webhook', shippingController.webhook);
+apiRouter.post('/orders/:id/shipment', requireAuth, shippingController.create);
+apiRouter.get('/orders/:id/shipment', requireAuth, shippingController.byOrder);
+apiRouter.get('/shipments/:trackingNumber', requireAuth, shippingController.byTracking);
+apiRouter.post('/orders/:id/shipment/sync', requireAuth, shippingController.sync);

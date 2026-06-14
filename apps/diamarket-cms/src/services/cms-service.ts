@@ -29,5 +29,7 @@ export const cmsService = {
   getFocalPoints: () => fetchCollection(endpoints.focalPoints),
   getSettings: () => api.get(endpoints.settings),
   getCurrencies: () => fetchCollection(endpoints.currencies),
-  getShipping: () => api.get(endpoints.shipping),
+  getShipping: () => fetchCollection<any>('/shipments'),
+  createShipment: (orderId: string) => api.post(`/orders/${orderId}/shipment`, {}),
+  syncShipment: (orderId: string) => api.post(`/orders/${orderId}/shipment/sync`, {}),
 };

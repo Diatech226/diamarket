@@ -4,6 +4,7 @@ import { Order, ORDER_STATUSES } from '../models/order.model';
 import { Product } from '../models/product.model';
 import { Shipment } from '../models/shipment.model';
 import { shippingService } from '../services/shipping';
+import { diaexpressService } from '../services/diaexpress.service';
 import { getAuth } from '../middlewares/requireAuth';
 import { orderScope } from '../middlewares/resource-access';
 
@@ -23,8 +24,9 @@ export const ordersController = {
       return { product: product._id, name: product.name, quantity, unitPrice: product.price, totalPrice: product.price * quantity };
     });
     const subtotalAmount = items.reduce((sum, item) => sum + item.totalPrice, 0);
-    const shippingEstimate = await shippingService.estimateShipping({ totalAmount: subtotalAmount });
-    const shippingAmount = Number(shippingEstimate.estimatedCost || 0);
+    const estimate = await diaexpressService.estimateShipping({ origin: { country: 'Burkina Faso', city: 'Ouagadougou' }, destination: req.body.address, weight: Math.max(1, items.reduce((sum, item) => sum + item.quantity, 0)), items });
+    const shippingEstimate = { provider: estimate.provider, estimatedCost: estimate.amount, estimatedDeliveryDays: estimate.estimatedDeliveryDays, simulated: estimate.simulated };
+    const shippingAmount = Number(estimate.amount || 0);
 
     const session = await mongoose.startSession();
     try {
@@ -44,7 +46,7 @@ export const ordersController = {
   },
   async list(req: Request, res: Response) { const data = await Order.find(orderScope(getAuth(req)!)).populate('customer vendor items.product').sort({ createdAt: -1 }); return res.json({ data }); },
   async getById(req: Request, res: Response) { const data = await Order.findOne({ _id: req.params.id, ...orderScope(getAuth(req)!) }).populate('customer vendor items.product'); if (!data) return res.status(404).json({ message: 'Order not found' }); return res.json({ data }); },
-  async updateStatus(req: Request, res: Response) { if (!ORDER_STATUSES.includes(req.body.status)) return res.status(400).json({ message: 'Invalid order status' }); const data = await Order.findOneAndUpdate({ _id: req.params.id, ...orderScope(getAuth(req)!) }, { status: req.body.status }, { new: true, runValidators: true }); if (!data) return res.status(404).json({ message: 'Order not found' }); if (req.body.status === 'processing') { const shipment = await shippingService.createShipment({ orderId: data.id, estimatedCost: data.shippingEstimate?.estimatedCost || 0, totalAmount: data.totalAmount, currency: data.currency }); data.shipmentStatus = 'created'; await data.save(); await Shipment.create({ order: data.id, carrier: shipment.simulated ? 'mock' : 'external', trackingNumber: shipment.trackingNumber, status: 'created', externalProviderPayload: shipment.raw }); return res.json({ data, shipment }); } return res.json({ data }); },
+  async updateStatus(req: Request, res: Response) { if (!ORDER_STATUSES.includes(req.body.status)) return res.status(400).json({ message: 'Invalid order status' }); const data = await Order.findOneAndUpdate({ _id: req.params.id, ...orderScope(getAuth(req)!) }, { status: req.body.status }, { new: true, runValidators: true }); if (!data) return res.status(404).json({ message: 'Order not found' }); return res.json({ data }); },
   async getPaymentStatus(req: Request, res: Response) { const data = await Order.findOne({ _id: req.params.id, ...orderScope(getAuth(req)!) }).select('status paymentProvider paymentStatus paymentMethod diapaySessionId diapayPaymentId checkoutUrl paidAt cancelledAt failedAt totalAmount currency'); if (!data) return res.status(404).json({ message: 'Order not found' }); return res.json({ data }); },
-  async syncShipmentStatus(req: Request, res: Response) { const order = await Order.findOne({ _id: req.params.id, ...orderScope(getAuth(req)!) }); if (!order) return res.status(404).json({ message: 'Order not found' }); const shipment = await Shipment.findOne({ order: order.id }).sort({ createdAt: -1 }); if (!shipment?.trackingNumber) return res.status(404).json({ message: 'Shipment not found or tracking number unavailable' }); const status = await shippingService.syncShipmentStatus(shipment.trackingNumber); order.shipmentStatus = status.shipmentStatus; order.status = status.orderStatus; await order.save(); shipment.status = status.shipmentStatus; shipment.externalProviderPayload = status.raw; await shipment.save(); return res.json({ data: { order, shipment, providerStatus: status.providerStatus } }); },
+  async syncShipmentStatus(req: Request, res: Response) { const order = await Order.findOne({ _id: req.params.id, ...orderScope(getAuth(req)!) }); if (!order) return res.status(404).json({ message: 'Order not found' }); const shipment = await Shipment.findOne({ order: order.id }).sort({ createdAt: -1 }); if (!shipment?.trackingNumber) return res.status(404).json({ message: 'Shipment not found or tracking number unavailable' }); const status = await shippingService.syncShipmentStatus(shipment.trackingNumber); order.shipmentStatus = status.shipmentStatus; order.status = status.orderStatus; await order.save(); shipment.status = status.shipmentStatus; shipment.providerPayload = status.raw; await shipment.save(); return res.json({ data: { order, shipment, providerStatus: status.providerStatus } }); },
 };
