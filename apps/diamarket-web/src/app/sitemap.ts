@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = 'https://diamarket.app';
-  return ['','/catalogue','/cart','/checkout','/account','/vendor-apply'].map((path) => ({
+  return ['','/catalogue','/vendor-apply'].map((path) => ({
     url: `${base}${path}`,
     lastModified: new Date(),
     changeFrequency: 'daily',

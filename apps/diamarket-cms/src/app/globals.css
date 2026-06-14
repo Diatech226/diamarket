@@ -4,3 +4,5 @@
 
 * { box-sizing: border-box; }
 body { margin: 0; font-family: Inter, Arial, sans-serif; @apply bg-zinc-50 text-zinc-900 dark:bg-black dark:text-zinc-100; }
+button, a, input, select, textarea { @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-black; }
+button, input, select { min-height: 44px; }

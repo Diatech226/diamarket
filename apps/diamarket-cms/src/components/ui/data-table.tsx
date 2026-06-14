@@ -62,12 +62,12 @@ export function DataTable({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <input value={query} onChange={(e) => { setQuery(e.target.value); setPage(1); }} placeholder={searchPlaceholder} className="w-full max-w-sm rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-2 text-sm outline-none ring-olive-500 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-900" />
         <div className="flex gap-2">
-          {enableBulkActions && <button className="rounded-lg border px-3 py-2 text-xs">Bulk archive ({selected.length})</button>}
-          <button onClick={exportCsv} className="rounded-lg bg-olive-700 px-3 py-2 text-xs text-white">Export CSV</button>
+          {enableBulkActions && <button disabled={!selected.length} className="rounded-lg border px-3 py-2 text-xs disabled:opacity-50">Archiver la sélection ({selected.length})</button>}
+          <button onClick={exportCsv} className="rounded-lg bg-olive-700 px-3 py-2 text-xs text-white">Exporter en CSV</button>
         </div>
       </div>
       <div className="overflow-x-auto">
-        <table className="min-w-full text-sm">
+        <table className="min-w-[720px] text-sm">
           <thead><tr>{enableBulkActions && <th className="px-3 py-2" />} {headers.map((h) => <th key={h} className="px-4 py-2 text-left font-medium text-zinc-500">{h}</th>)}</tr></thead>
           <tbody>{currentRows.map((row) => <tr key={row.id} className="border-t border-zinc-100 dark:border-zinc-800">{enableBulkActions && <td className="px-3 py-3"><input type="checkbox" checked={selected.includes(row.id)} onChange={() => toggleSelect(row.id)} /></td>}{row.cells.map((c, j) => <td key={j} className="px-4 py-3">{c}</td>)}</tr>)}</tbody>
         </table>
