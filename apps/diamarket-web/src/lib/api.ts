@@ -14,7 +14,7 @@ export const api = {
   getProduct: (slug: string) => request<any>(`/products/${encodeURIComponent(slug)}`).then(r => product(r.data ?? r)),
   estimateShipping: (payload: { country: string; city: string; itemCount: number }) => demoFallback(request<ShippingOption[]>('/shipping/estimate', { method: 'POST', body: JSON.stringify(payload) }), []),
   createOrder: (payload: unknown) => request('/orders', { method: 'POST', body: JSON.stringify(payload) }).then(order),
-  createDiapayCheckoutSession: (orderId: string) => request<{ data: { orderId: string; sessionId: string; checkoutUrl: string; paymentStatus: PaymentStatus } }>('/payments/diapay/checkout-session', { method: 'POST', body: JSON.stringify({ orderId }) }).then(r => r.data),
+  createDiapayCheckoutSession: (orderId: string) => request<{ success: true; orderId: string; sessionId: string; checkoutUrl: string }>('/payments/diapay/checkout-session', { method: 'POST', body: JSON.stringify({ orderId }) }),
   getPaymentStatus: (orderId: string) => request(`/orders/${orderId}/payment-status`).then(order),
   getOrders: () => request<any>('/orders').then(r => (r.data ?? r).map(order)),
   submitVendorRequest: (payload: unknown) => request<{ status: string }>('/vendor-requests', { method: 'POST', body: JSON.stringify(payload) }),
