@@ -1,11 +1,5 @@
-import { PageHeader } from "@/components/ui/page-header";
-import { DataTable } from "@/components/ui/data-table";
-
-export default function VendorsPage() {
-  const rows = [
-    { id: "v1", searchableText: "Naya Tech pending", cells: ["Naya Tech", "En attente", "1 980 000 FCFA", "12%", "Valider"] },
-    { id: "v2", searchableText: "Casa Lab active", cells: ["Casa Lab", "Actif", "1 320 000 FCFA", "10%", "Suspendre"] },
-  ];
-
-  return <div className="space-y-6"><PageHeader title="Vendeurs" subtitle="Validation, revenus, commissions, analytics et performance" /><div className="grid gap-4 md:grid-cols-3"><div className="rounded-2xl border p-4 dark:border-zinc-800"><p className="text-xs text-zinc-500">Vendeurs à valider</p><p className="text-2xl font-semibold">14</p></div><div className="rounded-2xl border p-4 dark:border-zinc-800"><p className="text-xs text-zinc-500">Commission moyenne</p><p className="text-2xl font-semibold">11.2%</p></div><div className="rounded-2xl border p-4 dark:border-zinc-800"><p className="text-xs text-zinc-500">Croissance GMV</p><p className="text-2xl font-semibold">+18%</p></div></div><DataTable headers={["Vendeur", "Statut", "Revenus", "Commission", "Action"]} rows={rows} /></div>;
-}
+"use client";
+import { useEffect,useState } from "react"; import { PageHeader } from "@/components/ui/page-header"; import { DataTable } from "@/components/ui/data-table"; import { cmsService } from "@/services/cms-service";
+export default function VendorsPage(){const [vendors,setVendors]=useState<any[]>([]);const [requests,setRequests]=useState<any[]>([]);const [message,setMessage]=useState("");const load=()=>Promise.all([cmsService.getVendors(),cmsService.getVendorRequests()]).then(([v,r])=>{setVendors(v);setRequests(r)}).catch(e=>setMessage(e.message));useEffect(()=>{load()},[]);
+const action=async(id:string,type:"approve"|"reject")=>{setMessage("Action en cours…");try{await cmsService.reviewVendorRequest(id,type);await load();setMessage(`Demande ${type==="approve"?"approuvée":"refusée"}.`)}catch(e){setMessage((e as Error).message)}};
+return <div className="space-y-6"><PageHeader title="Vendeurs" subtitle="Demandes, statut, commission et activité réels"/>{message&&<p className="rounded-xl bg-blue-500/10 p-3">{message}</p>}<h2 className="font-semibold">Demandes en attente</h2><DataTable headers={["Entreprise","Statut","Actions"]} rows={requests.map(r=>({id:r._id,searchableText:`${r.businessName} ${r.status}`,cells:[r.businessName,r.status,<span key={r._id} className="flex gap-2"><button onClick={()=>action(r._id,"approve")} className="rounded bg-olive-700 px-2 py-1 text-white">Approuver</button><button onClick={()=>action(r._id,"reject")} className="rounded border px-2 py-1">Refuser</button></span>]}))}/><h2 className="font-semibold">Vendeurs</h2><DataTable headers={["Boutique","Statut","Commission","Produits","Commandes"]} rows={vendors.map(v=>({id:v._id,searchableText:`${v.shopName} ${v.status}`,cells:[v.shopName||"—",v.status,`${Math.round((v.commissionRate||0)*100)}%`,v.productCount||0,v.orderCount||0]}))}/></div>}
