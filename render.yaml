@@ -8,7 +8,7 @@ services:
     healthCheckPath: /api/health
     envVars:
       - key: NODE_VERSION
-        value: 20
+        value: 20.x
       - key: NODE_ENV
         value: production
       - key: MONGODB_URI
