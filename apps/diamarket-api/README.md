@@ -11,6 +11,24 @@ npm run dev
 
 See `.env.example`.
 
+## Déploiement Render
+
+Le service Render doit utiliser `apps/diamarket-api` comme **Root Directory**,
+Node.js 20.x et npm. Aucune installation globale de pnpm n'est nécessaire (et
+le système de fichiers global de Render est en lecture seule).
+
+```text
+Build Command: npm install && npm run build
+Start Command: npm start
+Health Check Path: /api/health
+```
+
+Configurer dans Render les variables décrites dans `.env.example`. En
+production, `MONGODB_URI`, `JWT_SECRET`, `DIAPAY_SECRET_KEY` et
+`CORS_ALLOWED_ORIGINS` sont indispensables au démarrage ; définir
+`NODE_ENV=production`. Les secrets et fichiers `.env` ne doivent jamais être
+commités.
+
 ## Endpoints (Iteration 2)
 
 ### Products
