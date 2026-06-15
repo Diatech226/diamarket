@@ -4,7 +4,7 @@ Ce guide couvre uniquement `diamarket-api`, `diamarket-web` et `diamarket-cms`.
 
 ## Prérequis et installation
 
-- Node.js 20 ou 22 ;
+- Node.js 20.x (version épinglée pour Render) ;
 - npm 10 ou 11 ;
 - MongoDB local ou MongoDB Atlas.
 
@@ -66,6 +66,10 @@ npm --prefix apps/diamarket-cms start
 - Start command : `npm start`
 - Healthcheck : `/api/health`
 - Définir les variables de `apps/diamarket-api/.env.example` dans Render.
+- Définir `NODE_ENV=production` et utiliser le runtime Node.js 20.x déclaré
+  dans `package.json`.
+- Ne pas ajouter de précommande `npm install -g pnpm` : le dépôt utilise npm et
+  le système de fichiers global du runtime Render est en lecture seule.
 
 ### Vercel — web et CMS
 
