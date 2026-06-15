@@ -23,6 +23,13 @@ Start Command: npm start
 Health Check Path: /api/health
 ```
 
+La cause de l'erreur `EROFS` est une commande de build personnalisée qui tente
+d'installer pnpm globalement dans `/usr/lib/node_modules`, un emplacement en
+lecture seule sur Render. Le Blueprint `render.yaml` du dépôt ne contient pas
+cette commande. Si le service Render existait avant le Blueprint, vérifier
+également la commande enregistrée dans le dashboard Render : une valeur saisie
+dans le dashboard peut continuer à remplacer la configuration du dépôt.
+
 Configurer dans Render les variables décrites dans `.env.example`. En
 production, `MONGODB_URI`, `JWT_SECRET`, `DIAPAY_SECRET_KEY` et
 `CORS_ALLOWED_ORIGINS` sont indispensables au démarrage ; définir
