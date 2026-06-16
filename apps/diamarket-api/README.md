@@ -14,7 +14,7 @@ See `.env.example`.
 ## Déploiement Render
 
 Le service Render doit utiliser `apps/diamarket-api` comme **Root Directory**,
-Node.js 20.x et npm. Aucune installation globale de pnpm n'est nécessaire (et
+Node.js 20.x et npm. Aucune installation globale d’un gestionnaire alternatif n'est nécessaire (et
 le système de fichiers global de Render est en lecture seule).
 
 ```text
@@ -24,7 +24,7 @@ Health Check Path: /api/health
 ```
 
 La cause de l'erreur `EROFS` est une commande de build personnalisée qui tente
-d'installer pnpm globalement dans `/usr/lib/node_modules`, un emplacement en
+d'installer un gestionnaire alternatif globalement dans `/usr/lib/node_modules`, un emplacement en
 lecture seule sur Render. Le Blueprint `render.yaml` du dépôt ne contient pas
 cette commande. Si le service Render existait avant le Blueprint, vérifier
 également la commande enregistrée dans le dashboard Render : une valeur saisie

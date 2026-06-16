@@ -68,7 +68,7 @@ npm --prefix apps/diamarket-cms start
 - Définir les variables de `apps/diamarket-api/.env.example` dans Render.
 - Définir `NODE_ENV=production` et utiliser le runtime Node.js 20.x déclaré
   dans `package.json`.
-- Ne pas ajouter de précommande `npm install -g pnpm` : le dépôt utilise npm et
+- Ne pas ajouter de précommande `npm install -g gestionnaire alternatif` : le dépôt utilise npm et
   le système de fichiers global du runtime Render est en lecture seule.
 
 ### Vercel — web et CMS

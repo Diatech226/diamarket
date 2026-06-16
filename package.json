@@ -7,25 +7,24 @@
     "dev:diapay": "node scripts/dev.mjs diapay",
     "dev:diaexpress": "node scripts/dev.mjs diaexpress",
     "dev:all": "node scripts/dev.mjs all",
-    "build:diamarket": "turbo run build --filter=diamarket-web --filter=diamarket-cms --filter=diamarket-api",
-    "build:diapay": "turbo run build --filter=diapay-api --filter=diapay-dashboard --filter=diapay-docs --filter=diapay-sandbox",
-    "build:all": "turbo run build",
-    "lint": "turbo run lint --filter=diamarket-api --filter=diamarket-cms --filter=diamarket-web",
-    "typecheck": "turbo run typecheck --filter=diamarket-api --filter=diamarket-cms --filter=diamarket-web",
+    "build:diamarket": "npm --prefix apps/diamarket-api run build && npm --prefix apps/diamarket-web run build && npm --prefix apps/diamarket-cms run build",
+    "build:diapay": "npm --prefix apps/diapay-api run build && npm --prefix apps/diapay-dashboard run build && npm --prefix apps/diapay-docs run build && npm --prefix apps/diapay-sandbox run build",
+    "build:all": "npm run build:diamarket && npm run build:diapay && npm run build:diaexpress",
+    "lint": "npm --prefix apps/diamarket-api run lint && npm --prefix apps/diamarket-cms run lint && npm --prefix apps/diamarket-web run lint",
+    "typecheck": "npm --prefix apps/diamarket-api run typecheck && npm --prefix apps/diamarket-cms run typecheck && npm --prefix apps/diamarket-web run typecheck",
     "test:mongo:dns": "npm --prefix apps/diamarket-api run test:mongo:dns --",
     "build": "npm run build:diamarket",
     "build:diaexpress": "npm --prefix apps/diaexpress-web run build && npm --prefix apps/diaexpress-admin run build && npm --prefix apps/diaexpress-api run build",
-    "test": "turbo run test --filter=diamarket-api --filter=diamarket-cms --filter=diamarket-web"
+    "test": "npm --prefix apps/diamarket-api run test && npm --prefix apps/diamarket-cms run test && npm --prefix apps/diamarket-web run test",
+    "start": "node scripts/start.mjs diamarket"
   },
   "devDependencies": {
-    "turbo": "^2.1.1",
     "typescript": "^5.5.2",
     "eslint": "^8.57.1",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
     "eslint-config-next": "14.2.5"
   },
-  "packageManager": "npm@11.4.2",
   "engines": {
     "node": "20.x"
   },
