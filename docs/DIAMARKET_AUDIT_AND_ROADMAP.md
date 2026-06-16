@@ -69,7 +69,7 @@ Cependant, le niveau réel d'achèvement est inférieur à ce que suggèrent cer
 
 ## 3.1 Monorepo et applications
 
-Le dépôt racine utilise Turborepo, mais le manifest racine ne déclare ni `workspaces` ni `packageManager`, ce qui empêche actuellement `npm run build:diamarket` de résoudre les workspaces.
+Le dépôt racine doit être standardisé sur npm avec des workspaces déclarés, afin que `npm run build:diamarket` enchaîne directement les builds des applications Diamarket.
 
 ### Applications présentes
 
@@ -361,7 +361,7 @@ Pas de Dockerfile, manifeste cloud, pipeline CI/CD ou infrastructure-as-code pou
 
 ### I10 — Monorepo/npm non normalisé
 
-Aucun lockfile n'a été trouvé ; le script Turborepo racine échoue faute de `packageManager`/workspaces. Cela compromet la reproductibilité et le patching sécurité.
+Un lockfile npm racine doit être maintenu avec des workspaces déclarés. Cela sécurise la reproductibilité et le patching sécurité.
 
 ## 5.3 Moyens
 
@@ -517,7 +517,7 @@ Les estimations supposent une petite équipe pluridisciplinaire. Chaque itérati
 
 ### Travaux
 
-- corriger le manifest racine Turborepo (`workspaces`, `packageManager`) et choisir un gestionnaire npm unique ;
+- corriger le manifest racine npm (`workspaces`) et conserver npm comme gestionnaire unique ;
 - créer/committer un lockfile, nettoyer imports et dépendances inutilisées ;
 - rendre les trois builds et typechecks reproductibles depuis une installation propre ;
 - configurer ESLint non interactif pour API/CMS/web ;
@@ -734,7 +734,7 @@ Les estimations supposent une petite équipe pluridisciplinaire. Chaque itérati
 
 | Commande | Résultat | Conclusion |
 |---|---|---|
-| `npm run build:diamarket` | Échec | Turborepo ne résout pas les workspaces : champ `packageManager` manquant |
+| `npm run build:diamarket` | À valider | Le script doit enchaîner les builds npm des apps Diamarket sans orchestrateur externe |
 | `npm --prefix apps/diamarket-api run typecheck` | Échec | type definition `node` introuvable dans l'installation actuelle |
 | `npm --prefix apps/diamarket-api run build` | Échec | même blocage de dépendance/type Node |
 | `npm --prefix apps/diamarket-cms run typecheck` | Réussite | types CMS valides |
