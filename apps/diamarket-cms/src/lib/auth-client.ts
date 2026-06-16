@@ -1,6 +1,7 @@
 export type CmsUser = { id: string; email: string; name?: string; role: 'admin' | 'vendor' | 'user' };
 export type CmsSession = { success: boolean; authenticated: boolean; user?: CmsUser; message?: string };
-const AUTH_API_URL = process.env.NEXT_PUBLIC_AUTH_API_URL || 'http://localhost:5000/api/auth';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_DIAMARKET_API_URL || 'http://localhost:5000/api';
+const AUTH_API_URL = `${API_BASE_URL.replace(/\/$/, '')}/auth`;
 
 async function request(path: string, init?: RequestInit): Promise<CmsSession> {
   const response = await fetch(`${AUTH_API_URL}${path}`, { ...init, credentials: 'include', headers: { 'Content-Type': 'application/json', ...(init?.headers ?? {}) }, cache: 'no-store' });

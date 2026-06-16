@@ -28,10 +28,7 @@ export async function seedDefaultAdmin() {
     return;
   }
 
-  if (!env.adminResetPasswordOnStart) {
-    console.info('[admin-seed] An administrator account already exists.');
-    return;
-  }
+  if (!env.adminResetPasswordOnStart) return;
 
   if (!env.adminDefaultPassword) throw new Error('ADMIN_DEFAULT_PASSWORD est requis lorsque ADMIN_RESET_PASSWORD_ON_START=true.');
   if (email && env.adminWhitelist.length > 0 && !env.adminWhitelist.includes(email)) {

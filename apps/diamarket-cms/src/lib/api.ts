@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_DIAMARKET_API_URL || "http://localhost:5000/api";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_DIAMARKET_API_URL || "http://localhost:5000/api";
 export const API_ORIGIN = API_BASE_URL.replace(/\/api\/?$/, "");
 
 type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
