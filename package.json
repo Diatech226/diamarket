@@ -16,14 +16,15 @@
     "build": "npm run build:diamarket",
     "build:diaexpress": "npm --prefix apps/diaexpress-web run build && npm --prefix apps/diaexpress-admin run build && npm --prefix apps/diaexpress-api run build",
     "test": "npm --prefix apps/diamarket-api run test && npm --prefix apps/diamarket-cms run test && npm --prefix apps/diamarket-web run test",
-    "start": "node scripts/start.mjs diamarket"
+    "start": "node scripts/start.mjs diamarket",
+    "seed:admin": "npm --prefix apps/diamarket-api run seed:admin"
   },
   "devDependencies": {
-    "typescript": "^5.5.2",
-    "eslint": "^8.57.1",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
-    "eslint-config-next": "14.2.5"
+    "eslint": "^8.57.1",
+    "eslint-config-next": "14.2.5",
+    "typescript": "^5.5.2"
   },
   "engines": {
     "node": "20.x"

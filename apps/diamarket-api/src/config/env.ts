@@ -30,6 +30,7 @@ export const env = {
   adminDefaultEmail: (process.env.ADMIN_DEFAULT_EMAIL ?? '').trim().toLowerCase(),
   adminDefaultPassword: process.env.ADMIN_DEFAULT_PASSWORD ?? '',
   adminDefaultName: process.env.ADMIN_DEFAULT_NAME ?? 'Admin Diamarket',
+  adminResetPasswordOnStart: process.env.ADMIN_RESET_PASSWORD_ON_START === 'true',
   adminWhitelist: parseList(process.env.ADMIN_WHITELIST).map((email) => email.toLowerCase()),
   allowAuthHeaderBridge: process.env.AUTH_ALLOW_HEADER_BRIDGE === 'true',
   corsAllowedOrigins: parseList(process.env.CORS_ALLOWED_ORIGINS),

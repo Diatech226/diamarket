@@ -9,7 +9,17 @@ const formatPrice = (fcfa: number, currency: string) => currency === 'USD' ? `${
 export const CurrencySwitcher = () => { const { currency, setCurrency } = useStore(); return <select aria-label='Devise' className='rounded-xl border px-2 text-sm' value={currency} onChange={(e)=>setCurrency(e.target.value as 'FCFA' | 'USD')}><option>FCFA</option><option>USD</option></select>; };
 export const LanguageSwitcher = () => { const { locale, setLocale } = useStore(); return <select aria-label='Langue' className='rounded-xl border px-2 text-sm' value={locale} onChange={(e)=>setLocale(e.target.value as 'fr' | 'en' | 'zh')}><option value='fr'>FR</option><option value='en'>EN</option><option value='zh'>中文</option></select>; };
 
-export const HeroSlider = ({ slides }: { slides: Slide[] }) => <div className='overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 text-white shadow-xl'>{slides.slice(0,1).map(s => <div key={s.id} className='grid items-center gap-8 p-6 md:grid-cols-2 md:p-12'><div><p className='mb-3 inline-block rounded-full border border-white/20 px-3 py-1 text-xs'>Marketplace africaine de confiance</p><h1 className='text-3xl font-bold tracking-tight md:text-5xl'>{s.title}</h1><p className='mt-4 max-w-xl text-slate-200'>{s.subtitle}</p><div className='mt-6 flex flex-col gap-3 sm:flex-row'><Link href='/catalogue' className='btn-primary bg-amber-400 text-slate-950 hover:bg-amber-300'>Explorer les produits</Link><Link href='/vendor-apply' className='btn-secondary border-white/40 bg-transparent text-white hover:bg-white/10'>Vendre sur Diamarket</Link></div></div><img src={s.imageUrl} alt={s.title} loading='eager' className='h-64 w-full rounded-2xl object-cover md:h-96' /></div>)}</div>;
+export const HeroSlider = ({ slides }: { slides: Slide[] }) => {
+  const [firstSlide] = slides;
+  const slide = firstSlide ?? {
+    id: 'homepage-fallback',
+    title: 'Diamarket, la marketplace africaine de confiance',
+    subtitle: 'Découvrez des produits, vendeurs et services locaux sélectionnés pour vos achats du quotidien.',
+    imageUrl: '/placeholder.svg',
+    cta: '/catalogue',
+  };
+  return <div className='overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 text-white shadow-xl'><div className='grid items-center gap-8 p-6 md:grid-cols-2 md:p-12'><div><p className='mb-3 inline-block rounded-full border border-white/20 px-3 py-1 text-xs'>Marketplace africaine de confiance</p><h1 className='text-3xl font-bold tracking-tight md:text-5xl'>{slide.title}</h1><p className='mt-4 max-w-xl text-slate-200'>{slide.subtitle}</p><div className='mt-6 flex flex-col gap-3 sm:flex-row'><Link href={slide.cta || '/catalogue'} className='btn-primary bg-amber-400 text-slate-950 hover:bg-amber-300'>Explorer les produits</Link><Link href='/vendor-apply' className='btn-secondary border-white/40 bg-transparent text-white hover:bg-white/10'>Vendre sur Diamarket</Link></div></div><img src={slide.imageUrl || '/placeholder.svg'} alt={slide.title} loading='eager' className='h-64 w-full rounded-2xl object-cover md:h-96' /></div></div>;
+};
 
 export const CategoryCard = ({ category }: { category: Category }) => <div className='surface group p-3 transition hover:-translate-y-1 hover:shadow-lg'><img src={category.imageUrl || '/placeholder.svg'} alt='' loading='lazy' className='h-28 w-full rounded-xl object-cover sm:h-32'/><h3 className='mt-3 font-semibold'>{category.name}</h3><p className='text-sm text-slate-500'>{category.productCount} produits</p></div>;
 
