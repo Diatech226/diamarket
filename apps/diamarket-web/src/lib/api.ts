@@ -5,10 +5,12 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> { const 
 const record = (v: unknown): v is Record<string, any> => typeof v === 'object' && v !== null;
 const id = (v: unknown) => record(v) ? String(v._id ?? v.id ?? '') : String(v ?? '');
 const product = (raw: any): Product => ({ id: id(raw), slug: String(raw.slug ?? id(raw)), name: String(raw.name ?? raw.title ?? ''), description: String(raw.description ?? ''), priceFcfa: Number(raw.price ?? raw.priceFcfa ?? 0), currency: raw.currency ?? 'FCFA', images: Array.isArray(raw.images) ? raw.images : [], stock: Number(raw.stock ?? 0), vendor: record(raw.vendor) ? { id: id(raw.vendor), name: String(raw.vendor.businessName ?? raw.vendor.name ?? 'Vendeur'), country: String(raw.vendor.country ?? ''), city: String(raw.vendor.city ?? '') } : undefined, categoryId: id(raw.category), category: record(raw.category) ? { id: id(raw.category), name: String(raw.category.name ?? '') } : undefined, status: raw.status ?? 'active', weightKg: raw.weight, dimensions: raw.length ? `${raw.length}x${raw.width ?? 0}x${raw.height ?? 0} cm` : undefined, popularity: Number(raw.popularity ?? 0), createdAt: String(raw.createdAt ?? '') });
+const collection = (payload: any) => Array.isArray(payload) ? payload : (payload?.data ?? []);
+const slide = (raw: any): Slide => ({ id: id(raw), title: String(raw.title ?? ''), subtitle: String(raw.subtitle ?? ''), imageUrl: String(raw.imageUrl ?? ''), cta: String(raw.cta ?? raw.ctaUrl ?? '') });
 const order = (payload: any): Order => { const raw = payload?.data ?? payload; return { id: id(raw), items: raw.items ?? [], totalFcfa: Number(raw.totalAmount ?? 0), status: raw.status ?? 'pending', paymentProvider: raw.paymentProvider, paymentStatus: raw.paymentStatus, paymentMethod: raw.paymentMethod, diapaySessionId: raw.diapaySessionId, diapayPaymentId: raw.diapayPaymentId, checkoutUrl: raw.checkoutUrl, trackingNumber: raw.trackingNumber }; };
 async function demoFallback<T>(operation: Promise<T>, fallback: T): Promise<T> { try { return await operation; } catch (error) { if (DEMO_MODE) return fallback; throw error; } }
 export const api = {
-  getSlides: () => demoFallback(request<Slide[]>('/slides'), []),
+  getSlides: () => demoFallback(request<any>('/slides').then(r => collection(r).map(slide)), []),
   getCategories: () => demoFallback(request<any>('/categories').then(r => (r.data ?? r).map((x: any) => ({ id: id(x), name: x.name, imageUrl: x.imageUrl ?? '', productCount: x.productCount ?? 0 }))), []),
   getProducts: () => demoFallback(request<any>('/products').then(r => (r.data ?? r).map(product)), []),
   getProduct: (slug: string) => request<any>(`/products/${encodeURIComponent(slug)}`).then(r => product(r.data ?? r)),
