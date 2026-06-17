@@ -69,9 +69,25 @@ export const authController = {
     return res.json({ success: true, authenticated: true, user: publicUser(user) });
   },
 
+  forgotPassword(req: Request, res: Response) {
+    const email = normalizeEmail(req.body.email);
+    if (!email || !isValidEmail(email)) return res.status(400).json({ success: false, message: 'Adresse e-mail invalide' });
+    // Do not disclose whether the account exists. E-mail delivery is intentionally deferred
+    // until a transactional mail provider is configured.
+    return res.json({ success: true, message: 'Si un compte existe, des instructions de réinitialisation seront envoyées.' });
+  },
+
+  resetPassword(req: Request, res: Response) {
+    const token = String(req.body.token ?? '').trim();
+    const password = String(req.body.password ?? '');
+    if (!token) return res.status(400).json({ success: false, message: 'Token de réinitialisation requis' });
+    if (password.length < 8) return res.status(400).json({ success: false, message: 'Le mot de passe doit contenir au moins 8 caractères' });
+    return res.status(501).json({ success: false, message: 'Réinitialisation par token non configurée' });
+  },
+
   logout(_req: Request, res: Response) {
     clearSessionCookie(res);
-    return res.json({ success: true });
+    return res.json({ success: true, authenticated: false });
   },
 
   providers(_req: Request, res: Response) {

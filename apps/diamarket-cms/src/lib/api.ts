@@ -9,10 +9,16 @@ export function resolveMediaUrl(url?: string) {
   return `${API_ORIGIN}${url.startsWith("/") ? url : `/${url}`}`;
 }
 
+function readStoredToken() {
+  if (typeof window === "undefined") return null;
+  return window.localStorage.getItem("diamarket_cms_token");
+}
+
 export async function apiRequest<T>(path: string, method: HttpMethod, body?: unknown): Promise<T> {
+  const token = readStoredToken();
   const res = await fetch(`${API_BASE_URL}${path}`, {
     method,
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
     credentials: "include",
     body: body ? JSON.stringify(body) : undefined,
     cache: "no-store",
@@ -23,7 +29,9 @@ export async function apiRequest<T>(path: string, method: HttpMethod, body?: unk
     throw new Error(payload?.message || `API error: ${res.status}`);
   }
   if (res.status === 204) return null as T;
-  return res.json() as Promise<T>;
+  const payload = await res.json().catch(() => null);
+  if (payload === null) throw new Error("Réponse API invalide");
+  return payload as T;
 }
 
 export const api = {
