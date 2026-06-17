@@ -51,7 +51,7 @@ export const endpoints = {
   mediaUpload: "/media/upload",
   categories: "/admin/categories",
   slides: "/admin/slides",
-  orders: "/orders",
+  orders: "/admin/orders",
   vendors: "/admin/vendors",
   focalPoints: "/admin/marketplace-focal-points",
   settings: "/admin/settings",

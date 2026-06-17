@@ -81,3 +81,53 @@ export interface OrderAdminItem {
   failedAt?: string;
   createdAt?: string;
 }
+
+export interface CategoryItem {
+  _id: string;
+  name: string;
+  slug: string;
+  active?: boolean;
+  order?: number;
+  image?: string;
+  icon?: string;
+}
+
+export interface VendorRef { _id: string; shopName?: string; businessName?: string; status?: string }
+
+export interface ProductItem {
+  _id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  price: number;
+  currency: "FCFA" | "USD";
+  images?: string[];
+  category?: CategoryItem | string;
+  vendor?: VendorRef | string;
+  stock: number;
+  weight?: number;
+  length?: number;
+  width?: number;
+  height?: number;
+  status?: "draft" | "active" | "archived";
+}
+
+export type ProductPayload = {
+  name: string;
+  slug: string;
+  description: string;
+  price: number;
+  currency: "FCFA" | "USD";
+  category: string;
+  vendor: string;
+  stock: number;
+  images?: string[];
+  weight?: number;
+  length?: number;
+  width?: number;
+  height?: number;
+  status?: "draft" | "active" | "archived";
+};
+
+export interface SlideItem { _id?: string; id?: string; title: string; subtitle?: string; imageUrl?: string; cta?: string; ctaUrl?: string; isActive?: boolean }
+export type SlidePayload = Omit<SlideItem, "_id" | "id">;
