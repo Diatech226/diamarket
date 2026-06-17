@@ -1,18 +1,22 @@
 import { api, endpoints } from "@/lib/api";
-import type { ApiCollection, ApiItem, MediaAsset, OrderAdminItem, Project, ProjectPayload } from "@/types/cms";
+import type { ApiCollection, ApiItem, CategoryItem, MediaAsset, OrderAdminItem, ProductItem, ProductPayload, Project, ProjectPayload, SlideItem, SlidePayload } from "@/types/cms";
+
+function unwrapCollection<T>(response: T[] | ApiCollection<T> | { success?: boolean; data?: T[] }): T[] {
+  if (Array.isArray(response)) return response;
+  return Array.isArray(response.data) ? response.data : [];
+}
 
 export async function fetchCollection<T>(endpoint: string): Promise<T[]> {
-  try {
-    const response = await api.get<T[] | ApiCollection<T>>(endpoint);
-    return Array.isArray(response) ? response : response.data;
-  } catch {
-    return [];
-  }
+  const response = await api.get<T[] | ApiCollection<T> | { success?: boolean; data?: T[] }>(endpoint);
+  return unwrapCollection<T>(response);
 }
 
 export const cmsService = {
   getDashboard: () => api.get(endpoints.dashboard),
-  getProducts: () => fetchCollection(endpoints.products),
+  getProducts: () => fetchCollection<ProductItem>(endpoints.products),
+  createProduct: (payload: ProductPayload) => api.post<ApiItem<ProductItem>>("/products", payload),
+  updateProduct: (id: string, payload: Partial<ProductPayload>) => api.put<ApiItem<ProductItem>>(`/products/${id}`, payload),
+  deleteProduct: (id: string) => api.delete<void>(`/products/${id}`),
   getProjects: () => fetchCollection<Project>(endpoints.projects),
   createProject: (payload: ProjectPayload) => api.post<ApiItem<Project>>(endpoints.projects, payload),
   updateProject: (id: string, payload: ProjectPayload) => api.put<ApiItem<Project>>(`${endpoints.projects}/${id}`, payload),
@@ -21,11 +25,20 @@ export const cmsService = {
   createMediaFromUrl: (payload: { url: string; alt?: string; originalName?: string }) => api.post<ApiItem<MediaAsset>>(endpoints.mediaUrl, payload),
   uploadMedia: (payload: { dataUrl: string; fileName: string; alt?: string }) => api.post<ApiItem<MediaAsset>>(endpoints.mediaUpload, payload),
   deleteMedia: (id: string) => api.delete<void>(`${endpoints.media}/${id}`),
-  getCategories: () => fetchCollection(endpoints.categories),
-  getSlides: () => fetchCollection(endpoints.slides),
+  getCategories: () => fetchCollection<CategoryItem>(endpoints.categories),
+  createCategory: (payload: Partial<CategoryItem>) => api.post<ApiItem<CategoryItem>>(endpoints.categories, payload),
+  updateCategory: (id: string, payload: Partial<CategoryItem>) => api.put<ApiItem<CategoryItem>>(`${endpoints.categories}/${id}`, payload),
+  deleteCategory: (id: string) => api.delete<void>(`${endpoints.categories}/${id}`),
+  getSlides: () => fetchCollection<SlideItem>(endpoints.slides),
+  createSlide: (payload: SlidePayload) => api.post<ApiItem<SlideItem>>(endpoints.slides, payload),
+  updateSlide: (id: string, payload: Partial<SlidePayload>) => api.put<ApiItem<SlideItem>>(`${endpoints.slides}/${id}`, payload),
+  deleteSlide: (id: string) => api.delete<void>(`${endpoints.slides}/${id}`),
   getOrders: () => fetchCollection<OrderAdminItem>(endpoints.orders),
-  verifyDiapayPayment: (orderId: string) => api.get(`${endpoints.orders.replace('/admin', '')}/${orderId}/payment-status`),
+  getOrder: (id: string) => api.get<ApiItem<OrderAdminItem>>(`${endpoints.orders}/${id}`),
+  updateOrderStatus: (id: string, status: string) => api.put<ApiItem<OrderAdminItem>>(`${endpoints.orders}/${id}/status`, { status }),
+  verifyDiapayPayment: (orderId: string) => api.get(`${endpoints.orders}/${orderId}/payment-status`),
   getVendors: () => fetchCollection(endpoints.vendors),
+  updateVendorStatus: (id: string, status: "active" | "suspended") => api.put(`/admin/vendors/${id}/status`, { status }),
   getVendorRequests: () => fetchCollection('/admin/vendor-requests'),
   reviewVendorRequest: (id: string, action: 'approve' | 'reject') => api.put(`/admin/vendor-requests/${id}/${action}`, {}),
   getFocalPoints: () => fetchCollection(endpoints.focalPoints),
