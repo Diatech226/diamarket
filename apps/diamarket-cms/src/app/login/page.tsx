@@ -21,7 +21,9 @@ export default function CmsLoginPage() {
     try {
       const session = await cmsAuth.login(String(data.get('email')), String(data.get('password')));
       if (session.user?.role !== 'admin') {
-        window.location.replace('/unauthorized');
+        await cmsAuth.logout().catch(() => undefined);
+        setMessage('Accès refusé : ce compte n’est pas administrateur.');
+        setSubmitting(false);
         return;
       }
       window.location.replace('/dashboard');

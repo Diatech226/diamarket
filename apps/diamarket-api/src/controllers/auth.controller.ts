@@ -13,10 +13,10 @@ const publicUser = (user: { _id: unknown; email?: string | null; name?: string |
   name: user.name ?? undefined,
   role: user.role ?? 'user',
 });
-const establishSession = (res: Response, user: SessionUser, status = 200) => {
+const establishSession = (res: Response, user: SessionUser, message: string, status = 200) => {
   const token = createSessionToken(user);
   setSessionCookie(res, token);
-  return res.status(status).json({ success: true, authenticated: true, user });
+  return res.status(status).json({ success: true, message, authenticated: true, token, user });
 };
 const isDuplicateKeyError = (error: unknown) => typeof error === 'object' && error !== null && 'code' in error && error.code === 11000;
 
@@ -36,7 +36,7 @@ export const authController = {
     try {
       // Public input never controls the role, including when a malicious body contains role: "admin".
       const user = await User.create({ email, name, passwordHash: await hashPassword(password), role: 'user' });
-      return establishSession(res, publicUser(user), 201);
+      return establishSession(res, publicUser(user), 'Registration successful', 201);
     } catch (error) {
       if (isDuplicateKeyError(error)) return res.status(409).json({ success: false, message: 'Cet e-mail est déjà utilisé' });
       throw error;
@@ -56,7 +56,7 @@ export const authController = {
     if (!user.passwordHash || !(await verifyPassword(password, user.passwordHash))) {
       return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
-    return establishSession(res, publicUser(user));
+    return establishSession(res, publicUser(user), 'Login successful');
   },
 
   async me(req: Request, res: Response) {
@@ -71,7 +71,7 @@ export const authController = {
 
   logout(_req: Request, res: Response) {
     clearSessionCookie(res);
-    return res.json({ success: true, authenticated: false, message: 'Déconnexion réussie' });
+    return res.json({ success: true });
   },
 
   providers(_req: Request, res: Response) {
