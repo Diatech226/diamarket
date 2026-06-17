@@ -26,21 +26,26 @@ function isCmsSession(payload: unknown): payload is CmsSession {
 
 async function request(path: string, init?: RequestInit): Promise<CmsSession> {
   const token = readStoredToken();
-  const response = await fetch(`${AUTH_API_URL}${path}`, {
-    ...init,
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(init?.headers ?? {}),
-    },
-    cache: 'no-store',
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${AUTH_API_URL}${path}`, {
+      ...init,
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(init?.headers ?? {}),
+      },
+      cache: 'no-store',
+    });
+  } catch {
+    throw new Error(`Impossible de joindre l’API d’authentification (${AUTH_API_URL}). Vérifiez NEXT_PUBLIC_API_URL et CORS.`);
+  }
   const payload = await response.json().catch(() => null);
   const message = isCmsSession(payload) ? payload.message : undefined;
 
   if (!response.ok || !isCmsSession(payload) || payload.success === false) {
-    throw Object.assign(new Error(message || `Erreur API ${response.status}`), { status: response.status });
+    throw Object.assign(new Error(message || `Réponse API d’authentification invalide (${response.status})`), { status: response.status });
   }
 
   if (payload.token) storeToken(payload.token);
@@ -49,7 +54,7 @@ async function request(path: string, init?: RequestInit): Promise<CmsSession> {
 
 export const cmsAuth = {
   me: () => request('/me'),
-  login: (email: string, password: string) => request('/login', { method: 'POST', body: JSON.stringify({ email, password }) }),
+  login: (email: string, password: string) => request('/login', { method: 'POST', body: JSON.stringify({ email: email.trim().toLowerCase(), password }) }),
   logout: async () => {
     try {
       return await request('/logout', { method: 'POST' });

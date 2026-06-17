@@ -25,21 +25,26 @@ function isAuthSession(payload: unknown): payload is AuthSession {
 
 async function authRequest(path: string, init?: RequestInit): Promise<AuthSession> {
   const token = readStoredToken();
-  const response = await fetch(`${AUTH_API_URL}${path}`, {
-    ...init,
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(init?.headers ?? {}),
-    },
-    cache: 'no-store',
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${AUTH_API_URL}${path}`, {
+      ...init,
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(init?.headers ?? {}),
+      },
+      cache: 'no-store',
+    });
+  } catch {
+    throw new Error(`Impossible de joindre l’API d’authentification (${AUTH_API_URL}). Vérifiez NEXT_PUBLIC_API_URL et CORS.`);
+  }
   const payload = await response.json().catch(() => null);
   const message = isAuthSession(payload) ? payload.message : undefined;
 
   if (!response.ok || !isAuthSession(payload) || payload.success === false) {
-    throw new Error(message || `Erreur API ${response.status}`);
+    throw new Error(message || `Réponse API d’authentification invalide (${response.status})`);
   }
 
   if (payload.token) storeToken(payload.token);
@@ -48,8 +53,8 @@ async function authRequest(path: string, init?: RequestInit): Promise<AuthSessio
 
 export const publicAuth = {
   me: () => authRequest('/me'),
-  register: (body: { name: string; email: string; password: string }) => authRequest('/register', { method: 'POST', body: JSON.stringify(body) }),
-  login: (body: { email: string; password: string }) => authRequest('/login', { method: 'POST', body: JSON.stringify(body) }),
+  register: (body: { name: string; email: string; password: string }) => authRequest('/register', { method: 'POST', body: JSON.stringify({ name: body.name.trim(), email: body.email.trim().toLowerCase(), password: body.password }) }),
+  login: (body: { email: string; password: string }) => authRequest('/login', { method: 'POST', body: JSON.stringify({ email: body.email.trim().toLowerCase(), password: body.password }) }),
   logout: async () => {
     try {
       return await authRequest('/logout', { method: 'POST' });
