@@ -4,7 +4,30 @@ import { Category, Order, Product, Setting, User, Vendor, VendorRequest } from '
 import { getAuth } from '../middlewares/requireAuth';
 import { logAdminAction } from '../services/admin-audit.service';
 
-const allowedSettings = ['marketplaceName', 'defaultCurrency', 'defaultCommission', 'supportContact', 'maintenanceMode', 'checkout', 'shipping'];
+const settingDefinitions: Record<string, { group: string; isPublic: boolean; type: 'string' | 'number' | 'boolean' | 'object' }> = {
+  marketplaceName: { group: 'general', isPublic: true, type: 'string' },
+  defaultCurrency: { group: 'general', isPublic: true, type: 'string' },
+  defaultLanguage: { group: 'general', isPublic: true, type: 'string' },
+  primaryCountry: { group: 'general', isPublic: true, type: 'string' },
+  defaultCommission: { group: 'vendors', isPublic: false, type: 'number' },
+  logo: { group: 'branding', isPublic: true, type: 'string' },
+  favicon: { group: 'branding', isPublic: true, type: 'string' },
+  supportContact: { group: 'contact', isPublic: true, type: 'string' },
+  supportEmail: { group: 'contact', isPublic: true, type: 'string' },
+  supportPhone: { group: 'contact', isPublic: true, type: 'string' },
+  companyAddress: { group: 'contact', isPublic: true, type: 'string' },
+  maintenanceMode: { group: 'maintenance', isPublic: true, type: 'boolean' },
+  maintenanceMessage: { group: 'maintenance', isPublic: true, type: 'string' },
+  maintenanceImage: { group: 'maintenance', isPublic: true, type: 'string' },
+  socialLinks: { group: 'social', isPublic: true, type: 'object' },
+  seo: { group: 'seo', isPublic: true, type: 'object' },
+  checkout: { group: 'checkout', isPublic: true, type: 'object' },
+  shipping: { group: 'shipping', isPublic: true, type: 'object' },
+  vendors: { group: 'vendors', isPublic: true, type: 'object' },
+  homepage: { group: 'general', isPublic: true, type: 'object' },
+};
+const allowedSettings = Object.keys(settingDefinitions);
+const secretKeyPattern = /(secret|password|mongodb|uri|token|api[_-]?key|jwt)/i;
 const vendorStatuses = ['pending', 'active', 'suspended', 'rejected'];
 
 const toRate = (value: unknown) => {
@@ -106,12 +129,26 @@ export const adminController = {
   },
   async settings(_req: Request, res: Response) {
     const rows = await Setting.find({ key: { $in: allowedSettings } });
-    return res.json({ data: Object.fromEntries(rows.map((row) => [row.key, row.value])) });
+    return res.json({ success: true, data: Object.fromEntries(rows.map((row) => [row.key, row.value])) });
   },
   async updateSettings(req: Request, res: Response) {
-    const entries = Object.entries(req.body || {}).filter(([key]) => allowedSettings.includes(key));
-    await Promise.all(entries.map(([key, value]) => Setting.findOneAndUpdate({ key }, { value, scope: 'global' }, { upsert: true, new: true })));
-    await logAdminAction(getAuth(req)!.userId, 'settings.updated', 'settings', undefined, { keys: entries.map(([key]) => key) });
+    if (!req.body || typeof req.body !== 'object' || Array.isArray(req.body)) return res.status(400).json({ success: false, message: 'Invalid settings payload' });
+    const entries = Object.entries(req.body).filter(([key]) => allowedSettings.includes(key) && !secretKeyPattern.test(key));
+    const rejected = Object.keys(req.body).filter((key) => !allowedSettings.includes(key) || secretKeyPattern.test(key));
+    if (rejected.length) return res.status(400).json({ success: false, message: `Unsupported or sensitive setting: ${rejected[0]}` });
+    const changes = [];
+    for (const [key, value] of entries) {
+      const definition = settingDefinitions[key];
+      if (definition.type === 'string' && typeof value !== 'string') return res.status(400).json({ success: false, message: `${key} must be a string` });
+      if (definition.type === 'boolean' && typeof value !== 'boolean') return res.status(400).json({ success: false, message: `${key} must be a boolean` });
+      if (definition.type === 'number' && (!Number.isFinite(Number(value)) || Number(value) < 0 || (key === 'defaultCommission' && Number(value) > 1))) return res.status(400).json({ success: false, message: `${key} must be a valid number` });
+      if (definition.type === 'object' && (typeof value !== 'object' || value === null || Array.isArray(value))) return res.status(400).json({ success: false, message: `${key} must be an object` });
+      if (key === 'supportEmail' && value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value))) return res.status(400).json({ success: false, message: 'supportEmail must be a valid email' });
+      const previous = await Setting.findOne({ key });
+      await Setting.findOneAndUpdate({ key }, { value, group: definition.group, isPublic: definition.isPublic, updatedBy: getAuth(req)!.userId }, { upsert: true, new: true, runValidators: true });
+      if (JSON.stringify(previous?.value) !== JSON.stringify(value)) changes.push({ field: key, oldValue: previous?.value, newValue: value });
+    }
+    if (changes.length) await logAdminAction(getAuth(req)!.userId, 'settings.updated', 'settings', undefined, { changes });
     return adminController.settings(req, res);
   },
 };
