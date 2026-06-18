@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { isValidObjectId, PipelineStage } from 'mongoose';
 import { Category } from '../models/category.model';
 import { Product } from '../models/product.model';
+import { syncMediaUsage } from '../services/media-usage.service';
 
 const normalizeCategoryPayload = (body: Record<string, unknown>) => ({
   name: typeof body.name === 'string' ? body.name.trim() : body.name,
@@ -61,6 +62,8 @@ export const categoriesController = {
   async create(req: Request, res: Response) {
     try {
       const data = await Category.create(normalizeCategoryPayload(req.body));
+      await syncMediaUsage('category', data._id, 'image', [data.image]);
+      await syncMediaUsage('category', data._id, 'icon', [data.icon]);
       return res.status(201).json({ success: true, data });
     } catch (error) {
       return res.status(400).json({ success: false, message: readableError(error) });
@@ -70,8 +73,11 @@ export const categoriesController = {
   async update(req: Request, res: Response) {
     if (!isValidObjectId(req.params.id)) return res.status(400).json({ success: false, message: 'Identifiant catégorie invalide.' });
     try {
+      const previous = await Category.findById(req.params.id);
       const data = await Category.findByIdAndUpdate(req.params.id, normalizeCategoryPayload(req.body), { new: true, runValidators: true });
       if (!data) return res.status(404).json({ success: false, message: 'Catégorie introuvable.' });
+      await syncMediaUsage('category', data._id, 'image', [data.image], [previous?.image]);
+      await syncMediaUsage('category', data._id, 'icon', [data.icon], [previous?.icon]);
       return res.json({ success: true, data });
     } catch (error) {
       return res.status(400).json({ success: false, message: readableError(error) });

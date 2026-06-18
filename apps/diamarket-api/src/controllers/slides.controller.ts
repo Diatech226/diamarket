@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { Slide } from '../models/slide.model';
+import { syncMediaUsage } from '../services/media-usage.service';
 
 const serializeSlide = (slide: any) => ({
   id: String(slide._id ?? slide.id),
@@ -29,18 +30,22 @@ export const slidesController = {
 
   async create(req: Request, res: Response) {
     const slide = await Slide.create(req.body);
+    await syncMediaUsage('slide', slide._id, 'imageUrl', [slide.imageUrl]);
     return res.status(201).json({ success: true, data: serializeSlide(slide) });
   },
 
   async update(req: Request, res: Response) {
+    const previous = await Slide.findById(req.params.id);
     const slide = await Slide.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!slide) return res.status(404).json({ success: false, message: 'Slide not found' });
+    await syncMediaUsage('slide', slide._id, 'imageUrl', [slide.imageUrl], [previous?.imageUrl]);
     return res.json({ success: true, data: serializeSlide(slide) });
   },
 
   async remove(req: Request, res: Response) {
     const slide = await Slide.findByIdAndDelete(req.params.id);
     if (!slide) return res.status(404).json({ success: false, message: 'Slide not found' });
+    await syncMediaUsage('slide', slide._id, 'imageUrl', [], [slide.imageUrl]);
     return res.status(204).send();
   },
 };

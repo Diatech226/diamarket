@@ -127,6 +127,7 @@ apiRouter.post('/projects', requireAuth, requireRole('admin', 'vendor'), require
 apiRouter.put('/projects/:id', requireAuth, requireRole('admin', 'vendor'), requirePermission('projects:update'), projectsController.update);
 apiRouter.delete('/projects/:id', requireAuth, requireRole('admin', 'vendor'), requirePermission('projects:delete'), projectsController.remove);
 apiRouter.get('/media', requireAuth, requireAdmin, mediaController.list);
+apiRouter.get('/media/:id', requireAuth, requireAdmin, mediaController.getById);
 apiRouter.post('/media/url', requireAuth, requireAdmin, requirePermission('media:manage'), mediaController.createFromUrl);
 apiRouter.post('/media/upload', requireAuth, requireAdmin, requirePermission('media:manage'), localImageUpload, mediaController.upload);
 apiRouter.put('/media/:id', requireAuth, requireAdmin, requirePermission('media:manage'), mediaController.update);
