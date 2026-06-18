@@ -89,6 +89,7 @@ apiRouter.get('/admin/dashboard', adminController.dashboard);
 apiRouter.get('/admin/products', adminController.products);
 apiRouter.get('/admin/users', listUsers);
 apiRouter.get('/admin/slides', slidesController.list);
+apiRouter.get('/admin/slides/:id', slidesController.getById);
 apiRouter.get('/admin/categories', categoriesController.adminList);
 apiRouter.post('/admin/slides', slidesController.create);
 apiRouter.put('/admin/slides/:id', slidesController.update);

@@ -2,7 +2,7 @@ export type Currency = 'FCFA' | 'USD';
 export type Locale = 'fr' | 'en' | 'zh';
 export type PaymentStatus = 'pending' | 'processing' | 'paid' | 'failed' | 'cancelled' | 'expired' | 'refunded' | 'partially_refunded' | 'disputed';
 
-export interface Slide { id: string; title: string; subtitle: string; imageUrl: string; cta: string; }
+export interface Slide { id: string; title: string; subtitle: string; description?: string; imageUrl: string; imageDesktop?: string; imageMobile?: string; cta: string; ctaLabel?: string; badge?: string; backgroundColor?: string; position?: number; }
 export interface Category { id: string; name: string; imageUrl: string; productCount: number; }
 export interface Vendor { id: string; name: string; country: string; city: string; }
 export interface Product {
