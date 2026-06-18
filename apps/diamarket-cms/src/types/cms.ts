@@ -11,6 +11,16 @@ export interface CollectionQuery {
   vendor?: string;
   paymentStatus?: string;
   shipmentStatus?: string;
+  sortBy?: string;
+  sortDir?: string;
+}
+
+export interface ApiMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  globalCommissionRate?: number;
 }
 
 export interface DashboardMetrics {
@@ -22,12 +32,7 @@ export interface DashboardMetrics {
 
 export interface ApiCollection<T> {
   data: T[];
-  meta?: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
+  meta?: ApiMeta;
 }
 
 export interface ApiItem<T> {
@@ -175,3 +180,61 @@ export type ProductPayload = {
 
 export interface SlideItem { _id?: string; id?: string; title: string; subtitle?: string; imageUrl?: string; cta?: string; ctaUrl?: string; isActive?: boolean }
 export type SlidePayload = Omit<SlideItem, "_id" | "id">;
+
+
+export interface VendorAdminItem {
+  _id: string;
+  userId?: string;
+  shopName?: string;
+  phone?: string;
+  country?: string;
+  city?: string;
+  status: "pending" | "active" | "suspended" | "rejected";
+  isActive?: boolean;
+  commissionRate?: number;
+  productCount?: number;
+  orderCount?: number;
+  revenue?: number;
+  pendingOrderCount?: number;
+  deliveredOrderCount?: number;
+  owner?: { _id: string; name?: string; email?: string; role?: string };
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface VendorRequestItem {
+  _id: string;
+  userId?: string | { _id: string; name?: string; email?: string };
+  businessName: string;
+  businessEmail?: string;
+  phone?: string;
+  country?: string;
+  city?: string;
+  notes?: string;
+  adminComment?: string;
+  requestedCommissionRate?: number;
+  status: "pending" | "approved" | "rejected";
+  reviewedBy?: string | { _id: string; name?: string; email?: string };
+  reviewedAt?: string;
+  decisionHistory?: Array<{ action: "approved" | "rejected"; comment?: string; decidedBy?: string; decidedAt?: string }>;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface VendorDetailResponse {
+  vendor: VendorAdminItem;
+  products: ProductItem[];
+  orders: OrderAdminItem[];
+  stats: {
+    revenue: number;
+    averageOrderValue: number;
+    pendingOrders: number;
+    deliveredOrders: number;
+    activeProducts: number;
+    draftProducts: number;
+    archivedProducts: number;
+    globalCommissionRate: number;
+    effectiveCommissionRate: number;
+    estimatedCommission: number;
+  };
+}

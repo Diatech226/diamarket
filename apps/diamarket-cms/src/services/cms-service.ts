@@ -1,5 +1,5 @@
 import { api, endpoints } from "@/lib/api";
-import type { ApiCollection, ApiItem, CategoryItem, CategoryPayload, CollectionQuery, MediaAsset, OrderAdminItem, ProductItem, ProductPayload, Project, ProjectPayload, SlideItem, SlidePayload } from "@/types/cms";
+import type { ApiCollection, ApiItem, CategoryItem, CategoryPayload, CollectionQuery, MediaAsset, OrderAdminItem, ProductItem, ProductPayload, Project, ProjectPayload, SlideItem, SlidePayload, VendorAdminItem, VendorDetailResponse, VendorRequestItem } from "@/types/cms";
 
 function toQueryString(query?: CollectionQuery) {
   const params = new URLSearchParams();
@@ -57,10 +57,13 @@ export const cmsService = {
   getOrder: (id: string) => api.get<ApiItem<OrderAdminItem>>(`${endpoints.orders}/${id}`),
   updateOrderStatus: (id: string, status: string) => api.put<ApiItem<OrderAdminItem>>(`${endpoints.orders}/${id}/status`, { status }),
   verifyDiapayPayment: (orderId: string) => api.get<ApiItem<OrderAdminItem>>(`${endpoints.orders}/${orderId}/payment-status`),
-  getVendors: () => fetchCollection(endpoints.vendors),
+  getVendors: (query?: CollectionQuery) => fetchPaginatedCollection<VendorAdminItem>(endpoints.vendors, query),
+  getVendor: (id: string) => api.get<ApiItem<VendorDetailResponse>>(`${endpoints.vendors}/${id}`),
   updateVendorStatus: (id: string, status: "active" | "suspended") => api.put(`/admin/vendors/${id}/status`, { status }),
-  getVendorRequests: () => fetchCollection('/admin/vendor-requests'),
-  reviewVendorRequest: (id: string, action: 'approve' | 'reject') => api.put(`/admin/vendor-requests/${id}/${action}`, {}),
+  updateVendorCommission: (id: string, commissionRate: number) => api.put(`/admin/vendors/${id}/commission`, { commissionRate }),
+  getVendorRequests: (query?: CollectionQuery) => fetchCollection<VendorRequestItem>('/admin/vendor-requests', query),
+  getVendorRequest: (id: string) => api.get<ApiItem<VendorRequestItem>>(`/admin/vendor-requests/${id}`),
+  reviewVendorRequest: (id: string, action: 'approve' | 'reject', adminComment?: string) => api.put(`/admin/vendor-requests/${id}/${action}`, { adminComment }),
   getFocalPoints: () => fetchCollection(endpoints.focalPoints),
   getSettings: () => api.get(endpoints.settings),
   updateSettings: (payload: unknown) => api.put(endpoints.settings, payload),
