@@ -13,6 +13,10 @@ export interface CollectionQuery {
   shipmentStatus?: string;
   sortBy?: string;
   sortDir?: string;
+  mimeType?: string;
+  tags?: string;
+  sort?: string;
+  order?: string;
 }
 
 export interface ApiMeta {
@@ -39,13 +43,25 @@ export interface ApiItem<T> {
   data: T;
 }
 
+export type MediaCategory = "product" | "vendor" | "slide" | "category" | "brand" | "marketing" | "document" | "other";
+
 export interface MediaAsset {
   _id: string;
+  id?: string;
+  name?: string;
   filename?: string;
   originalName?: string;
   mimeType?: string;
   size?: number;
+  width?: number;
+  height?: number;
   url: string;
+  path?: string;
+  category?: MediaCategory;
+  tags?: string[];
+  usageCount?: number;
+  usedIn?: Array<{ resourceType: string; resourceId: string; field: string }>;
+  description?: string;
   alt?: string;
   source?: "upload" | "url";
   createdAt?: string;

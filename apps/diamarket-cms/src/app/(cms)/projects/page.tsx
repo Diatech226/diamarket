@@ -90,7 +90,7 @@ export default function ProjectsPage() {
     try {
       const [nextProjects, nextMedia] = await Promise.all([cmsService.getProjects(), cmsService.getMedia()]);
       setProjects(nextProjects);
-      setMedia(nextMedia);
+      setMedia(nextMedia.data);
     } catch (error) {
       setNotice({ tone: "error", message: error instanceof Error ? error.message : "Chargement impossible." });
     } finally {
