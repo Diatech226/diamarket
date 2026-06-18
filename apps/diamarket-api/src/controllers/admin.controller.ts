@@ -92,6 +92,60 @@ export const adminController = {
     return res.json({ success: true, data: items, meta: { page, limit, total, totalPages: Math.max(Math.ceil(total / limit), 1) } });
   },
   async categories(_req: Request, res: Response) { return res.json({ data: await Category.find().sort({ order: 1, name: 1 }) }); },
+  async users(req: Request, res: Response) {
+    const page = Math.max(Number(req.query.page || 1), 1);
+    const limit = Math.min(Math.max(Number(req.query.limit || 20), 1), 100);
+    const skip = (page - 1) * limit;
+    const filter: Record<string, unknown> = {};
+    const search = String(req.query.search || '').trim();
+    if (req.query.role && ['admin', 'vendor', 'user'].includes(String(req.query.role))) filter.role = req.query.role;
+    if (req.query.status === 'active') filter.disabled = { $ne: true };
+    if (req.query.status === 'disabled') filter.disabled = true;
+    if (search) filter.$or = [{ email: new RegExp(search, 'i') }, { name: new RegExp(search, 'i') }];
+    const [data, total] = await Promise.all([
+      User.find(filter).select('-passwordHash').sort({ createdAt: -1 }).skip(skip).limit(limit),
+      User.countDocuments(filter),
+    ]);
+    return res.json({ success: true, data, meta: { page, limit, total, totalPages: Math.max(Math.ceil(total / limit), 1) } });
+  },
+  async userById(req: Request, res: Response) {
+    if (!Types.ObjectId.isValid(req.params.id)) return res.status(400).json({ success: false, message: 'Invalid user id' });
+    const [user, orders, vendor] = await Promise.all([
+      User.findById(req.params.id).select('-passwordHash'),
+      Order.find({ customer: req.params.id }).populate('vendor items.product').sort({ createdAt: -1 }).limit(100),
+      Vendor.findOne({ userId: req.params.id }),
+    ]);
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+    return res.json({ success: true, data: { user, orders, vendor } });
+  },
+  async updateUserRole(req: Request, res: Response) {
+    if (!Types.ObjectId.isValid(req.params.id)) return res.status(400).json({ success: false, message: 'Invalid user id' });
+    if (!['admin', 'vendor', 'user'].includes(req.body.role)) return res.status(400).json({ success: false, message: 'Invalid role' });
+    const user = await User.findById(req.params.id).select('-passwordHash');
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+    const previousRole = user.role;
+    if (previousRole === 'admin' && req.body.role !== 'admin' && await User.countDocuments({ role: 'admin', disabled: { $ne: true } }) <= 1) {
+      return res.status(409).json({ success: false, message: 'Impossible de retirer le rôle du dernier admin actif' });
+    }
+    user.role = req.body.role;
+    await user.save();
+    await logAdminAction(getAuth(req)!.userId, 'user.role_changed', 'user', user.id, { previousRole, newRole: user.role });
+    return res.json({ success: true, data: user });
+  },
+  async updateUserStatus(req: Request, res: Response) {
+    if (!Types.ObjectId.isValid(req.params.id)) return res.status(400).json({ success: false, message: 'Invalid user id' });
+    if (typeof req.body.disabled !== 'boolean') return res.status(400).json({ success: false, message: 'disabled must be a boolean' });
+    const user = await User.findById(req.params.id).select('-passwordHash');
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+    if (user.role === 'admin' && req.body.disabled && await User.countDocuments({ role: 'admin', disabled: { $ne: true } }) <= 1) {
+      return res.status(409).json({ success: false, message: 'Impossible de désactiver le dernier admin actif' });
+    }
+    const previousDisabled = user.disabled;
+    user.disabled = req.body.disabled;
+    await user.save();
+    await logAdminAction(getAuth(req)!.userId, 'user.status_changed', 'user', user.id, { previousDisabled, disabled: user.disabled });
+    return res.json({ success: true, data: user });
+  },
   async vendors(req: Request, res: Response) {
     const page = Math.max(Number(req.query.page || 1), 1);
     const limit = Math.min(Math.max(Number(req.query.limit || 20), 1), 100);
