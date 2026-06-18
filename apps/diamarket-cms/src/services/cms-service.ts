@@ -1,5 +1,5 @@
 import { api, endpoints } from "@/lib/api";
-import type { ApiCollection, ApiItem, CategoryItem, CollectionQuery, MediaAsset, OrderAdminItem, ProductItem, ProductPayload, Project, ProjectPayload, SlideItem, SlidePayload } from "@/types/cms";
+import type { ApiCollection, ApiItem, CategoryItem, CategoryPayload, CollectionQuery, MediaAsset, OrderAdminItem, ProductItem, ProductPayload, Project, ProjectPayload, SlideItem, SlidePayload } from "@/types/cms";
 
 function toQueryString(query?: CollectionQuery) {
   const params = new URLSearchParams();
@@ -44,9 +44,10 @@ export const cmsService = {
   createMediaFromUrl: (payload: { url: string; alt?: string; originalName?: string }) => api.post<ApiItem<MediaAsset>>(endpoints.mediaUrl, payload),
   uploadMedia: (payload: { dataUrl: string; fileName: string; alt?: string }) => api.post<ApiItem<MediaAsset>>(endpoints.mediaUpload, payload),
   deleteMedia: (id: string) => api.delete<void>(`${endpoints.media}/${id}`),
-  getCategories: () => fetchCollection<CategoryItem>(endpoints.categories),
-  createCategory: (payload: Partial<CategoryItem>) => api.post<ApiItem<CategoryItem>>(endpoints.categories, payload),
-  updateCategory: (id: string, payload: Partial<CategoryItem>) => api.put<ApiItem<CategoryItem>>(`${endpoints.categories}/${id}`, payload),
+  getCategories: (query?: CollectionQuery) => fetchPaginatedCollection<CategoryItem>(endpoints.categories, query),
+  getAllCategories: () => fetchCollection<CategoryItem>(endpoints.categories, { limit: 100 }),
+  createCategory: (payload: CategoryPayload) => api.post<ApiItem<CategoryItem>>(endpoints.categories, payload),
+  updateCategory: (id: string, payload: Partial<CategoryPayload>) => api.put<ApiItem<CategoryItem>>(`${endpoints.categories}/${id}`, payload),
   deleteCategory: (id: string) => api.delete<void>(`${endpoints.categories}/${id}`),
   getSlides: () => fetchCollection<SlideItem>(endpoints.slides),
   createSlide: (payload: SlidePayload) => api.post<ApiItem<SlideItem>>(endpoints.slides, payload),

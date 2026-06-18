@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { Product } from '../models/product.model';
+import { Category } from '../models/category.model';
 import { getAuth } from '../middlewares/requireAuth';
 import { ownerScope } from '../middlewares/resource-access';
 
@@ -10,7 +11,13 @@ export const productsController = {
     const skip = (page - 1) * limit;
 
     const filter: Record<string, unknown> = { status: 'active' };
-    if (req.query.category) filter.category = req.query.category;
+    if (req.query.category) {
+      const activeCategory = await Category.exists({ _id: req.query.category, active: true });
+      filter.category = activeCategory ? req.query.category : null;
+    } else {
+      const activeCategoryIds = await Category.distinct('_id', { active: true });
+      filter.category = { $in: activeCategoryIds };
+    }
     if (req.query.vendor) filter.vendor = req.query.vendor;
     if (req.query.isFeatured) filter.isFeatured = req.query.isFeatured === 'true';
     if (req.query.search) filter.$text = { $search: String(req.query.search) };
@@ -25,7 +32,7 @@ export const productsController = {
 
   async getBySlug(req: Request, res: Response) {
     const item = await Product.findOne({ slug: req.params.slug, status: 'active' }).populate('category vendor');
-    if (!item) return res.status(404).json({ message: 'Product not found' });
+    if (!item || (typeof item.category === 'object' && item.category && 'active' in item.category && item.category.active === false)) return res.status(404).json({ message: 'Product not found' });
     return res.json({ data: item });
   },
 
