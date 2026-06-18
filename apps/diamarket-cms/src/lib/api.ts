@@ -53,6 +53,7 @@ export const endpoints = {
   slides: "/admin/slides",
   orders: "/admin/orders",
   vendors: "/admin/vendors",
+  users: "/admin/users",
   focalPoints: "/admin/marketplace-focal-points",
   settings: "/admin/settings",
   currencies: "/admin/currencies",

@@ -7,6 +7,7 @@ export interface CollectionQuery {
   limit?: number;
   search?: string;
   status?: string;
+  role?: string;
   category?: string;
   vendor?: string;
   paymentStatus?: string;
@@ -275,4 +276,22 @@ export interface VendorDetailResponse {
     effectiveCommissionRate: number;
     estimatedCommission: number;
   };
+}
+
+export type UserRole = "admin" | "vendor" | "user";
+export interface AdminUserItem {
+  _id: string;
+  email?: string;
+  name?: string;
+  role: UserRole;
+  disabled?: boolean;
+  locale?: string;
+  preferredCurrency?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+export interface UserDetailResponse {
+  user: AdminUserItem;
+  orders: OrderAdminItem[];
+  vendor?: VendorAdminItem | null;
 }
