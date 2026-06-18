@@ -64,7 +64,7 @@ export default function ProductsPage() {
   };
 
   useEffect(() => {
-    void Promise.all([cmsService.getCategories(), cmsService.getVendors(), cmsService.getMedia()])
+    void Promise.all([cmsService.getAllCategories(), cmsService.getVendors(), cmsService.getMedia()])
       .then(([categoryRows, vendorRows, mediaRows]) => { setCategories(categoryRows); setVendors(vendorRows as VendorRef[]); setMedia(mediaRows); })
       .catch((err) => setError((err as Error).message));
   }, []);

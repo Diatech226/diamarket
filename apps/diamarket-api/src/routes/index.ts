@@ -53,7 +53,20 @@ const validateProductUpdate = (req: Request) => {
   return null;
 };
 const validateProject = (req: Request) => (!req.body.title || !String(req.body.title).trim() ? 'title is required' : null);
-const validateCategory = (req: Request) => (!req.body.name || !req.body.slug ? 'name and slug are required' : null);
+const validateCategory = (req: Request) => {
+  if (!req.body.name || !String(req.body.name).trim()) return 'Le nom de catégorie est obligatoire';
+  if (!req.body.slug || !String(req.body.slug).trim()) return 'Le slug de catégorie est obligatoire';
+  if (req.body.active !== undefined && typeof req.body.active !== 'boolean') return 'Le statut active doit être booléen';
+  if (req.body.order !== undefined && !Number.isFinite(Number(req.body.order))) return 'L’ordre doit être un nombre';
+  return null;
+};
+const validateCategoryUpdate = (req: Request) => {
+  if (req.body.name !== undefined && !String(req.body.name).trim()) return 'Le nom de catégorie est obligatoire';
+  if (req.body.slug !== undefined && !String(req.body.slug).trim()) return 'Le slug de catégorie est obligatoire';
+  if (req.body.active !== undefined && typeof req.body.active !== 'boolean') return 'Le statut active doit être booléen';
+  if (req.body.order !== undefined && !Number.isFinite(Number(req.body.order))) return 'L’ordre doit être un nombre';
+  return null;
+};
 const validateVendorRequest = (req: Request) => (!req.body.businessName ? 'businessName is required' : null);
 const validateOrder = (req: Request) => {
   if (!Array.isArray(req.body.items) || req.body.items.length === 0) return 'items must be a non-empty array';
@@ -76,12 +89,12 @@ apiRouter.get('/admin/dashboard', adminController.dashboard);
 apiRouter.get('/admin/products', adminController.products);
 apiRouter.get('/admin/users', listUsers);
 apiRouter.get('/admin/slides', slidesController.list);
-apiRouter.get('/admin/categories', adminController.categories);
+apiRouter.get('/admin/categories', categoriesController.adminList);
 apiRouter.post('/admin/slides', slidesController.create);
 apiRouter.put('/admin/slides/:id', slidesController.update);
 apiRouter.delete('/admin/slides/:id', slidesController.remove);
 apiRouter.post('/admin/categories', validateRequest(validateCategory), categoriesController.create);
-apiRouter.put('/admin/categories/:id', categoriesController.update);
+apiRouter.put('/admin/categories/:id', validateRequest(validateCategoryUpdate), categoriesController.update);
 apiRouter.delete('/admin/categories/:id', categoriesController.remove);
 apiRouter.get('/admin/orders', ordersController.list);
 apiRouter.get('/admin/orders/:id', ordersController.getById);
@@ -116,7 +129,7 @@ apiRouter.get('/slides', slidesController.list);
 apiRouter.get('/slides/:id', slidesController.getById);
 apiRouter.get('/categories', categoriesController.list);
 apiRouter.post('/categories', requireAuth, requireAdmin, validateRequest(validateCategory), categoriesController.create);
-apiRouter.put('/categories/:id', requireAuth, requireAdmin, categoriesController.update);
+apiRouter.put('/categories/:id', requireAuth, requireAdmin, validateRequest(validateCategoryUpdate), categoriesController.update);
 apiRouter.delete('/categories/:id', requireAuth, requireAdmin, categoriesController.remove);
 apiRouter.post('/vendor-requests', requireAuth, validateRequest(validateVendorRequest), vendorRequestsController.create);
 apiRouter.get('/vendor-requests', requireAuth, requireAdmin, requirePermission('vendors:approve'), vendorRequestsController.list);

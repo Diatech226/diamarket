@@ -95,11 +95,23 @@ export interface CategoryItem {
   _id: string;
   name: string;
   slug: string;
+  description?: string;
   active?: boolean;
   order?: number;
   image?: string;
   icon?: string;
+  productCount?: number;
 }
+
+export type CategoryPayload = {
+  name: string;
+  slug: string;
+  description?: string;
+  active: boolean;
+  order: number;
+  image?: string;
+  icon?: string;
+};
 
 export interface VendorRef { _id: string; shopName?: string; businessName?: string; status?: string }
 
