@@ -16,12 +16,21 @@ export const adminController = {
     return res.json({ success: true, stats: { products, orders, users, vendors, revenue: revenue[0]?.total || 0, pendingOrders, pendingVendorRequests, lowStock } });
   },
   async products(req: Request, res: Response) {
+    const page = Math.max(Number(req.query.page || 1), 1);
+    const limit = Math.min(Math.max(Number(req.query.limit || 20), 1), 100);
+    const skip = (page - 1) * limit;
     const filter: Record<string, unknown> = {};
-    if (req.query.status) filter.status = req.query.status;
+    if (req.query.status && ['draft', 'active', 'archived'].includes(String(req.query.status))) filter.status = req.query.status;
     if (req.query.category) filter.category = req.query.category;
     if (req.query.vendor) filter.vendor = req.query.vendor;
     if (req.query.search) filter.$text = { $search: String(req.query.search) };
-    return res.json({ data: await Product.find(filter).populate('category vendor').sort({ createdAt: -1 }) });
+
+    const [items, total] = await Promise.all([
+      Product.find(filter).skip(skip).limit(limit).populate('category vendor').sort({ createdAt: -1 }),
+      Product.countDocuments(filter),
+    ]);
+
+    return res.json({ data: items, meta: { page, limit, total, totalPages: Math.max(Math.ceil(total / limit), 1) } });
   },
   async categories(_req: Request, res: Response) { return res.json({ data: await Category.find().sort({ order: 1, name: 1 }) }); },
   async vendors(_req: Request, res: Response) {

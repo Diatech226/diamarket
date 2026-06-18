@@ -1,19 +1,38 @@
 import { api, endpoints } from "@/lib/api";
-import type { ApiCollection, ApiItem, CategoryItem, MediaAsset, OrderAdminItem, ProductItem, ProductPayload, Project, ProjectPayload, SlideItem, SlidePayload } from "@/types/cms";
+import type { ApiCollection, ApiItem, CategoryItem, CollectionQuery, MediaAsset, OrderAdminItem, ProductItem, ProductPayload, Project, ProjectPayload, SlideItem, SlidePayload } from "@/types/cms";
+
+function toQueryString(query?: CollectionQuery) {
+  const params = new URLSearchParams();
+  Object.entries(query ?? {}).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && String(value).trim() !== "") params.set(key, String(value));
+  });
+  const serialized = params.toString();
+  return serialized ? `?${serialized}` : "";
+}
 
 function unwrapCollection<T>(response: T[] | ApiCollection<T> | { success?: boolean; data?: T[] }): T[] {
   if (Array.isArray(response)) return response;
   return Array.isArray(response.data) ? response.data : [];
 }
 
-export async function fetchCollection<T>(endpoint: string): Promise<T[]> {
-  const response = await api.get<T[] | ApiCollection<T> | { success?: boolean; data?: T[] }>(endpoint);
+function unwrapPaginatedCollection<T>(response: T[] | ApiCollection<T> | { success?: boolean; data?: T[] }): ApiCollection<T> {
+  if (Array.isArray(response)) return { data: response };
+  return { data: Array.isArray(response.data) ? response.data : [], meta: "meta" in response ? response.meta : undefined };
+}
+
+export async function fetchCollection<T>(endpoint: string, query?: CollectionQuery): Promise<T[]> {
+  const response = await api.get<T[] | ApiCollection<T> | { success?: boolean; data?: T[] }>(`${endpoint}${toQueryString(query)}`);
   return unwrapCollection<T>(response);
+}
+
+export async function fetchPaginatedCollection<T>(endpoint: string, query?: CollectionQuery): Promise<ApiCollection<T>> {
+  const response = await api.get<T[] | ApiCollection<T> | { success?: boolean; data?: T[] }>(`${endpoint}${toQueryString(query)}`);
+  return unwrapPaginatedCollection<T>(response);
 }
 
 export const cmsService = {
   getDashboard: () => api.get(endpoints.dashboard),
-  getProducts: () => fetchCollection<ProductItem>(endpoints.products),
+  getProducts: (query?: CollectionQuery) => fetchPaginatedCollection<ProductItem>(endpoints.products, query),
   createProduct: (payload: ProductPayload) => api.post<ApiItem<ProductItem>>("/products", payload),
   updateProduct: (id: string, payload: Partial<ProductPayload>) => api.put<ApiItem<ProductItem>>(`/products/${id}`, payload),
   deleteProduct: (id: string) => api.delete<void>(`/products/${id}`),
