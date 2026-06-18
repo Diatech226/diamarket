@@ -75,7 +75,9 @@ export const cmsService = {
   getCommissions: () => api.get('/admin/commissions'),
   updateDefaultCommission: (commissionRate: number) => api.put('/admin/commissions/default', { commissionRate }),
   updateCategoryCommission: (id: string, commissionRate: number | null) => api.put(`/admin/categories/${id}/commission`, { commissionRate }),
-  getShipping: () => fetchCollection<any>('/shipments'),
+  getShipping: (query?: CollectionQuery) => fetchCollection<any>('/shipments', query),
+  getShippingConfig: () => api.get(endpoints.shipping),
+  updateShippingConfig: (payload: unknown) => api.put(endpoints.shipping, payload),
   createShipment: (orderId: string) => api.post(`${endpoints.orders}/${orderId}/shipment`, {}),
   syncShipment: (orderId: string) => api.post(`${endpoints.orders}/${orderId}/shipment/sync`, {}),
 };

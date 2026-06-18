@@ -103,6 +103,8 @@ apiRouter.get('/admin/orders', ordersController.list);
 apiRouter.get('/admin/orders/:id/payment-status', ordersController.getPaymentStatus);
 apiRouter.post('/admin/orders/:id/shipment', shippingController.create);
 apiRouter.post('/admin/orders/:id/shipment/sync', shippingController.sync);
+apiRouter.get('/admin/shipping', shippingController.adminConfig);
+apiRouter.put('/admin/shipping', shippingController.updateAdminConfig);
 apiRouter.get('/admin/orders/:id', ordersController.getById);
 apiRouter.put('/admin/orders/:id/status', ordersController.updateStatus);
 apiRouter.get('/admin/currencies', currenciesController.list);
@@ -161,7 +163,7 @@ apiRouter.put('/orders/:id/status', requireAuth, requirePermission('orders:updat
 apiRouter.post('/payments/diapay/checkout-session', requireAuth, paymentsController.createDiapayCheckoutSession);
 apiRouter.get('/payments/diapay/session/:sessionId', requireAuth, paymentsController.retrieveDiapaySession);
 apiRouter.post('/payments/diapay/webhook', paymentsController.handleDiapayWebhook);
-apiRouter.get('/shipments', requireAuth, requireAdmin, shippingController.list);
+apiRouter.get('/shipments', requireAuth, shippingController.list);
 apiRouter.post('/shipping/estimate', shippingController.estimate);
 apiRouter.post('/shipping/diaexpress/webhook', shippingController.webhook);
 apiRouter.post('/orders/:id/shipment', requireAuth, shippingController.create);

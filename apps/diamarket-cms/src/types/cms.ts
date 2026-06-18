@@ -11,6 +11,7 @@ export interface CollectionQuery {
   vendor?: string;
   paymentStatus?: string;
   shipmentStatus?: string;
+  tracking?: string;
   sortBy?: string;
   sortDir?: string;
   mimeType?: string;
