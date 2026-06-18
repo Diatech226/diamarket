@@ -30,8 +30,9 @@ const getCurrentUser = async (req: Request, res: Response) => {
   return res.json({ success: true, data: user });
 };
 const listVendors = async (_req: Request, res: Response) => res.json({ success: true, data: await Vendor.find().sort({ createdAt: -1 }) });
+const publicSettingKeys = ['marketplaceName', 'defaultCurrency', 'defaultLanguage', 'primaryCountry', 'logo', 'favicon', 'supportContact', 'supportEmail', 'supportPhone', 'companyAddress', 'maintenanceMode', 'maintenanceMessage', 'maintenanceImage', 'socialLinks', 'seo', 'checkout', 'shipping', 'vendors', 'homepage'];
 const publicSettings = async (_req: Request, res: Response) => {
-  const rows = await Setting.find({ key: { $in: ['marketplaceName', 'defaultCurrency', 'supportContact', 'maintenanceMode', 'checkout', 'shipping'] } });
+  const rows = await Setting.find({ key: { $in: publicSettingKeys, $not: /(secret|password|mongodb|uri|token|api[_-]?key|jwt)/i } });
   return res.json({ success: true, data: Object.fromEntries(rows.map((row) => [row.key, row.value])) });
 };
 

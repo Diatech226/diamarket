@@ -24,3 +24,7 @@ export const api = {
   getOrderShipment: (orderId: string) => request<any>(`/orders/${orderId}/shipment`).then(r => r.data ?? r),
   submitVendorRequest: (payload: unknown) => request<{ status: string }>('/vendor-requests', { method: 'POST', body: JSON.stringify(payload) }),
 };
+export type PublicSettings = {
+  marketplaceName?: string; logo?: string; favicon?: string; defaultCurrency?: string; supportContact?: string; supportEmail?: string; supportPhone?: string; companyAddress?: string; maintenanceMode?: boolean; maintenanceMessage?: string; maintenanceImage?: string; socialLinks?: Record<string, string>; seo?: { title?: string; description?: string; keywords?: string; openGraphImage?: string }; checkout?: Record<string, unknown>; shipping?: Record<string, unknown>; vendors?: Record<string, unknown>; homepage?: Record<string, unknown>;
+};
+export async function getPublicSettings(): Promise<PublicSettings> { return demoFallback(request<any>('/settings').then(r => r.data ?? {}), {}); }
