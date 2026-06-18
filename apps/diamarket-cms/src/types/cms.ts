@@ -194,8 +194,29 @@ export type ProductPayload = {
   status?: "draft" | "active" | "archived";
 };
 
-export interface SlideItem { _id?: string; id?: string; title: string; subtitle?: string; imageUrl?: string; cta?: string; ctaUrl?: string; isActive?: boolean }
-export type SlidePayload = Omit<SlideItem, "_id" | "id">;
+export interface SlideItem {
+  _id?: string;
+  id?: string;
+  title: string;
+  subtitle?: string;
+  description?: string;
+  imageDesktop?: string;
+  imageMobile?: string;
+  imageUrl?: string;
+  ctaLabel?: string;
+  ctaLink?: string;
+  cta?: string;
+  ctaUrl?: string;
+  badge?: string;
+  backgroundColor?: string;
+  position?: number;
+  isActive?: boolean;
+  startDate?: string;
+  endDate?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+export type SlidePayload = Omit<SlideItem, "_id" | "id" | "createdAt" | "updatedAt">;
 
 
 export interface VendorAdminItem {
