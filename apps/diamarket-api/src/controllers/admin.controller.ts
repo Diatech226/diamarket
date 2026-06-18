@@ -79,11 +79,17 @@ export const adminController = {
     const skip = (page - 1) * limit;
     const filter: Record<string, unknown> = {};
     if (req.query.status && ['draft', 'active', 'archived'].includes(String(req.query.status))) filter.status = req.query.status;
-    if (req.query.category) filter.category = req.query.category;
-    if (req.query.vendor) filter.vendor = req.query.vendor;
+    if (req.query.category) {
+      if (!Types.ObjectId.isValid(String(req.query.category))) return res.status(400).json({ success: false, message: 'Invalid category id' });
+      filter.category = req.query.category;
+    }
+    if (req.query.vendor) {
+      if (!Types.ObjectId.isValid(String(req.query.vendor))) return res.status(400).json({ success: false, message: 'Invalid vendor id' });
+      filter.vendor = req.query.vendor;
+    }
     if (req.query.search) filter.$text = { $search: String(req.query.search) };
     const [items, total] = await Promise.all([Product.find(filter).skip(skip).limit(limit).populate('category vendor').sort({ createdAt: -1 }), Product.countDocuments(filter)]);
-    return res.json({ data: items, meta: { page, limit, total, totalPages: Math.max(Math.ceil(total / limit), 1) } });
+    return res.json({ success: true, data: items, meta: { page, limit, total, totalPages: Math.max(Math.ceil(total / limit), 1) } });
   },
   async categories(_req: Request, res: Response) { return res.json({ data: await Category.find().sort({ order: 1, name: 1 }) }); },
   async vendors(req: Request, res: Response) {

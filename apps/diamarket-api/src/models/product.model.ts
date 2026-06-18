@@ -7,7 +7,7 @@ const ProductSchema = new Schema(
     name: { type: String, required: true, trim: true },
     slug: { type: String, required: true, unique: true, lowercase: true, trim: true, index: true },
     description: { type: String, required: true, trim: true },
-    price: { type: Number, required: true, min: 0 },
+    price: { type: Number, required: true, min: 0.01 },
     currency: { type: String, enum: ['FCFA', 'XOF', 'USD', 'EUR', 'CAD', 'CNY'], default: 'XOF', required: true },
     commissionRate: { type: Number, min: 0, max: 1 },
     images: { type: [String], default: [] },
