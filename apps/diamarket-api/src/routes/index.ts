@@ -97,6 +97,9 @@ apiRouter.post('/admin/categories', validateRequest(validateCategory), categorie
 apiRouter.put('/admin/categories/:id', validateRequest(validateCategoryUpdate), categoriesController.update);
 apiRouter.delete('/admin/categories/:id', categoriesController.remove);
 apiRouter.get('/admin/orders', ordersController.list);
+apiRouter.get('/admin/orders/:id/payment-status', ordersController.getPaymentStatus);
+apiRouter.post('/admin/orders/:id/shipment', shippingController.create);
+apiRouter.post('/admin/orders/:id/shipment/sync', shippingController.sync);
 apiRouter.get('/admin/orders/:id', ordersController.getById);
 apiRouter.put('/admin/orders/:id/status', ordersController.updateStatus);
 apiRouter.get('/admin/vendors', adminController.vendors);

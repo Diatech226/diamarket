@@ -9,6 +9,8 @@ export interface CollectionQuery {
   status?: string;
   category?: string;
   vendor?: string;
+  paymentStatus?: string;
+  shipmentStatus?: string;
 }
 
 export interface DashboardMetrics {
@@ -72,23 +74,42 @@ export type ProjectPayload = Partial<Omit<Project, "_id" | "coverMedia" | "galle
   media?: string[];
 };
 
-export type OrderPaymentStatus = 'unpaid' | 'pending' | 'paid' | 'failed' | 'cancelled' | 'expired' | 'refunded';
+export type OrderStatus = 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'refunded';
+export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'cancelled' | 'expired' | 'refunded';
+export type ShipmentStatus = 'pending' | 'created' | 'picked_up' | 'in_transit' | 'out_for_delivery' | 'delivered' | 'failed' | 'returned' | 'cancelled';
+export type OrderPaymentStatus = PaymentStatus;
+
+export interface OrderPartyRef { _id: string; name?: string; email?: string; shopName?: string; businessName?: string }
+export interface OrderAddress { country?: string; city?: string; phone?: string; line1?: string }
+export interface OrderLineItem { product?: ProductItem | string; name: string; quantity: number; unitPrice: number; totalPrice: number }
+export interface OrderTimelineEvent { eventId?: string; type?: string; status?: string; message?: string; location?: string; receivedAt?: string; occurredAt?: string; processedAt?: string }
+export interface OrderShipment { _id?: string; trackingNumber?: string; providerShipmentId?: string; provider?: string; status?: ShipmentStatus; estimatedDeliveryDate?: string; history?: OrderTimelineEvent[] }
 
 export interface OrderAdminItem {
   _id: string;
-  status?: string;
+  status?: OrderStatus;
   paymentProvider?: 'cash_on_delivery' | 'diapay';
-  paymentStatus?: OrderPaymentStatus;
+  paymentStatus?: PaymentStatus;
   paymentMethod?: string;
+  shipmentStatus?: ShipmentStatus;
+  customer?: OrderPartyRef | string;
+  vendor?: OrderPartyRef | string;
+  items?: OrderLineItem[];
+  address?: OrderAddress;
+  shipment?: OrderShipment;
+  paymentEvents?: OrderTimelineEvent[];
   diapaySessionId?: string;
   diapayPaymentId?: string;
   checkoutUrl?: string;
+  subtotalAmount?: number;
+  shippingAmount?: number;
   totalAmount?: number;
   currency?: string;
   paidAt?: string;
   cancelledAt?: string;
   failedAt?: string;
   createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface CategoryItem {
