@@ -36,7 +36,20 @@ const publicSettings = async (_req: Request, res: Response) => {
 
 const validateProduct = (req: Request) => {
   const required = ['name', 'slug', 'description', 'price', 'currency', 'category', 'vendor', 'stock'];
-  for (const field of required) if (req.body[field] === undefined) return `Missing field: ${field}`;
+  for (const field of required) if (req.body[field] === undefined || req.body[field] === '') return `Missing field: ${field}`;
+  if (!['FCFA', 'USD'].includes(req.body.currency)) return 'Invalid currency';
+  if (req.body.status && !['draft', 'active', 'archived'].includes(req.body.status)) return 'Invalid product status';
+  if (Number(req.body.price) < 0) return 'price must be greater than or equal to 0';
+  if (!Number.isInteger(Number(req.body.stock)) || Number(req.body.stock) < 0) return 'stock must be a positive integer';
+  if (req.body.images && !Array.isArray(req.body.images)) return 'images must be an array';
+  return null;
+};
+const validateProductUpdate = (req: Request) => {
+  if (req.body.currency && !['FCFA', 'USD'].includes(req.body.currency)) return 'Invalid currency';
+  if (req.body.status && !['draft', 'active', 'archived'].includes(req.body.status)) return 'Invalid product status';
+  if (req.body.price !== undefined && Number(req.body.price) < 0) return 'price must be greater than or equal to 0';
+  if (req.body.stock !== undefined && (!Number.isInteger(Number(req.body.stock)) || Number(req.body.stock) < 0)) return 'stock must be a positive integer';
+  if (req.body.images && !Array.isArray(req.body.images)) return 'images must be an array';
   return null;
 };
 const validateProject = (req: Request) => (!req.body.title || !String(req.body.title).trim() ? 'title is required' : null);
@@ -87,7 +100,7 @@ apiRouter.get('/settings', publicSettings);
 apiRouter.get('/products', productsController.list);
 apiRouter.get('/products/:slug', productsController.getBySlug);
 apiRouter.post('/products', requireAuth, requireRole('admin', 'vendor'), requirePermission('products:create'), validateRequest(validateProduct), productsController.create);
-apiRouter.put('/products/:id', requireAuth, requireRole('admin', 'vendor'), requirePermission('products:update'), productsController.update);
+apiRouter.put('/products/:id', requireAuth, requireRole('admin', 'vendor'), requirePermission('products:update'), validateRequest(validateProductUpdate), productsController.update);
 apiRouter.delete('/products/:id', requireAuth, requireRole('admin', 'vendor'), requirePermission('products:delete'), productsController.remove);
 apiRouter.get('/projects', projectsController.list);
 apiRouter.get('/projects/:id', projectsController.getById);

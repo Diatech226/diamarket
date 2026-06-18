@@ -2,6 +2,15 @@ export type Role = "admin";
 
 export type EntityStatus = "active" | "inactive" | "suspended" | "draft" | "archived";
 
+export interface CollectionQuery {
+  page?: number;
+  limit?: number;
+  search?: string;
+  status?: string;
+  category?: string;
+  vendor?: string;
+}
+
 export interface DashboardMetrics {
   totalOrders: number;
   totalSales: number;
@@ -110,6 +119,8 @@ export interface ProductItem {
   width?: number;
   height?: number;
   status?: "draft" | "active" | "archived";
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export type ProductPayload = {
