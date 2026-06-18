@@ -164,7 +164,7 @@ export interface ProductItem {
   slug: string;
   description?: string;
   price: number;
-  currency: "FCFA" | "USD";
+  currency: "FCFA" | "XOF" | "USD" | "EUR" | "CAD" | "CNY";
   images?: string[];
   category?: CategoryItem | string;
   vendor?: VendorRef | string;
@@ -183,7 +183,7 @@ export type ProductPayload = {
   slug: string;
   description: string;
   price: number;
-  currency: "FCFA" | "USD";
+  currency: "FCFA" | "XOF" | "USD" | "EUR" | "CAD" | "CNY";
   category: string;
   vendor: string;
   stock: number;
