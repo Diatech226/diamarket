@@ -3,6 +3,7 @@ import { Types } from 'mongoose';
 import { Category, Order, Product, Setting, User, Vendor, VendorRequest } from '../models';
 import { getAuth } from '../middlewares/requireAuth';
 import { logAdminAction } from '../services/admin-audit.service';
+import { getDefaultCommissionRate } from '../services/commission.service';
 
 const allowedSettings = ['marketplaceName', 'defaultCurrency', 'defaultCommission', 'supportContact', 'maintenanceMode', 'checkout', 'shipping'];
 const vendorStatuses = ['pending', 'active', 'suspended', 'rejected'];
@@ -96,8 +97,28 @@ export const adminController = {
     await logAdminAction(getAuth(req)!.userId, 'vendor.status_changed', 'vendor', data.id, { status: data.status });
     return res.json({ success: true, data });
   },
+  async commissions(_req: Request, res: Response) {
+    const [defaultRate, vendors, categories] = await Promise.all([getDefaultCommissionRate(), Vendor.find().select('shopName commissionRate status').sort({ shopName: 1 }), Category.find().select('name slug commissionRate active').sort({ name: 1 })]);
+    return res.json({ success: true, data: { defaultRate, priority: ['product', 'vendor', 'category', 'global'], vendors, categories } });
+  },
+  async updateDefaultCommission(req: Request, res: Response) {
+    const commissionRate = toRate(Number(req.body.commissionRate) > 1 ? Number(req.body.commissionRate) / 100 : req.body.commissionRate);
+    if (commissionRate === null) return res.status(400).json({ success: false, message: 'commissionRate must be between 0 and 1' });
+    const data = await Setting.findOneAndUpdate({ key: 'defaultCommission' }, { key: 'defaultCommission', value: commissionRate, scope: 'global' }, { new: true, upsert: true });
+    await logAdminAction(getAuth(req)!.userId, 'commission.default_changed', 'commission', data.id, { commissionRate });
+    return res.json({ success: true, data: { defaultRate: commissionRate } });
+  },
+  async updateCategoryCommission(req: Request, res: Response) {
+    const commissionRate = req.body.commissionRate === null || req.body.commissionRate === '' ? undefined : toRate(Number(req.body.commissionRate) > 1 ? Number(req.body.commissionRate) / 100 : req.body.commissionRate);
+    if (commissionRate === null) return res.status(400).json({ success: false, message: 'commissionRate must be between 0 and 1' });
+    const update = commissionRate === undefined ? { $unset: { commissionRate: 1 } } : { $set: { commissionRate } };
+    const data = await Category.findByIdAndUpdate(req.params.id, update, { new: true, runValidators: true });
+    if (!data) return res.status(404).json({ success: false, message: 'Category not found' });
+    await logAdminAction(getAuth(req)!.userId, 'category.commission_changed', 'category', data.id, { commissionRate });
+    return res.json({ success: true, data });
+  },
   async updateVendorCommission(req: Request, res: Response) {
-    const commissionRate = toRate(req.body.commissionRate);
+    const commissionRate = toRate(Number(req.body.commissionRate) > 1 ? Number(req.body.commissionRate) / 100 : req.body.commissionRate);
     if (commissionRate === null) return res.status(400).json({ success: false, message: 'commissionRate must be between 0 and 1' });
     const data = await Vendor.findByIdAndUpdate(req.params.id, { commissionRate }, { new: true, runValidators: true });
     if (!data) return res.status(404).json({ success: false, message: 'Vendor not found' });
@@ -109,7 +130,9 @@ export const adminController = {
     return res.json({ data: Object.fromEntries(rows.map((row) => [row.key, row.value])) });
   },
   async updateSettings(req: Request, res: Response) {
-    const entries = Object.entries(req.body || {}).filter(([key]) => allowedSettings.includes(key));
+    if (req.body?.defaultCommission !== undefined && toRate(Number(req.body.defaultCommission) > 1 ? Number(req.body.defaultCommission) / 100 : req.body.defaultCommission) === null) return res.status(400).json({ success: false, message: 'defaultCommission must be between 0 and 100' });
+    const normalized = { ...req.body, ...(req.body?.defaultCommission !== undefined ? { defaultCommission: Number(req.body.defaultCommission) > 1 ? Number(req.body.defaultCommission) / 100 : Number(req.body.defaultCommission) } : {}) };
+    const entries = Object.entries(normalized || {}).filter(([key]) => allowedSettings.includes(key));
     await Promise.all(entries.map(([key, value]) => Setting.findOneAndUpdate({ key }, { value, scope: 'global' }, { upsert: true, new: true })));
     await logAdminAction(getAuth(req)!.userId, 'settings.updated', 'settings', undefined, { keys: entries.map(([key]) => key) });
     return adminController.settings(req, res);
