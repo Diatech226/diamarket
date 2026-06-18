@@ -3,6 +3,7 @@ import { Types } from 'mongoose';
 import { Category, Order, Product, Setting, User, Vendor, VendorRequest } from '../models';
 import { getAuth } from '../middlewares/requireAuth';
 import { logAdminAction } from '../services/admin-audit.service';
+import { getDefaultCommissionRate } from '../services/commission.service';
 
 const settingDefinitions: Record<string, { group: string; isPublic: boolean; type: 'string' | 'number' | 'boolean' | 'object' }> = {
   marketplaceName: { group: 'general', isPublic: true, type: 'string' },
@@ -119,8 +120,28 @@ export const adminController = {
     await logAdminAction(getAuth(req)!.userId, 'vendor.status_changed', 'vendor', data.id, { status: data.status });
     return res.json({ success: true, data });
   },
+  async commissions(_req: Request, res: Response) {
+    const [defaultRate, vendors, categories] = await Promise.all([getDefaultCommissionRate(), Vendor.find().select('shopName commissionRate status').sort({ shopName: 1 }), Category.find().select('name slug commissionRate active').sort({ name: 1 })]);
+    return res.json({ success: true, data: { defaultRate, priority: ['product', 'vendor', 'category', 'global'], vendors, categories } });
+  },
+  async updateDefaultCommission(req: Request, res: Response) {
+    const commissionRate = toRate(Number(req.body.commissionRate) > 1 ? Number(req.body.commissionRate) / 100 : req.body.commissionRate);
+    if (commissionRate === null) return res.status(400).json({ success: false, message: 'commissionRate must be between 0 and 1' });
+    const data = await Setting.findOneAndUpdate({ key: 'defaultCommission' }, { key: 'defaultCommission', value: commissionRate, scope: 'global' }, { new: true, upsert: true });
+    await logAdminAction(getAuth(req)!.userId, 'commission.default_changed', 'commission', data.id, { commissionRate });
+    return res.json({ success: true, data: { defaultRate: commissionRate } });
+  },
+  async updateCategoryCommission(req: Request, res: Response) {
+    const commissionRate = req.body.commissionRate === null || req.body.commissionRate === '' ? undefined : toRate(Number(req.body.commissionRate) > 1 ? Number(req.body.commissionRate) / 100 : req.body.commissionRate);
+    if (commissionRate === null) return res.status(400).json({ success: false, message: 'commissionRate must be between 0 and 1' });
+    const update = commissionRate === undefined ? { $unset: { commissionRate: 1 } } : { $set: { commissionRate } };
+    const data = await Category.findByIdAndUpdate(req.params.id, update, { new: true, runValidators: true });
+    if (!data) return res.status(404).json({ success: false, message: 'Category not found' });
+    await logAdminAction(getAuth(req)!.userId, 'category.commission_changed', 'category', data.id, { commissionRate });
+    return res.json({ success: true, data });
+  },
   async updateVendorCommission(req: Request, res: Response) {
-    const commissionRate = toRate(req.body.commissionRate);
+    const commissionRate = toRate(Number(req.body.commissionRate) > 1 ? Number(req.body.commissionRate) / 100 : req.body.commissionRate);
     if (commissionRate === null) return res.status(400).json({ success: false, message: 'commissionRate must be between 0 and 1' });
     const data = await Vendor.findByIdAndUpdate(req.params.id, { commissionRate }, { new: true, runValidators: true });
     if (!data) return res.status(404).json({ success: false, message: 'Vendor not found' });

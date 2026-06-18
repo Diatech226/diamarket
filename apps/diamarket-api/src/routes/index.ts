@@ -18,6 +18,7 @@ import { systemRouter } from './system.routes';
 import { shippingController } from '../controllers/shipping.controller';
 import { adminController } from '../controllers/admin.controller';
 import { slidesController } from '../controllers/slides.controller';
+import { currenciesController } from '../controllers/currencies.controller';
 import { User, Vendor, Setting } from '../models';
 import { AuthContext } from '../middlewares/requireAuth';
 
@@ -38,7 +39,7 @@ const publicSettings = async (_req: Request, res: Response) => {
 const validateProduct = (req: Request) => {
   const required = ['name', 'slug', 'description', 'price', 'currency', 'category', 'vendor', 'stock'];
   for (const field of required) if (req.body[field] === undefined || req.body[field] === '') return `Missing field: ${field}`;
-  if (!['FCFA', 'USD'].includes(req.body.currency)) return 'Invalid currency';
+  if (!['FCFA', 'XOF', 'USD', 'EUR', 'CAD', 'CNY'].includes(req.body.currency)) return 'Invalid currency';
   if (req.body.status && !['draft', 'active', 'archived'].includes(req.body.status)) return 'Invalid product status';
   if (Number(req.body.price) < 0) return 'price must be greater than or equal to 0';
   if (!Number.isInteger(Number(req.body.stock)) || Number(req.body.stock) < 0) return 'stock must be a positive integer';
@@ -46,7 +47,7 @@ const validateProduct = (req: Request) => {
   return null;
 };
 const validateProductUpdate = (req: Request) => {
-  if (req.body.currency && !['FCFA', 'USD'].includes(req.body.currency)) return 'Invalid currency';
+  if (req.body.currency && !['FCFA', 'XOF', 'USD', 'EUR', 'CAD', 'CNY'].includes(req.body.currency)) return 'Invalid currency';
   if (req.body.status && !['draft', 'active', 'archived'].includes(req.body.status)) return 'Invalid product status';
   if (req.body.price !== undefined && Number(req.body.price) < 0) return 'price must be greater than or equal to 0';
   if (req.body.stock !== undefined && (!Number.isInteger(Number(req.body.stock)) || Number(req.body.stock) < 0)) return 'stock must be a positive integer';
@@ -104,6 +105,13 @@ apiRouter.post('/admin/orders/:id/shipment', shippingController.create);
 apiRouter.post('/admin/orders/:id/shipment/sync', shippingController.sync);
 apiRouter.get('/admin/orders/:id', ordersController.getById);
 apiRouter.put('/admin/orders/:id/status', ordersController.updateStatus);
+apiRouter.get('/admin/currencies', currenciesController.list);
+apiRouter.post('/admin/currencies', currenciesController.create);
+apiRouter.put('/admin/currencies/:id', currenciesController.update);
+apiRouter.delete('/admin/currencies/:id', currenciesController.remove);
+apiRouter.get('/admin/commissions', adminController.commissions);
+apiRouter.put('/admin/commissions/default', adminController.updateDefaultCommission);
+apiRouter.put('/admin/categories/:id/commission', adminController.updateCategoryCommission);
 apiRouter.get('/admin/vendors', adminController.vendors);
 apiRouter.get('/admin/vendors/:id', adminController.vendorById);
 apiRouter.put('/admin/vendors/:id/commission', adminController.updateVendorCommission);
@@ -118,6 +126,7 @@ apiRouter.get('/users/me', requireAuth, getCurrentUser);
 apiRouter.get('/users', requireAuth, requireAdmin, listUsers);
 apiRouter.get('/vendors', listVendors);
 apiRouter.get('/settings', publicSettings);
+apiRouter.get('/currencies', currenciesController.publicList);
 apiRouter.get('/products', productsController.list);
 apiRouter.get('/products/:slug', productsController.getBySlug);
 apiRouter.post('/products', requireAuth, requireRole('admin', 'vendor'), requirePermission('products:create'), validateRequest(validateProduct), productsController.create);
