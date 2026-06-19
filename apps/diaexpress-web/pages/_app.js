@@ -7,6 +7,7 @@ import '@/styles/App.css';
 import '../src/styles/diaexpress-theme.css';
 import '../src/styles/design-tokens.css';
 import '../src/styles/public-design-tokens.css';
+import '../src/styles/TrackShipment.css';
 import { useBackendAuth } from '@/auth/useBackendAuth';
 import { useSafeClerk, useSafeUser } from '@/auth/useSafeClerk';
 

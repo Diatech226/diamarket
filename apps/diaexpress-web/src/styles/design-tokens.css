@@ -67,3 +67,99 @@
     --dx-duration-page: 0ms;
   }
 }
+
+:root {
+  --dx-color-graphite: #111827;
+  --dx-color-logistic-navy: #17324D;
+  --dx-color-tracking-cyan: #00B8D9;
+  --dx-color-delivered-green: #2ECC71;
+  --dx-color-transit-orange: #FF9F1C;
+  --dx-color-exception-red: #E63946;
+  --dx-color-parcel-sand: #D9B382;
+  --dx-color-cold-white: #F8FAFC;
+  --dx-color-interface-gray: #E5E7EB;
+  --dx-shadow-logistic-card: 0 20px 50px rgba(17, 24, 39, 0.10);
+  --dx-shadow-logistic-lift: 0 28px 70px rgba(23, 50, 77, 0.18);
+}
+
+.dx-status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.75rem;
+  padding: 0.28rem 0.68rem;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.015em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.dx-progress-stepper {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: 0.75rem;
+  padding: 0;
+  margin: 1rem 0;
+  list-style: none;
+}
+
+.dx-progress-stepper li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 0.55rem;
+  border: 1px solid var(--dx-color-interface-gray);
+  border-radius: 1rem;
+  background: var(--dx-color-cold-white);
+  padding: 0.75rem;
+  color: var(--dx-color-graphite);
+}
+
+.dx-progress-stepper span {
+  display: inline-grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 999px;
+  background: var(--dx-color-interface-gray);
+  font-weight: 800;
+}
+
+.dx-progress-stepper .is-active {
+  border-color: var(--dx-color-tracking-cyan);
+  box-shadow: var(--dx-shadow-logistic-card);
+}
+
+.dx-progress-stepper .is-active span {
+  background: var(--dx-color-tracking-cyan);
+  color: var(--dx-color-graphite);
+}
+
+.dx-timeline-status {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.85rem;
+  padding: 0.5rem 0 1rem;
+}
+
+.dx-timeline-dot {
+  width: 0.9rem;
+  height: 0.9rem;
+  margin-top: 0.45rem;
+  border: 3px solid var(--dx-color-cold-white);
+  border-radius: 999px;
+  background: var(--dx-color-tracking-cyan);
+  box-shadow: 0 0 0 2px rgba(0, 184, 217, 0.35);
+}
+
+.dx-timeline-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
