@@ -1,18 +1,19 @@
  :root {
-  --background: #FFFDF8;
+  --background: #F8FAFC;
   --surface: #FFFFFF;
-  --surface-2: #F7FAF6;
-  --surface-3: #EDF4EE;
-  --primary: #2E8B57;
-  --primary-soft: rgba(46, 139, 87, 0.14);
-  --accent: #F4C95D;
-  --text: #1F2937;
-  --text-muted: #6B7280;
-  --border: #D8E0D6;
-  --success: #2E8B57;
-  --warning: #D2A43A;
-  --danger: #C55050;
-  --info: #3F8F6A;
+  --surface-2: #F3F7FA;
+  --surface-3: #EAF2F8;
+  --primary: #17324D;
+  --primary-soft: rgba(0, 184, 217, 0.14);
+  --accent: #00B8D9;
+  --text: #111827;
+  --text-muted: #64748B;
+  --border: #E5E7EB;
+  --success: #2ECC71;
+  --warning: #FF9F1C;
+  --danger: #E63946;
+  --info: #00B8D9;
+  --parcel: #D9B382;
   --radius: 16px;
   --shadow: 0 20px 42px rgba(31, 95, 58, 0.12);
   --shadow-sm: 0 12px 24px rgba(31, 95, 58, 0.08);
@@ -1230,4 +1231,10 @@ p {
   .alert-row { grid-template-columns: 1fr; }
   .alert-row small { grid-column: auto; }
   .search-panel { flex-direction: column; }
+}
+
+.badge--violet {
+  background: rgba(139, 92, 246, 0.14);
+  color: #5B21B6;
+  border-color: rgba(139, 92, 246, 0.28);
 }
