@@ -51,6 +51,7 @@ export const endpoints = {
   mediaUpload: "/media/upload",
   categories: "/admin/categories",
   slides: "/admin/slides",
+  team: "/v1/content/team",
   orders: "/admin/orders",
   vendors: "/admin/vendors",
   users: "/admin/users",
