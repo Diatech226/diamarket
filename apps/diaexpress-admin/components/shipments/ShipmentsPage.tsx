@@ -16,6 +16,7 @@ import { fetchEmbarkments } from '@/src/services/api/logisticsAdmin';
 import { assignShipmentEmbarkment, updateShipmentStatus } from '@/src/services/api/logisticsShipments';
 import { resolveStatusClass, resolveStatusLabel, shipmentStatusConfig } from '@/lib/status';
 import { formatDate } from '@/src/lib/format';
+import { getShipmentSource } from '@/src/lib/operations';
 import type { Embarkment, Shipment } from '@/src/types/logistics';
 
 const STATUS_OPTIONS: Shipment['status'][] = [
@@ -41,6 +42,8 @@ export function ShipmentsPage() {
   const [route, setRoute] = useState('');
   const [transport, setTransport] = useState('');
   const [customer, setCustomer] = useState('');
+  const [hub, setHub] = useState('');
+  const [operator, setOperator] = useState('');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [selected, setSelected] = useState<Shipment | null>(null);
@@ -83,6 +86,8 @@ export function ShipmentsPage() {
       const routeText = `${shipment.origin || shipment.meta?.quote?.origin || ''} ${shipment.destination || shipment.meta?.quote?.destination || ''}`.toLowerCase();
       const transportText = String(shipment.carrier || shipment.provider || shipment.meta?.quote?.transportType || '').toLowerCase();
       const customerText = String(shipment.meta?.customerEmail || shipment.meta?.customerName || shipment.meta?.quoteId || '').toLowerCase();
+      const hubText = String(shipment.meta?.hubId || shipment.currentLocation || shipment.origin || shipment.destination || '').toLowerCase();
+      const operatorText = String(shipment.meta?.operatorId || '').toLowerCase();
       const updated = shipment.updatedAt ? new Date(shipment.updatedAt).getTime() : 0;
       const afterFrom = dateFrom ? updated >= new Date(dateFrom).getTime() : true;
       const beforeTo = dateTo ? updated <= new Date(`${dateTo}T23:59:59`).getTime() : true;
@@ -90,10 +95,12 @@ export function ShipmentsPage() {
       return (!route || routeText.includes(route.toLowerCase()))
         && (!transport || transportText.includes(transport.toLowerCase()))
         && (!customer || customerText.includes(customer.toLowerCase()))
+        && (!hub || hubText.includes(hub.toLowerCase()))
+        && (!operator || operatorText.includes(operator.toLowerCase()))
         && afterFrom
         && beforeTo;
     });
-  }, [items, route, transport, customer, dateFrom, dateTo]);
+  }, [items, route, transport, customer, hub, operator, dateFrom, dateTo]);
 
   const resolvedListError = useMemo(() => {
     if (!error) return null;
@@ -177,6 +184,8 @@ export function ShipmentsPage() {
             <option value="internal">Internal</option>
           </Select>
           <Input placeholder="Client" value={customer} onChange={(event) => setCustomer(event.target.value)} />
+          <Input placeholder="Hub" value={hub} onChange={(event) => setHub(event.target.value)} />
+          <Input placeholder="Opérateur" value={operator} onChange={(event) => setOperator(event.target.value)} />
           <Input type="date" value={dateFrom} onChange={(event) => setDateFrom(event.target.value)} />
           <Input type="date" value={dateTo} onChange={(event) => setDateTo(event.target.value)} />
           <Select value={status} onChange={(event) => { setStatus(event.target.value); setPage(1); }}>
@@ -231,6 +240,7 @@ export function ShipmentsPage() {
                 <th>Statut</th>
                 <th>Client / transport</th>
                 <th>Quote source</th>
+                <th>Source</th>
                 <th>Dernière MAJ</th>
                 <th>Actions</th>
               </tr>
@@ -239,13 +249,13 @@ export function ShipmentsPage() {
               {loading ? (
                 Array.from({ length: 3 }).map((_, index) => (
                   <tr key={`skeleton-${index}`}>
-                    {Array.from({ length: 7 }).map((_, cellIndex) => (
+                    {Array.from({ length: 8 }).map((_, cellIndex) => (
                       <td key={`skeleton-cell-${cellIndex}`}><div className="skeleton" style={{ width: `${60 + cellIndex * 4}%` }} /></td>
                     ))}
                   </tr>
                 ))
               ) : filteredItems.length === 0 ? (
-                <tr><td colSpan={7}><div className="empty-state">Aucun shipment avec ces filtres.</div></td></tr>
+                <tr><td colSpan={8}><div className="empty-state">Aucun shipment avec ces filtres.</div></td></tr>
               ) : (
                 filteredItems.map((shipment) => (
                   <tr key={shipment._id}>
@@ -254,6 +264,7 @@ export function ShipmentsPage() {
                     <td><Badge className={resolveStatusClass(shipment.status, shipmentStatusConfig)}>{resolveStatusLabel(shipment.status, shipmentStatusConfig)}</Badge></td>
                     <td><div className="cell-stack"><strong>{shipment.meta?.customerName || shipment.meta?.customerEmail || '—'}</strong><span className="muted">{shipment.carrier || shipment.provider || shipment.meta?.quote?.transportType || '—'}</span></div></td>
                     <td className="mono">{shipment.quoteId || shipment.meta?.quoteId || '—'}</td>
+                    <td>{getShipmentSource(shipment)}</td>
                     <td>{formatDate(shipment.updatedAt)}</td>
                     <td>
                       <div className="table-actions">
