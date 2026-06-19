@@ -44,11 +44,11 @@ export function QuotesTable({
   actionError,
   getPriority,
 }: QuotesTableProps) {
-  const canConfirm = (quote: Quote) => quote.status === 'pending';
+  const canConfirm = (quote: Quote) => ['requested', 'pending', 'under_review', 'info_requested'].includes(quote.status);
   const canConvert = (quote: Quote) =>
-    quote.status === 'confirmed' && quote.paymentStatus === 'confirmed' && !quote.shipmentId;
-  const canReject = (quote: Quote) => quote.status === 'pending' || quote.status === 'confirmed';
-  const canEdit = (quote: Quote) => quote.status === 'pending' || quote.status === 'confirmed';
+    ['approved', 'confirmed', 'ready_for_shipment'].includes(quote.status) && !quote.shipmentId;
+  const canReject = (quote: Quote) => !['rejected', 'converted_to_shipment', 'cancelled'].includes(quote.status);
+  const canEdit = (quote: Quote) => !['converted_to_shipment', 'cancelled'].includes(quote.status);
 
   return (
     <div className="panel">
@@ -73,6 +73,8 @@ export function QuotesTable({
               <th>Référence</th>
               <th>Client</th>
               <th>Itinéraire</th>
+              <th>Transport</th>
+              <th>Dimensions</th>
               <th>Priorité</th>
               <th>Montant</th>
               <th>Statut</th>
@@ -84,7 +86,7 @@ export function QuotesTable({
             {loading ? (
               Array.from({ length: 3 }).map((_, index) => (
                 <tr key={`skeleton-${index}`}>
-                  {Array.from({ length: 8 }).map((_, cellIndex) => (
+                  {Array.from({ length: 10 }).map((_, cellIndex) => (
                     <td key={`skeleton-cell-${cellIndex}`}>
                       <div className="skeleton" style={{ width: `${60 + cellIndex * 3}%` }} />
                     </td>
@@ -93,7 +95,7 @@ export function QuotesTable({
               ))
             ) : items.length === 0 ? (
               <tr>
-                <td colSpan={8}>
+                <td colSpan={10}>
                   <div className="empty-state">Aucun devis trouvé avec ces filtres.</div>
                 </td>
               </tr>
@@ -110,7 +112,14 @@ export function QuotesTable({
                   <td>
                     <div className="cell-stack">
                       <span>{quote.origin} → {quote.destination}</span>
-                      <span className="muted">{toTitle(quote.transportType)}</span>
+                      <span className="muted">Créé le {formatDate(quote.createdAt)}</span>
+                    </div>
+                  </td>
+                  <td>{toTitle(quote.transportType)}</td>
+                  <td>
+                    <div className="cell-stack">
+                      <span>{quote.weight ?? '—'} kg · {quote.volume ?? '—'} m³</span>
+                      <span className="muted">{quote.length ?? '—'} × {quote.width ?? '—'} × {quote.height ?? '—'} cm</span>
                     </div>
                   </td>
                   <td>
@@ -126,7 +135,7 @@ export function QuotesTable({
                   <td>
                     <div className="table-actions">
                       <Link className="button button--ghost" href={`/admin/quotes/${quote._id}`}>
-                        View
+                        Voir détail
                       </Link>
                       <details className="actions-menu">
                         <summary className="actions-menu__trigger">⋮</summary>

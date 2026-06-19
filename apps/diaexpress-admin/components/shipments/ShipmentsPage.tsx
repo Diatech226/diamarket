@@ -23,6 +23,7 @@ const STATUS_OPTIONS: Shipment['status'][] = [
   'created',
   'pending_dispatch',
   'scheduled',
+  'picked_up',
   'in_transit',
   'delayed',
   'at_hub',
@@ -38,6 +39,7 @@ export function ShipmentsPage() {
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState('');
   const [route, setRoute] = useState('');
+  const [transport, setTransport] = useState('');
   const [customer, setCustomer] = useState('');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
@@ -79,17 +81,19 @@ export function ShipmentsPage() {
   const filteredItems = useMemo(() => {
     return items.filter((shipment) => {
       const routeText = `${shipment.origin || shipment.meta?.quote?.origin || ''} ${shipment.destination || shipment.meta?.quote?.destination || ''}`.toLowerCase();
+      const transportText = String(shipment.carrier || shipment.provider || shipment.meta?.quote?.transportType || '').toLowerCase();
       const customerText = String(shipment.meta?.customerEmail || shipment.meta?.customerName || shipment.meta?.quoteId || '').toLowerCase();
       const updated = shipment.updatedAt ? new Date(shipment.updatedAt).getTime() : 0;
       const afterFrom = dateFrom ? updated >= new Date(dateFrom).getTime() : true;
       const beforeTo = dateTo ? updated <= new Date(`${dateTo}T23:59:59`).getTime() : true;
 
       return (!route || routeText.includes(route.toLowerCase()))
+        && (!transport || transportText.includes(transport.toLowerCase()))
         && (!customer || customerText.includes(customer.toLowerCase()))
         && afterFrom
         && beforeTo;
     });
-  }, [items, route, customer, dateFrom, dateTo]);
+  }, [items, route, transport, customer, dateFrom, dateTo]);
 
   const resolvedListError = useMemo(() => {
     if (!error) return null;
@@ -165,6 +169,13 @@ export function ShipmentsPage() {
         <form className="filters" onSubmit={(event) => event.preventDefault()}>
           <Input placeholder="Tracking / quote" value={search} onChange={(event) => { setSearch(event.target.value); setPage(1); }} />
           <Input placeholder="Route (origin/destination)" value={route} onChange={(event) => setRoute(event.target.value)} />
+          <Select value={transport} onChange={(event) => setTransport(event.target.value)}>
+            <option value="">Tous transports</option>
+            <option value="air">Air</option>
+            <option value="sea">Mer</option>
+            <option value="road">Route</option>
+            <option value="internal">Internal</option>
+          </Select>
           <Input placeholder="Client" value={customer} onChange={(event) => setCustomer(event.target.value)} />
           <Input type="date" value={dateFrom} onChange={(event) => setDateFrom(event.target.value)} />
           <Input type="date" value={dateTo} onChange={(event) => setDateTo(event.target.value)} />
@@ -218,6 +229,7 @@ export function ShipmentsPage() {
                 <th>Code</th>
                 <th>Origin/Destination</th>
                 <th>Statut</th>
+                <th>Client / transport</th>
                 <th>Quote source</th>
                 <th>Dernière MAJ</th>
                 <th>Actions</th>
@@ -227,20 +239,21 @@ export function ShipmentsPage() {
               {loading ? (
                 Array.from({ length: 3 }).map((_, index) => (
                   <tr key={`skeleton-${index}`}>
-                    {Array.from({ length: 6 }).map((_, cellIndex) => (
+                    {Array.from({ length: 7 }).map((_, cellIndex) => (
                       <td key={`skeleton-cell-${cellIndex}`}><div className="skeleton" style={{ width: `${60 + cellIndex * 4}%` }} /></td>
                     ))}
                   </tr>
                 ))
               ) : filteredItems.length === 0 ? (
-                <tr><td colSpan={6}><div className="empty-state">Aucun shipment avec ces filtres.</div></td></tr>
+                <tr><td colSpan={7}><div className="empty-state">Aucun shipment avec ces filtres.</div></td></tr>
               ) : (
                 filteredItems.map((shipment) => (
                   <tr key={shipment._id}>
                     <td className="mono">{shipment.trackingCode}</td>
                     <td>{shipment.origin || shipment.meta?.quote?.origin || '—'} → {shipment.destination || shipment.meta?.quote?.destination || '—'}</td>
                     <td><Badge className={resolveStatusClass(shipment.status, shipmentStatusConfig)}>{resolveStatusLabel(shipment.status, shipmentStatusConfig)}</Badge></td>
-                    <td className="mono">{shipment.quoteId}</td>
+                    <td><div className="cell-stack"><strong>{shipment.meta?.customerName || shipment.meta?.customerEmail || '—'}</strong><span className="muted">{shipment.carrier || shipment.provider || shipment.meta?.quote?.transportType || '—'}</span></div></td>
+                    <td className="mono">{shipment.quoteId || shipment.meta?.quoteId || '—'}</td>
                     <td>{formatDate(shipment.updatedAt)}</td>
                     <td>
                       <div className="table-actions">

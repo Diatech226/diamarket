@@ -10,6 +10,9 @@ export type QuoteFiltersProps = {
   search: string;
   customer: string;
   priority: string;
+  transportType: string;
+  origin: string;
+  destination: string;
   dateFrom: string;
   dateTo: string;
   onStatusChange: (value: string) => void;
@@ -17,6 +20,9 @@ export type QuoteFiltersProps = {
   onSearchChange: (value: string) => void;
   onCustomerChange: (value: string) => void;
   onPriorityChange: (value: string) => void;
+  onTransportTypeChange: (value: string) => void;
+  onOriginChange: (value: string) => void;
+  onDestinationChange: (value: string) => void;
   onDateFromChange: (value: string) => void;
   onDateToChange: (value: string) => void;
   onRefresh: () => void;
@@ -25,10 +31,17 @@ export type QuoteFiltersProps = {
 
 const STATUS_OPTIONS = [
   { value: '', label: 'Tous les statuts' },
+  { value: 'requested', label: 'Demandé' },
   { value: 'pending', label: 'En attente' },
+  { value: 'under_review', label: 'En revue' },
+  { value: 'info_requested', label: 'Infos demandées' },
+  { value: 'approved', label: 'Approuvé' },
   { value: 'confirmed', label: 'Confirmé' },
   { value: 'rejected', label: 'Rejeté' },
-  { value: 'dispatched', label: 'Expédié' }
+  { value: 'ready_for_shipment', label: 'Prêt expédition' },
+  { value: 'converted_to_shipment', label: 'Converti shipment' },
+  { value: 'dispatched', label: 'Expédié' },
+  { value: 'cancelled', label: 'Annulé' }
 ];
 
 const PRIORITY_OPTIONS = [
@@ -40,10 +53,10 @@ const PRIORITY_OPTIONS = [
 
 const TABS = [
   { key: 'all', label: 'Tous' },
-  { key: 'pending', label: 'Pending' },
-  { key: 'under_review', label: 'Under review' },
-  { key: 'approved', label: 'Approved' },
-  { key: 'rejected', label: 'Rejected' },
+  { key: 'pending', label: 'En attente' },
+  { key: 'under_review', label: 'En revue' },
+  { key: 'approved', label: 'Approuvés' },
+  { key: 'rejected', label: 'Refusés' },
 ];
 
 export function QuoteFilters({
@@ -52,6 +65,9 @@ export function QuoteFilters({
   search,
   customer,
   priority,
+  transportType,
+  origin,
+  destination,
   dateFrom,
   dateTo,
   onStatusChange,
@@ -59,6 +75,9 @@ export function QuoteFilters({
   onSearchChange,
   onCustomerChange,
   onPriorityChange,
+  onTransportTypeChange,
+  onOriginChange,
+  onDestinationChange,
   onDateFromChange,
   onDateToChange,
   onRefresh,
@@ -102,6 +121,22 @@ export function QuoteFilters({
           placeholder="Client (email ou nom)"
           value={customer}
           onChange={(event) => onCustomerChange(event.target.value)}
+        />
+        <Select value={transportType} onChange={(event) => onTransportTypeChange(event.target.value)}>
+          <option value="">Tous transports</option>
+          <option value="air">Air</option>
+          <option value="sea">Mer</option>
+          <option value="road">Route</option>
+        </Select>
+        <Input
+          placeholder="Origine"
+          value={origin}
+          onChange={(event) => onOriginChange(event.target.value)}
+        />
+        <Input
+          placeholder="Destination"
+          value={destination}
+          onChange={(event) => onDestinationChange(event.target.value)}
         />
         <Select value={priority} onChange={(event) => onPriorityChange(event.target.value)}>
           {PRIORITY_OPTIONS.map((option) => (

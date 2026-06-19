@@ -1,10 +1,22 @@
-export type QuoteStatus = 'pending' | 'confirmed' | 'rejected' | 'dispatched';
+export type QuoteStatus =
+  | 'requested'
+  | 'pending'
+  | 'under_review'
+  | 'info_requested'
+  | 'approved'
+  | 'confirmed'
+  | 'rejected'
+  | 'ready_for_shipment'
+  | 'converted_to_shipment'
+  | 'dispatched'
+  | 'cancelled';
 export type QuotePaymentStatus = 'pending' | 'confirmed' | 'failed';
 export type ShipmentStatus =
   | 'draft'
   | 'created'
   | 'pending_dispatch'
   | 'scheduled'
+  | 'picked_up'
   | 'in_transit'
   | 'delayed'
   | 'at_hub'
@@ -68,7 +80,10 @@ export interface Shipment {
   trackingUpdates?: Array<{ eventType?: string; location?: string; status?: ShipmentStatus; note?: string; timestamp?: string; source?: string; actorId?: string; actorLabel?: string; carrierReference?: string }>;
   timeline?: Array<{ eventType?: string; location?: string; status?: ShipmentStatus; note?: string; timestamp?: string; source?: string; actorId?: string; actorLabel?: string; carrierReference?: string }>;
   meta?: {
-    quote?: { origin?: string; destination?: string; estimatedPrice?: number };
+    quote?: { origin?: string; destination?: string; estimatedPrice?: number; transportType?: string; userEmail?: string; recipientContactName?: string };
+    customerEmail?: string;
+    customerName?: string;
+    quoteId?: string;
     [key: string]: unknown;
   };
   embarkmentId?: string;
