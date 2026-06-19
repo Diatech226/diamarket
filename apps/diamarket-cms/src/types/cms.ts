@@ -295,3 +295,15 @@ export interface UserDetailResponse {
   orders: OrderAdminItem[];
   vendor?: VendorAdminItem | null;
 }
+
+
+export interface AdminAuditLogItem {
+  _id: string;
+  actorId?: string | { _id: string; name?: string; email?: string; role?: string };
+  action: string;
+  resource: string;
+  resourceId?: string;
+  metadata?: unknown;
+  createdAt?: string;
+  updatedAt?: string;
+}

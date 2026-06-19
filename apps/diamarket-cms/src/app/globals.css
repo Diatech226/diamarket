@@ -6,3 +6,21 @@
 body { margin: 0; font-family: Inter, Arial, sans-serif; @apply bg-zinc-50 text-zinc-900 dark:bg-black dark:text-zinc-100; }
 button, a, input, select, textarea { @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-black; }
 button, input, select { min-height: 44px; }
+
+@layer components {
+  .admin-btn { @apply inline-flex min-h-11 items-center justify-center rounded-xl px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 focus-visible:ring-2 focus-visible:ring-olive-600; }
+  .admin-btn-primary { @apply bg-olive-700 text-white shadow-sm hover:bg-olive-800; }
+  .admin-btn-secondary { @apply border border-zinc-200 bg-white text-zinc-800 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100 dark:hover:bg-zinc-900; }
+  .admin-btn-danger { @apply border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-200; }
+  .admin-field { @apply w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 disabled:bg-zinc-100 disabled:text-zinc-500 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100 dark:disabled:bg-zinc-900; }
+  .admin-card { @apply rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-950; }
+  .admin-alert-success { @apply rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950/30 dark:text-emerald-200; }
+  .admin-alert-error { @apply rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950/30 dark:text-red-200; }
+  .admin-empty { @apply rounded-2xl border border-dashed border-zinc-300 bg-white p-8 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-400; }
+}
+
+@media (max-width: 640px) {
+  .admin-sidebar nav { scroll-snap-type: x mandatory; }
+  .admin-sidebar section { scroll-snap-align: start; }
+  table { font-size: 0.8125rem; }
+}

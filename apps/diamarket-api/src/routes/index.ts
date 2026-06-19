@@ -88,6 +88,7 @@ apiRouter.use('/auth', authRouter);
 apiRouter.use(systemRouter);
 apiRouter.use(['/admin', '/cms', '/dashboard'], requireAuth, requireAdmin);
 apiRouter.get('/admin/dashboard', adminController.dashboard);
+apiRouter.get('/admin/audit-logs', adminController.auditLogs);
 apiRouter.get('/admin/products', adminController.products);
 apiRouter.get('/admin/users', adminController.users);
 apiRouter.get('/admin/users/:id', adminController.userById);

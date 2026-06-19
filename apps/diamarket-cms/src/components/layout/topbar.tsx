@@ -24,5 +24,5 @@ export function Topbar() {
     window.location.assign("/login");
   };
 
-  return <header className="flex items-center justify-between border-b border-zinc-200 bg-white px-6 py-4 dark:border-zinc-800 dark:bg-zinc-950"><p className="text-sm text-zinc-500">Administration marketplace</p><div className="flex items-center gap-3"><button onClick={toggle} className="rounded-lg border px-3 py-1.5 text-xs dark:border-zinc-700">{dark ? "☀️ Light" : "🌙 Dark"}</button><button onClick={logout} className="rounded-lg border px-3 py-1.5 text-xs dark:border-zinc-700">Se déconnecter</button></div></header>;
+  return <header className="sticky top-0 z-20 flex flex-col gap-3 border-b border-zinc-200 bg-white/90 px-4 py-3 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/90 sm:flex-row sm:items-center sm:justify-between sm:px-6"><div><p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">Administration marketplace</p><p className="text-xs text-zinc-500">Actions rapides, thèmes et session admin.</p></div><div className="flex flex-wrap items-center gap-2"><button type="button" onClick={toggle} aria-label="Basculer le thème clair ou sombre" className="admin-btn admin-btn-secondary text-xs">{dark ? "☀️ Clair" : "🌙 Sombre"}</button><button type="button" onClick={logout} className="admin-btn admin-btn-danger text-xs">Se déconnecter</button></div></header>;
 }

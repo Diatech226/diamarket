@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { Types } from 'mongoose';
-import { Category, Order, Product, Setting, User, Vendor, VendorRequest } from '../models';
+import { AdminAuditLog, Category, Order, Product, Setting, User, Vendor, VendorRequest } from '../models';
 import { getAuth } from '../middlewares/requireAuth';
 import { logAdminAction } from '../services/admin-audit.service';
 import { getDefaultCommissionRate } from '../services/commission.service';
@@ -64,6 +64,22 @@ function vendorPipeline(match: Record<string, unknown> = {}, sort: Record<string
 }
 
 export const adminController = {
+
+  async auditLogs(req: Request, res: Response) {
+    const page = Math.max(Number(req.query.page || 1), 1);
+    const limit = Math.min(Math.max(Number(req.query.limit || 20), 1), 100);
+    const skip = (page - 1) * limit;
+    const filter: Record<string, unknown> = {};
+    const search = String(req.query.search || '').trim();
+    if (req.query.action) filter.action = new RegExp(String(req.query.action), 'i');
+    if (req.query.resource) filter.resource = new RegExp(String(req.query.resource), 'i');
+    if (search) filter.$or = [{ action: new RegExp(search, 'i') }, { resource: new RegExp(search, 'i') }, { resourceId: new RegExp(search, 'i') }];
+    const [data, total] = await Promise.all([
+      AdminAuditLog.find(filter).populate('actorId', 'name email role').sort({ createdAt: -1 }).skip(skip).limit(limit),
+      AdminAuditLog.countDocuments(filter),
+    ]);
+    return res.json({ success: true, data, meta: { page, limit, total, totalPages: Math.max(Math.ceil(total / limit), 1) } });
+  },
   async dashboard(_req: Request, res: Response) {
     const [products, orders, users, vendors, pendingOrders, pendingVendorRequests, revenue, lowStock] = await Promise.all([
       Product.countDocuments(), Order.countDocuments(), User.countDocuments(), Vendor.countDocuments(),
