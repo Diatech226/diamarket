@@ -25,8 +25,11 @@ const SeoHead = ({
   imageAlt = 'Illustration des services logistiques DiaExpress',
   noIndex = false,
   type = 'website',
+  keywords,
+  canonical,
+  robots,
 }) => {
-  const canonicalUrl = buildCanonicalUrl(path);
+  const canonicalUrl = canonical || buildCanonicalUrl(path);
   const imageUrl = image.startsWith('http') ? image : `${getBaseUrl()}${image}`;
 
   return (
@@ -34,7 +37,8 @@ const SeoHead = ({
       <title>{title}</title>
       <meta name="description" content={description} />
       <link rel="canonical" href={canonicalUrl} />
-      {noIndex ? <meta name="robots" content="noindex,nofollow" /> : <meta name="robots" content="index,follow" />}
+      <meta name="robots" content={robots || (noIndex ? 'noindex,nofollow' : 'index,follow')} />
+      {keywords ? <meta name="keywords" content={Array.isArray(keywords) ? keywords.join(', ') : keywords} /> : null}
 
       <meta property="og:type" content={type} />
       <meta property="og:site_name" content={DEFAULT_SITE_NAME} />
