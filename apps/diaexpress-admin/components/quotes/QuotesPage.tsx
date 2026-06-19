@@ -26,6 +26,9 @@ export function QuotesPage() {
   const [quickView, setQuickView] = useState(() => searchParams.get('view') ?? 'all');
   const [customer, setCustomer] = useState(() => searchParams.get('customer') ?? '');
   const [priority, setPriority] = useState(() => searchParams.get('priority') ?? '');
+  const [transportType, setTransportType] = useState(() => searchParams.get('transport') ?? '');
+  const [origin, setOrigin] = useState(() => searchParams.get('origin') ?? '');
+  const [destination, setDestination] = useState(() => searchParams.get('destination') ?? '');
   const [dateFrom, setDateFrom] = useState(() => searchParams.get('from') ?? '');
   const [dateTo, setDateTo] = useState(() => searchParams.get('to') ?? '');
   const [showCreate, setShowCreate] = useState(false);
@@ -43,6 +46,9 @@ export function QuotesPage() {
     setQuickView(searchParams.get('view') ?? 'all');
     setCustomer(searchParams.get('customer') ?? '');
     setPriority(searchParams.get('priority') ?? '');
+    setTransportType(searchParams.get('transport') ?? '');
+    setOrigin(searchParams.get('origin') ?? '');
+    setDestination(searchParams.get('destination') ?? '');
     setDateFrom(searchParams.get('from') ?? '');
     setDateTo(searchParams.get('to') ?? '');
     if (searchParams.get('create') === '1') {
@@ -92,15 +98,18 @@ export function QuotesPage() {
         return haystack.includes(customer.toLowerCase());
       })
       .filter((quote) => (priority ? getPriority(quote) === priority : true))
+      .filter((quote) => (transportType ? quote.transportType === transportType : true))
+      .filter((quote) => (origin ? String(quote.origin || '').toLowerCase().includes(origin.toLowerCase()) : true))
+      .filter((quote) => (destination ? String(quote.destination || '').toLowerCase().includes(destination.toLowerCase()) : true))
       .filter((quote) => {
         if (quickView === 'all') return true;
-        if (quickView === 'pending') return quote.status === 'pending';
-        if (quickView === 'under_review') return quote.status === 'pending' && Boolean(quote.notes);
-        if (quickView === 'approved') return quote.status === 'confirmed';
+        if (quickView === 'pending') return ['requested', 'pending'].includes(quote.status);
+        if (quickView === 'under_review') return quote.status === 'under_review' || (quote.status === 'pending' && Boolean(quote.notes));
+        if (quickView === 'approved') return ['approved', 'confirmed', 'ready_for_shipment'].includes(quote.status);
         if (quickView === 'rejected') return quote.status === 'rejected';
         return true;
       });
-  }, [items, customer, priority, quickView]);
+  }, [items, customer, priority, transportType, origin, destination, quickView]);
 
   const syncQueryParams = (nextValues: Partial<Record<string, unknown>>) => {
     const merged = {
@@ -112,6 +121,9 @@ export function QuotesPage() {
       priority,
       dateFrom,
       dateTo,
+      transportType,
+      origin,
+      destination,
       ...nextValues
     };
 
@@ -122,6 +134,9 @@ export function QuotesPage() {
       view: merged.quickView && merged.quickView !== 'all' ? merged.quickView : undefined,
       customer: merged.customer || undefined,
       priority: merged.priority || undefined,
+      transport: merged.transportType || undefined,
+      origin: merged.origin || undefined,
+      destination: merged.destination || undefined,
       from: merged.dateFrom || undefined,
       to: merged.dateTo || undefined
     });
@@ -146,7 +161,7 @@ export function QuotesPage() {
   };
 
   const canConvert = (quote: Quote) =>
-    quote.status === 'confirmed' && (!quote.shipmentId || quote.shipmentId === '') && quote.paymentStatus === 'confirmed';
+    ['approved', 'confirmed', 'ready_for_shipment'].includes(quote.status) && (!quote.shipmentId || quote.shipmentId === '');
 
   const handleActionSubmit = async (payload: QuoteActionPayload) => {
     if (!activeAction || !activeQuote) return;
@@ -187,7 +202,7 @@ export function QuotesPage() {
 
       if (activeAction === 'convert') {
         if (!canConvert(activeQuote)) {
-          throw new Error('Le devis doit être confirmé et payé avant conversion.');
+          throw new Error('Le devis doit être approuvé/prêt et non encore converti.');
         }
         const result = await convertQuoteToShipment(activeQuote._id);
         const trackingCode = result?.shipment?.trackingCode;
@@ -251,6 +266,9 @@ export function QuotesPage() {
         search={search}
         customer={customer}
         priority={priority}
+        transportType={transportType}
+        origin={origin}
+        destination={destination}
         dateFrom={dateFrom}
         dateTo={dateTo}
         onStatusChange={(value) => {
@@ -282,6 +300,24 @@ export function QuotesPage() {
           setPriority(value);
           setPage(1);
           syncQueryParams({ priority: value, page: 1 });
+        }}
+        onTransportTypeChange={(value) => {
+          resetFeedback();
+          setTransportType(value);
+          setPage(1);
+          syncQueryParams({ transportType: value, page: 1 });
+        }}
+        onOriginChange={(value) => {
+          resetFeedback();
+          setOrigin(value);
+          setPage(1);
+          syncQueryParams({ origin: value, page: 1 });
+        }}
+        onDestinationChange={(value) => {
+          resetFeedback();
+          setDestination(value);
+          setPage(1);
+          syncQueryParams({ destination: value, page: 1 });
         }}
         onDateFromChange={(value) => {
           resetFeedback();

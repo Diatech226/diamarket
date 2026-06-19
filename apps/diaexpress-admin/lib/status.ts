@@ -5,11 +5,18 @@ export type StatusConfig = {
   className: string;
 };
 
-export const quoteStatusConfig: Record<Quote['status'], StatusConfig> = {
+export const quoteStatusConfig: Record<string, StatusConfig> = {
+  requested: { label: 'Demandé', className: 'badge--warning' },
   pending: { label: 'En attente', className: 'badge--warning' },
+  under_review: { label: 'En revue', className: 'badge--info' },
+  info_requested: { label: 'Infos demandées', className: 'badge--orange' },
+  approved: { label: 'Approuvé', className: 'badge--success' },
   confirmed: { label: 'Confirmé', className: 'badge--success' },
   rejected: { label: 'Rejeté', className: 'badge--danger' },
+  ready_for_shipment: { label: 'Prêt expédition', className: 'badge--primary' },
+  converted_to_shipment: { label: 'Converti shipment', className: 'badge--secondary' },
   dispatched: { label: 'Expédié', className: 'badge--info' },
+  cancelled: { label: 'Annulé', className: 'badge--danger' },
 };
 
 export const shipmentStatusConfig: Record<Shipment['status'], StatusConfig> = {
@@ -17,6 +24,7 @@ export const shipmentStatusConfig: Record<Shipment['status'], StatusConfig> = {
   created: { label: 'Créé', className: 'badge--primary' },
   pending_dispatch: { label: 'En attente dispatch', className: 'badge--warning' },
   scheduled: { label: 'Planifié', className: 'badge--secondary' },
+  picked_up: { label: 'Collecté', className: 'badge--primary' },
   in_transit: { label: 'En transit', className: 'badge--info' },
   delayed: { label: 'Retardé', className: 'badge--orange' },
   at_hub: { label: 'Au hub', className: 'badge--secondary' },

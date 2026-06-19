@@ -204,6 +204,43 @@ export async function createQuote(payload: CreateQuotePayload) {
   return data?.quote;
 }
 
+
+export async function updateQuoteStatus(id: string, status: Quote['status'], payload: { note?: string; reason?: string } = {}): Promise<Quote> {
+  const data = await apiClient<{ quote?: Quote } | Quote>(`/api/quotes/${id}/status`, {
+    method: 'PATCH',
+    json: { status, ...payload }
+  });
+
+  return 'quote' in data && data.quote ? data.quote : (data as Quote);
+}
+
+export async function markQuoteUnderReview(id: string, note?: string): Promise<Quote> {
+  try {
+    const data = await apiClient<{ quote: Quote }>(`/api/quotes/${id}/review`, { method: 'POST', json: note ? { note } : {} });
+    return data.quote;
+  } catch {
+    return updateQuoteStatus(id, 'under_review', { note });
+  }
+}
+
+export async function requestQuoteInfo(id: string, message?: string): Promise<Quote> {
+  try {
+    const data = await apiClient<{ quote: Quote }>(`/api/quotes/${id}/request-info`, { method: 'POST', json: message ? { message } : {} });
+    return data.quote;
+  } catch {
+    return updateQuoteStatus(id, 'info_requested', { note: message });
+  }
+}
+
+export async function markQuoteReadyForShipment(id: string): Promise<Quote> {
+  try {
+    const data = await apiClient<{ quote: Quote }>(`/api/quotes/${id}/ready-for-shipment`, { method: 'POST' });
+    return data.quote;
+  } catch {
+    return updateQuoteStatus(id, 'ready_for_shipment');
+  }
+}
+
 export async function confirmQuote(
   id: string,
   payload: { finalPrice?: number; currency?: string } = {}
@@ -223,6 +260,10 @@ export async function rejectQuote(id: string, reason?: string): Promise<Quote> {
   });
 
   return data.quote;
+}
+
+export async function deleteQuote(id: string) {
+  return apiClient<{ success?: boolean }>(`/api/quotes/${id}`, { method: 'DELETE' });
 }
 
 export async function convertQuoteToShipment(id: string) {

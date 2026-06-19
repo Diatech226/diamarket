@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/ui/page-header';
 import { QuoteStatusBadge } from '@/components/quotes/QuoteStatusBadge';
-import { confirmQuote, convertQuoteToShipment, fetchQuoteById, rejectQuote } from '@/lib/api/quotes';
+import { confirmQuote, convertQuoteToShipment, deleteQuote, fetchQuoteById, markQuoteReadyForShipment, markQuoteUnderReview, rejectQuote, requestQuoteInfo } from '@/lib/api/quotes';
 import { formatCurrency, formatDate, toTitle } from '@/src/lib/format';
 import type { Quote } from '@/src/types/logistics';
 
@@ -18,7 +18,7 @@ export default function QuoteDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [actionMessage, setActionMessage] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
-  const [busyAction, setBusyAction] = useState<'confirm' | 'reject' | 'convert' | null>(null);
+  const [busyAction, setBusyAction] = useState<'review' | 'info' | 'confirm' | 'ready' | 'reject' | 'convert' | 'delete' | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -49,34 +49,56 @@ export default function QuoteDetailPage() {
     ].filter(Boolean) as Array<{ label: string; date: string }>;
   }, [quote]);
 
-  const handleConfirm = async () => {
-    if (!quote) return;
+  const runAction = async (key: NonNullable<typeof busyAction>, success: string, action: () => Promise<Quote | void>) => {
     try {
-      setBusyAction('confirm');
+      setBusyAction(key);
       setActionError(null);
-      const updated = await confirmQuote(quote._id, { finalPrice: quote.finalPrice ?? quote.estimatedPrice });
-      setQuote(updated);
-      setActionMessage('Devis approuvé.');
+      const updated = await action();
+      if (updated) setQuote(updated);
+      setActionMessage(success);
+      await load();
     } catch (err) {
-      setActionError((err as Error).message || 'Impossible de confirmer le devis.');
+      setActionError((err as Error).message || 'Action impossible sur ce devis.');
     } finally {
       setBusyAction(null);
     }
   };
 
+  const handleReview = async () => {
+    if (!quote) return;
+    await runAction('review', 'Devis marqué en revue.', () => markQuoteUnderReview(quote._id, 'Revue admin démarrée.'));
+  };
+
+  const handleRequestInfo = async () => {
+    if (!quote) return;
+    const message = window.prompt('Informations à demander au client', 'Merci de compléter les dimensions, le poids ou les documents manquants.');
+    if (message === null) return;
+    await runAction('info', 'Demande d’information enregistrée.', () => requestQuoteInfo(quote._id, message));
+  };
+
+  const handleConfirm = async () => {
+    if (!quote) return;
+await runAction('confirm', 'Devis approuvé.', () => confirmQuote(quote._id, { finalPrice: quote.finalPrice ?? quote.estimatedPrice }));
+  };
+
   const handleReject = async () => {
     if (!quote) return;
-    try {
-      setBusyAction('reject');
-      setActionError(null);
-      const updated = await rejectQuote(quote._id, 'Rejet opéré depuis la fiche devis admin');
-      setQuote(updated);
-      setActionMessage('Devis rejeté.');
-    } catch (err) {
-      setActionError((err as Error).message || 'Impossible de rejeter le devis.');
-    } finally {
-      setBusyAction(null);
-    }
+if (!window.confirm('Refuser définitivement ce devis ?')) return;
+    await runAction('reject', 'Devis rejeté.', () => rejectQuote(quote._id, 'Rejet opéré depuis la fiche devis admin'));
+  };
+
+  const handleReady = async () => {
+    if (!quote) return;
+    await runAction('ready', 'Devis prêt pour expédition.', () => markQuoteReadyForShipment(quote._id));
+  };
+
+  const handleDelete = async () => {
+    if (!quote) return;
+    if (!window.confirm('Supprimer ce devis ? Cette action est sensible.')) return;
+    await runAction('delete', 'Devis supprimé.', async () => {
+      await deleteQuote(quote._id);
+      router.push('/admin/quotes');
+    });
   };
 
   const handleConvert = async () => {
@@ -125,7 +147,17 @@ export default function QuoteDetailPage() {
                 <QuoteStatusBadge status={quote.status} />
               </div>
               <div className="panel__actions">
-                {quote.status === 'pending' ? (
+                {!['under_review', 'approved', 'confirmed', 'ready_for_shipment', 'converted_to_shipment', 'rejected', 'cancelled'].includes(quote.status) ? (
+                  <Button variant="ghost" onClick={handleReview} disabled={busyAction === 'review'}>
+                    {busyAction === 'review' ? 'Revue...' : 'Marquer en revue'}
+                  </Button>
+                ) : null}
+                {!['approved', 'confirmed', 'ready_for_shipment', 'converted_to_shipment', 'rejected', 'cancelled'].includes(quote.status) ? (
+                  <Button variant="ghost" onClick={handleRequestInfo} disabled={busyAction === 'info'}>
+                    {busyAction === 'info' ? 'Envoi...' : 'Demander infos'}
+                  </Button>
+                ) : null}
+                {['requested', 'pending', 'under_review', 'info_requested'].includes(quote.status) ? (
                   <Button variant="secondary" onClick={handleConfirm} disabled={busyAction === 'confirm'}>
                     {busyAction === 'confirm' ? 'Validation...' : 'Approuver'}
                   </Button>
@@ -135,9 +167,19 @@ export default function QuoteDetailPage() {
                     {busyAction === 'reject' ? 'Rejet...' : 'Rejeter'}
                   </Button>
                 ) : null}
-                {quote.status === 'confirmed' ? (
+                {['approved', 'confirmed'].includes(quote.status) ? (
+                  <Button variant="secondary" onClick={handleReady} disabled={busyAction === 'ready'}>
+                    {busyAction === 'ready' ? 'MAJ...' : 'Prêt expédition'}
+                  </Button>
+                ) : null}
+                {['approved', 'confirmed', 'ready_for_shipment'].includes(quote.status) ? (
                   <Button variant="primary" onClick={handleConvert} disabled={busyAction === 'convert'}>
                     {busyAction === 'convert' ? 'Conversion...' : 'Convertir en shipment'}
+                  </Button>
+                ) : null}
+                {!['converted_to_shipment'].includes(quote.status) ? (
+                  <Button variant="ghost" onClick={handleDelete} disabled={busyAction === 'delete'}>
+                    {busyAction === 'delete' ? 'Suppression...' : 'Supprimer'}
                   </Button>
                 ) : null}
               </div>
@@ -171,6 +213,18 @@ export default function QuoteDetailPage() {
                   <p className="muted">{formatDate(item.date)}</p>
                 </div>
               )) : <div className="empty-state">Aucun événement de timeline.</div>}
+            </div>
+          </div>
+
+          <div className="panel">
+            <div className="panel__title">Colis, dimensions et documents</div>
+            <div className="summary-grid">
+              <div><strong>Poids</strong><p>{quote.weight ?? '—'} kg</p></div>
+              <div><strong>Volume</strong><p>{quote.volume ?? '—'} m³</p></div>
+              <div><strong>Dimensions</strong><p>{quote.length ?? '—'} × {quote.width ?? '—'} × {quote.height ?? '—'} cm</p></div>
+              <div><strong>Paiement</strong><p>{quote.paymentStatus || '—'}</p></div>
+              <div><strong>Shipment lié</strong><p className="mono">{quote.shipmentId || quote.trackingNumber || '—'}</p></div>
+              <div><strong>Documents</strong><p>Non renseignés par l’API actuelle</p></div>
             </div>
           </div>
 
