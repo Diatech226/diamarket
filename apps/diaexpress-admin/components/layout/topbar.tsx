@@ -34,9 +34,9 @@ export function Topbar({ title, onMenuClick }: { title: string; onMenuClick: () 
         <Link className="button button--ghost" href="/admin/expeditions#embarkment-form">
           Nouvel embarquement
         </Link>
-        <button className="icon-button" aria-label="Recherche globale">
+        <Link className="icon-button" aria-label="Recherche globale" href="/admin/search">
           <Search size={18} />
-        </button>
+        </Link>
         <button className="icon-button" aria-label="Notifications">
           <Bell size={18} />
         </button>

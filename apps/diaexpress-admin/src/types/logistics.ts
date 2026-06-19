@@ -83,6 +83,10 @@ export interface Shipment {
     quote?: { origin?: string; destination?: string; estimatedPrice?: number; transportType?: string; userEmail?: string; recipientContactName?: string };
     customerEmail?: string;
     customerName?: string;
+    source?: string;
+    operatorId?: string;
+    hubId?: string;
+    planning?: string;
     quoteId?: string;
     [key: string]: unknown;
   };
