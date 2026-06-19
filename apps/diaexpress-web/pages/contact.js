@@ -2,6 +2,7 @@ import React from 'react';
 import SeoHead from '../src/components/seo/SeoHead';
 import { ANALYTICS_EVENTS, trackEvent } from '../src/lib/analytics/trackEvent';
 import { contactContent, contactSeo } from '../src/content/public/contactContent';
+import { getPublicSiteSettings } from '../src/api/cms';
 import {
   ContactFormCard,
   ContactInfoCard,
@@ -14,7 +15,15 @@ import {
   useRevealOnScroll,
 } from '../src/components/marketing/PublicPageSections';
 
-export default function ContactPage() {
+function ContactPage({ settings = null }) {
+  const pageSeo = settings?.seo?.find?.((item) => item.page === 'contact') || {};
+  const cmsInfo = [
+    settings?.supportPhone && { label: 'Téléphone', value: settings.supportPhone },
+    settings?.supportEmail && { label: 'Email', value: settings.supportEmail },
+    settings?.whatsapp && { label: 'WhatsApp', value: settings.whatsapp },
+    settings?.address && { label: 'Adresse', value: settings.address },
+    settings?.openingHours && { label: 'Horaires', value: settings.openingHours },
+  ].filter(Boolean);
   useRevealOnScroll();
   const [form, setForm] = React.useState(contactContent.initialForm);
   const [status, setStatus] = React.useState('idle');
@@ -28,11 +37,11 @@ export default function ContactPage() {
 
   return (
     <PublicBackgroundVisual>
-      <SeoHead {...contactSeo} />
+      <SeoHead {...contactSeo} title={pageSeo.metaTitle || contactSeo.title} description={pageSeo.metaDescription || contactSeo.description} image={pageSeo.openGraphImage || contactSeo.image} keywords={pageSeo.keywords} canonical={pageSeo.canonical} robots={pageSeo.robots} />
       <PublicPageHero eyebrow="Contact" title="Contactez DiaExpress" subtitle="Une équipe disponible pour vos demandes de devis, suivi et assistance opérationnelle." pills={contactContent.heroPills} />
 
       <PublicSection title="Nos canaux de contact" description="Choisissez le canal le plus rapide selon votre besoin.">
-        <div className={styles.grid}>{contactContent.info.map((item) => <ContactInfoCard key={item.label} item={item} />)}</div>
+        <div className={styles.grid}>{(cmsInfo.length ? cmsInfo : contactContent.info).map((item) => <ContactInfoCard key={item.label} item={item} />)}</div>
       </PublicSection>
 
       <PublicSection title="Formulaire de contact" description="Formulaire frontend statique (aucun endpoint backend contact détecté).">
@@ -45,3 +54,6 @@ export default function ContactPage() {
     </PublicBackgroundVisual>
   );
 }
+
+export async function getServerSideProps() { const settings = await getPublicSiteSettings(); return { props: { settings } }; }
+export default ContactPage;

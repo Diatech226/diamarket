@@ -181,6 +181,7 @@ const requireMongoConnection = (req, res, next) => {
 app.use(requireMongoConnection);
 
 // Routes
+app.use('/api', require('./routes/cms'));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/users', require('./routes/user'));
 app.use('/api/quotes', require('./routes/quotes'));

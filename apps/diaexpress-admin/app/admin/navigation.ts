@@ -48,6 +48,9 @@ export const navGroups: NavGroup[] = [
       { href: '/admin/users', label: 'Users', icon: Users },
       { href: '/admin/payments', label: 'Payments', icon: CreditCard },
       { href: '/admin/cms', label: 'CMS', icon: FilePenLine },
+      { href: '/admin/services', label: 'Services CMS', icon: Box },
+      { href: '/admin/popular-routes', label: 'Popular Routes', icon: Route },
+      { href: '/admin/faq', label: 'FAQ', icon: FilePenLine },
       { href: '/admin/settings', label: 'Settings', icon: Settings },
     ]
   },
