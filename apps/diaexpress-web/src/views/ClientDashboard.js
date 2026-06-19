@@ -1,132 +1,20 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useBackendAuth } from '../auth/useBackendAuth';
 import Link from 'next/link';
-import { buildApiUrl } from '../api/api';
-import { normaliseCountry } from '../utils/addressValidation';
+import { useBackendAuth } from '../auth/useBackendAuth';
+import { fetchAddresses } from '../api/addresses';
+import { myPayments } from '../api/payment';
+import { fetchClientQuotes, fetchClientShipments } from '../api/logistics';
+import { StatusPill } from '../components/client/status';
+import { amountOf, formatDate, formatDateTime, idOf, money, refOf, routeOf } from '../components/client/format';
 
 const ClientDashboard = () => {
   const { getToken } = useBackendAuth();
-  const [quotes, setQuotes] = useState([]);
-  const [shipments, setShipments] = useState([]);
-  const [addresses, setAddresses] = useState([]);
-  const [error, setError] = useState('');
-
-  const fetchData = useCallback(async () => {
-    try {
-      const token = await getToken();
-      const [quoteRes, shipRes, addressRes] = await Promise.all([
-        fetch(buildApiUrl('/api/quotes/my'), {
-          headers: { Authorization: `Bearer ${token}` }
-        }),
-        fetch(buildApiUrl('/api/shipments/my'), {
-          headers: { Authorization: `Bearer ${token}` }
-        }),
-        fetch(buildApiUrl('/api/addresses'), {
-          headers: { Authorization: `Bearer ${token}` }
-        })
-      ]);
-      const quoteData = await quoteRes.json();
-      const shipData = await shipRes.json();
-      const addressData = await addressRes.json();
-
-      if (!quoteRes.ok || !shipRes.ok || !addressRes.ok) throw new Error('Erreur chargement données');
-
-      setQuotes(quoteData.quotes || []);
-      setShipments(shipData.shipments || []);
-      const list = Array.isArray(addressData?.addresses)
-        ? addressData.addresses
-        : Array.isArray(addressData)
-        ? addressData
-        : [];
-      setAddresses(list);
-      setError('');
-    } catch (err) {
-      setError('❌ Erreur de chargement : ' + err.message);
-    }
-  }, [getToken]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
-  const handleCreateShipment = async (quoteId) => {
-    try {
-      const token = await getToken();
-      const res = await fetch(buildApiUrl('/api/shipments'), {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({ quoteId })
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message);
-      alert("✅ Envoi créé !");
-      fetchData();
-    } catch (err) {
-      alert("❌ Erreur création d'envoi : " + err.message);
-    }
-  };
-
-  const lastAddress = useMemo(() => {
-    if (!addresses.length) return null;
-    return [...addresses].sort((a, b) => {
-      const dateA = new Date(a.updatedAt || a.createdAt || 0).getTime();
-      const dateB = new Date(b.updatedAt || b.createdAt || 0).getTime();
-      return dateB - dateA;
-    })[0];
-  }, [addresses]);
-
-  return (
-    <div className="client-dashboard">
-      <section className="address-summary">
-        <h2>📇 Mes adresses rapides</h2>
-        {lastAddress ? (
-          <div className="address-summary-card">
-            <p><strong>{lastAddress.label || 'Adresse sans libellé'}</strong></p>
-            <p>{lastAddress.line1}</p>
-            {lastAddress.line2 && <p>{lastAddress.line2}</p>}
-            <p>
-              {lastAddress.postalCode} {lastAddress.city}{' '}
-              {normaliseCountry(lastAddress.country)}
-            </p>
-            {lastAddress.phone && <p>📞 {lastAddress.phone}</p>}
-          </div>
-        ) : (
-          <p>Aucune adresse sauvegardée pour le moment.</p>
-        )}
-        <Link href="/profile/addresses" className="address-summary-link">Gérer mes adresses</Link>
-      </section>
-
-      <h2>📄 Mes Devis</h2>
-      <p style={{ marginBottom: '1rem' }}>
-        💳 <Link href="/payments">Voir mes paiements</Link>
-      </p>
-      {quotes.length === 0 && <p>Aucun devis trouvé.</p>}
-      {quotes.map(q => (
-        <div key={q._id} className="quote-item">
-          <p><strong>{q.productType}</strong> – {q.origin} → {q.destination}</p>
-          <p>📦 Transport : {q.transportType} – 💰 {q.price} €</p>
-          {!shipments.find(s => s.quoteId === q._id || s.quoteId?._id === q._id) && (
-            <button onClick={() => handleCreateShipment(q._id)}>Créer un envoi 📦</button>
-          )}
-        </div>
-      ))}
-
-      <h2>🚚 Mes Envois</h2>
-      {shipments.length === 0 && <p>Aucun envoi trouvé.</p>}
-      {shipments.map(s => (
-        <div key={s._id} className="shipment-item">
-          <p><strong>Tracking :</strong> {s.trackingCode}</p>
-          <p><strong>Statut :</strong> {s.status}</p>
-        </div>
-      ))}
-
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-    </div>
-  );
+  const [data, setData] = useState({ quotes: [], shipments: [], addresses: [], payments: [] });
+  const [loading, setLoading] = useState(true); const [error, setError] = useState(''); const [trackingCode, setTrackingCode] = useState('');
+  const load = useCallback(async () => { setLoading(true); setError(''); try { const token = await getToken(); const [quotes, shipments, addresses, paymentsPayload] = await Promise.all([fetchClientQuotes(token), fetchClientShipments(token), fetchAddresses(token).catch(() => []), myPayments(token).catch(() => ({ payments: [] }))]); setData({ quotes, shipments, addresses, payments: Array.isArray(paymentsPayload) ? paymentsPayload : paymentsPayload?.payments || [] }); } catch (e) { setError(e.message || 'Erreur de chargement du dashboard.'); } finally { setLoading(false); } }, [getToken]);
+  useEffect(() => { load(); }, [load]);
+  const summary = useMemo(() => { const pendingQuotes = data.quotes.filter((q) => ['requested', 'under_review', 'info_requested'].includes(String(q.status || '').toLowerCase())).length; const delivered = data.shipments.filter((s) => String(s.status || '').toLowerCase() === 'delivered').length; const active = data.shipments.filter((s) => !['delivered', 'cancelled', 'returned'].includes(String(s.status || '').toLowerCase())).length; const pendingPayments = data.payments.filter((p) => String(p.status || p.state || '').toLowerCase().includes('pending')).length; const movements = [...data.quotes.map((q) => ({ type: 'Devis', label: refOf(q, 'DEV'), status: q.status, date: q.updatedAt || q.createdAt, href: `/account/quotes/${idOf(q)}` })), ...data.shipments.map((s) => ({ type: 'Expédition', label: refOf(s, 'TRK'), status: s.status, date: s.updatedAt || s.createdAt, href: `/account/shipments/${idOf(s)}` }))].sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0)).slice(0, 6); return { pendingQuotes, delivered, active, pendingPayments, movements }; }, [data]);
+  const goTrack = (e) => { e.preventDefault(); if (trackingCode.trim()) window.location.href = `/track-shipment?code=${encodeURIComponent(trackingCode.trim())}`; };
+  return <main className="dx-dashboard-shell"><div className="dx-dashboard"><header className="dx-dashboard__header"><span className="dx-dashboard__eyebrow">DiaExpress · portail client</span><h1 className="dx-dashboard__title">Dashboard client</h1><p className="dx-dashboard__subtitle">Un espace self-service pour suivre devis, expéditions, paiements, adresses et mouvements.</p><div className="dx-dashboard__actions"><Link href="/quote-request" className="dx-button dx-button--primary">Nouveau devis</Link><Link href="/track-shipment" className="dx-button dx-button--outline">Tracking public</Link></div></header>{loading && <div className="dx-empty">Chargement de votre espace…</div>}{error && <div className="dx-empty dx-empty--error">{error}<button className="dx-button dx-button--sm" onClick={load}>Réessayer</button></div>}{!loading && !error && <><section className="dx-grid dx-grid--four"><article className="dx-card"><p>Nombre devis</p><strong className="dx-card__value">{data.quotes.length}</strong></article><article className="dx-card"><p>Devis en attente</p><strong className="dx-card__value">{summary.pendingQuotes}</strong></article><article className="dx-card"><p>Expéditions actives</p><strong className="dx-card__value">{summary.active}</strong></article><article className="dx-card"><p>Livrées / paiements attente</p><strong className="dx-card__value">{summary.delivered} / {summary.pendingPayments}</strong></article></section><section className="dx-grid dx-grid--two"><article className="dx-card"><h2>Devis récents</h2>{data.quotes.slice(0, 4).map((q) => { const r = routeOf(q); return <p key={idOf(q)}><Link href={`/account/quotes/${idOf(q)}`}>{refOf(q, 'DEV')}</Link> · {r.origin} → {r.destination} · <StatusPill type="quote" status={q.status} /></p>; })}{!data.quotes.length && <p>Aucun devis.</p>}<Link className="dx-button dx-button--sm dx-button--outline" href="/account/quotes">Voir tous</Link></article><article className="dx-card"><h2>Shipments récents</h2>{data.shipments.slice(0, 4).map((s) => <p key={idOf(s)}><Link href={`/account/shipments/${idOf(s)}`}>{refOf(s, 'TRK')}</Link> · <StatusPill status={s.status} /> · {formatDate(s.updatedAt)}</p>)}{!data.shipments.length && <p>Aucune expédition.</p>}<Link className="dx-button dx-button--sm dx-button--outline" href="/account/shipments">Voir toutes</Link></article></section><section className="dx-grid dx-grid--two"><article className="dx-card"><h2>Tracking rapide</h2><form onSubmit={goTrack} className="dx-filterbar"><input className="dx-input" value={trackingCode} onChange={(e) => setTrackingCode(e.target.value)} placeholder="Code tracking" /><button className="dx-button dx-button--primary">Suivre</button></form></article><article className="dx-card"><h2>Notifications</h2><ul><li>Nouveau devis · prêt à être traité</li><li>Devis approuvé · paiement disponible</li><li>Shipment créé · tracking activé</li><li>Shipment en transit / livré · timeline mise à jour</li><li>Paiement reçu · reçu dans l’historique</li></ul></article></section><section className="dx-section"><h2>Derniers mouvements</h2>{summary.movements.length ? <ol className="dx-timeline">{summary.movements.map((m, i) => <li key={`${m.type}-${m.label}-${i}`}><strong>{m.type} · <Link href={m.href}>{m.label}</Link></strong><p>{m.status || 'Mise à jour'}</p><small>{formatDateTime(m.date)}</small></li>)}</ol> : <div className="dx-empty">Aucun mouvement récent.</div>}</section><section className="dx-grid dx-grid--three"><article className="dx-card"><h2>Adresses</h2><p>{data.addresses.length} adresse(s) enregistrée(s)</p><Link href="/account/addresses" className="dx-button dx-button--sm dx-button--outline">Gérer</Link></article><article className="dx-card"><h2>Paiements</h2><p>{data.payments.length} transaction(s) · {data.payments[0] ? money(amountOf(data.payments[0]), data.payments[0].currency || 'EUR') : '—'}</p><Link href="/account/payments" className="dx-button dx-button--sm dx-button--outline">Historique</Link></article><article className="dx-card"><h2>Self-service</h2><p>Accès rapide devis, expéditions, adresses et paiements.</p><Link href="/account/quotes" className="dx-button dx-button--sm dx-button--primary">Commencer</Link></article></section></>}</div></main>;
 };
-
 export default ClientDashboard;
