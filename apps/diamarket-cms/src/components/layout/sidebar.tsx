@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 
 const groups = [
   { title: "Pilotage", links: [{ href: "/dashboard", label: "Dashboard" }, { href: "/orders", label: "Commandes" }, { href: "/audit-logs", label: "Audit logs" }] },
-  { title: "Catalogue", links: [{ href: "/products", label: "Produits" }, { href: "/categories", label: "Catégories" }, { href: "/media", label: "Médiathèque" }, { href: "/slides", label: "Slides" }] },
+  { title: "Catalogue", links: [{ href: "/products", label: "Produits" }, { href: "/categories", label: "Catégories" }, { href: "/media", label: "Médiathèque" }, { href: "/slides", label: "Slides" }, { href: "/team", label: "Équipe" }] },
   { title: "Marchands", links: [{ href: "/vendors", label: "Vendeurs" }, { href: "/users", label: "Utilisateurs" }] },
   { title: "Configuration", links: [{ href: "/settings", label: "Settings" }, { href: "/currencies", label: "Devises & commissions" }, { href: "/shipping", label: "Shipping" }, { href: "/focal-points", label: "Points focaux", disabled: true }] },
 ];

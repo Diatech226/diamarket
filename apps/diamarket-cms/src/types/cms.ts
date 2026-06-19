@@ -307,3 +307,23 @@ export interface AdminAuditLogItem {
   createdAt?: string;
   updatedAt?: string;
 }
+
+export interface TeamMemberItem {
+  _id?: string;
+  id?: string;
+  name: string;
+  role?: string;
+  bio?: string;
+  photo?: string;
+  email?: string;
+  phone?: string;
+  contact?: string;
+  whatsapp?: string;
+  socialLinks?: Record<string, string>;
+  status?: 'draft' | 'active' | 'inactive' | 'archived';
+  position?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export type TeamMemberPayload = Pick<TeamMemberItem, 'name' | 'role' | 'bio' | 'photo' | 'email' | 'phone' | 'contact' | 'socialLinks' | 'status' | 'whatsapp'>;

@@ -25,3 +25,6 @@ export interface Order {
   checkoutUrl?: string;
   trackingNumber?: string;
 }
+
+
+export interface TeamMember { id: string; name: string; role?: string; bio?: string; photo?: string; email?: string; phone?: string; contact?: string; whatsapp?: string; socialLinks?: Record<string, string>; status?: string; }

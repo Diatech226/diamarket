@@ -1,5 +1,5 @@
 import { api, endpoints } from "@/lib/api";
-import type { ApiCollection, ApiItem, CategoryItem, CategoryPayload, CollectionQuery, MediaAsset, OrderAdminItem, ProductItem, ProductPayload, Project, ProjectPayload, SlideItem, SlidePayload, VendorAdminItem, VendorDetailResponse, VendorRequestItem, AdminUserItem, UserDetailResponse, AdminAuditLogItem } from "@/types/cms";
+import type { ApiCollection, ApiItem, CategoryItem, CategoryPayload, CollectionQuery, MediaAsset, OrderAdminItem, ProductItem, ProductPayload, Project, ProjectPayload, SlideItem, SlidePayload, VendorAdminItem, VendorDetailResponse, VendorRequestItem, AdminUserItem, UserDetailResponse, AdminAuditLogItem, TeamMemberItem, TeamMemberPayload } from "@/types/cms";
 
 function toQueryString(query?: CollectionQuery) {
   const params = new URLSearchParams();
@@ -56,6 +56,10 @@ export const cmsService = {
   updateCategory: (id: string, payload: Partial<CategoryPayload>) => api.put<ApiItem<CategoryItem>>(`${endpoints.categories}/${id}`, payload),
   deleteCategory: (id: string) => api.delete<void>(`${endpoints.categories}/${id}`),
   getSlides: () => fetchCollection<SlideItem>(endpoints.slides),
+  getTeam: () => fetchCollection<TeamMemberItem>(endpoints.team),
+  createTeamMember: (payload: TeamMemberPayload) => api.post<ApiItem<TeamMemberItem>>(endpoints.team, payload),
+  updateTeamMember: (id: string, payload: Partial<TeamMemberPayload>) => api.patch<ApiItem<TeamMemberItem>>(`${endpoints.team}/${id}`, payload),
+  deleteTeamMember: (id: string) => api.delete<void>(`${endpoints.team}/${id}`),
   createSlide: (payload: SlidePayload) => api.post<ApiItem<SlideItem>>(endpoints.slides, payload),
   updateSlide: (id: string, payload: Partial<SlidePayload>) => api.put<ApiItem<SlideItem>>(`${endpoints.slides}/${id}`, payload),
   deleteSlide: (id: string) => api.delete<void>(`${endpoints.slides}/${id}`),
