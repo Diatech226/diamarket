@@ -1,0 +1,1 @@
+function Robots(){return null}export async function getServerSideProps({res}){const site=process.env.NEXT_PUBLIC_SITE_URL||'https://www.diaexpress.com';res.setHeader('Content-Type','text/plain');res.write(`User-agent: *\nAllow: /\nSitemap: ${site}/sitemap.xml\n`);res.end();return {props:{}}}export default Robots;

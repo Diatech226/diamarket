@@ -572,3 +572,5 @@
   background: rgba(31, 95, 58, 0.16);
   border-color: rgba(31, 95, 58, 0.36);
 }
+.quickEstimate{margin:2rem 0;padding:1.5rem;border:1px solid rgba(15,95,255,.18);border-radius:24px;background:linear-gradient(135deg,#fff,#eef6ff);box-shadow:0 18px 50px rgba(7,20,43,.08)}
+.estimateGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem;margin:1rem 0}.estimateGrid label{display:flex;flex-direction:column;font-weight:700;color:#16315c}.estimateGrid input,.estimateGrid select{margin-top:.4rem;border:1px solid #cbd5e1;border-radius:12px;padding:.75rem}.estimateResult{display:flex;gap:1rem;align-items:center;flex-wrap:wrap}.estimateResult strong{font-size:1.25rem;color:#0b3b85}.estimateResult span{color:#475569}@media(max-width:800px){.estimateGrid{grid-template-columns:1fr}}

@@ -1,0 +1,1 @@
+import { PageHeader } from '@/components/ui/page-header';import { CmsCrud } from '@/components/cms/CmsForms';export default function Page(){return <div className="page-stack"><PageHeader title="Newsletter" description="Abonnés, campagnes et historique prêt pour futur envoi email."/><CmsCrud resource="newsletter/subscribers"/><CmsCrud resource="newsletter/campaigns"/></div>}
