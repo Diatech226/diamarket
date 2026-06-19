@@ -56,6 +56,59 @@ const faqSchema = new mongoose.Schema({
   isActive: { type: Boolean, default: true },
 }, { timestamps: true });
 
+
+const testimonialSchema = new mongoose.Schema({
+  client: { type: String, required: true },
+  photo: String,
+  company: String,
+  comment: { type: String, required: true },
+  rating: { type: Number, default: 5, min: 1, max: 5 },
+  isActive: { type: Boolean, default: true },
+  displayOrder: { type: Number, default: 0 },
+}, { timestamps: true });
+
+const caseStudySchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  category: { type: String, default: 'fret commercial' },
+  summary: { type: String, default: '' },
+  result: String,
+  route: String,
+  isActive: { type: Boolean, default: true },
+  displayOrder: { type: Number, default: 0 },
+}, { timestamps: true });
+
+const newsletterSubscriberSchema = new mongoose.Schema({
+  email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+  name: String,
+  country: String,
+  status: { type: String, default: 'subscribed' },
+}, { timestamps: true });
+
+const newsletterCampaignSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  subject: String,
+  status: { type: String, default: 'draft' },
+  sentAt: Date,
+}, { timestamps: true });
+
+const quoteLeadSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  phone: { type: String, required: true },
+  email: String,
+  country: String,
+  need: { type: String, required: true },
+  source: { type: String, default: 'quote-lead' },
+  status: { type: String, default: 'new' },
+}, { timestamps: true });
+
+const marketingCtaSchema = new mongoose.Schema({
+  label: { type: String, required: true },
+  href: { type: String, required: true },
+  placement: { type: String, default: 'homepage' },
+  isActive: { type: Boolean, default: true },
+  displayOrder: { type: Number, default: 0 },
+}, { timestamps: true });
+
 const homepageSchema = new mongoose.Schema({
   key: { type: String, default: 'default', unique: true },
   heroTitle: { type: String, default: 'Expédiez vos colis en toute confiance' },
@@ -76,4 +129,10 @@ module.exports = {
   PopularRoute: mongoose.models.PopularRoute || mongoose.model('PopularRoute', popularRouteSchema),
   FaqItem: mongoose.models.FaqItem || mongoose.model('FaqItem', faqSchema),
   HomepageContent: mongoose.models.HomepageContent || mongoose.model('HomepageContent', homepageSchema),
+  Testimonial: mongoose.models.Testimonial || mongoose.model('Testimonial', testimonialSchema),
+  CaseStudy: mongoose.models.CaseStudy || mongoose.model('CaseStudy', caseStudySchema),
+  NewsletterSubscriber: mongoose.models.NewsletterSubscriber || mongoose.model('NewsletterSubscriber', newsletterSubscriberSchema),
+  NewsletterCampaign: mongoose.models.NewsletterCampaign || mongoose.model('NewsletterCampaign', newsletterCampaignSchema),
+  QuoteLead: mongoose.models.QuoteLead || mongoose.model('QuoteLead', quoteLeadSchema),
+  MarketingCta: mongoose.models.MarketingCta || mongoose.model('MarketingCta', marketingCtaSchema),
 };

@@ -51,6 +51,10 @@ export const navGroups: NavGroup[] = [
       { href: '/admin/services', label: 'Services CMS', icon: Box },
       { href: '/admin/popular-routes', label: 'Popular Routes', icon: Route },
       { href: '/admin/faq', label: 'FAQ', icon: FilePenLine },
+      { href: '/admin/testimonials', label: 'Testimonials', icon: FilePenLine },
+      { href: '/admin/case-studies', label: 'Case Studies', icon: FilePenLine },
+      { href: '/admin/newsletter', label: 'Newsletter', icon: FilePenLine },
+      { href: '/admin/marketing', label: 'Marketing', icon: FilePenLine },
       { href: '/admin/settings', label: 'Settings', icon: Settings },
     ]
   },

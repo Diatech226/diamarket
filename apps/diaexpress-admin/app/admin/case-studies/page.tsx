@@ -1,0 +1,1 @@
+import { PageHeader } from '@/components/ui/page-header';import { CmsCrud } from '@/components/cms/CmsForms';export default function Page(){return <div className="page-stack"><PageHeader title="Études de cas" description="Fret commercial, import Chine, export Canada et transport régional."/><CmsCrud resource="case-studies"/></div>}

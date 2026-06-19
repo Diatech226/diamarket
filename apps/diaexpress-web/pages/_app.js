@@ -2,6 +2,8 @@ import React from 'react';
 import { useRouter } from 'next/router';
 import { ClerkProvider, SignInButton, UserButton } from '@clerk/nextjs';
 import Header from '@/components/Header';
+import PremiumFooter from '@/components/layout/PremiumFooter';
+import AnalyticsReady from '@/components/analytics/AnalyticsReady';
 import { AuthProvider } from '@/auth/AuthContext';
 import '@/styles/App.css';
 import '../src/styles/diaexpress-theme.css';
@@ -56,6 +58,7 @@ const AppWithClerk = ({ Component, pageProps }) => {
   return (
     <AuthProvider clerkUser={resolvedUser} isUserLoaded={isLoaded} getToken={getToken}>
       <div className={`dx-route-progress ${isNavigating ? 'dx-route-progress--active' : ''}`} aria-hidden="true" />
+      <AnalyticsReady />
       <Header
         user={resolvedUser}
         onSignOut={resolvedSignOut}
@@ -66,6 +69,7 @@ const AppWithClerk = ({ Component, pageProps }) => {
       <div className="dx-page-transition">
         <Component {...pageProps} />
       </div>
+      <PremiumFooter />
     </AuthProvider>
   );
 };

@@ -10,6 +10,7 @@ import { homeContent, homeSeo } from '../src/content/public/homeContent';
 import { getPublicHomepage } from '../src/api/cms';
 import QuickActionCard from '../src/components/home/QuickActionCard';
 import TrustStatsRow from '../src/components/home/TrustStatsRow';
+import QuickEstimate from '../src/components/home/QuickEstimate';
 
 const Section = dynamic(() => import('../src/components/home/Section'));
 const CTA = dynamic(() => import('../src/components/home/CTA'));
@@ -80,6 +81,8 @@ const HomePage = ({ cms = null }) => {
           </div>
         </div>
       </section>
+
+      <div className={styles.container}><QuickEstimate /></div>
 
       <Section id="services" blockId="home-services" eyebrow="Nos engagements" title="Une logistique premium pensée pour votre croissance" description="Nous combinons expertise opérationnelle et technologie pour livrer vos colis avec rigueur.">
         <ThreeCards items={services} />

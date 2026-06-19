@@ -1,6 +1,6 @@
 const express = require('express');
 const { requireAuth, requireRole } = require('../middleware/auth');
-const { SiteSettings, CmsService, PopularRoute, FaqItem, HomepageContent } = require('../models/CmsContent');
+const { SiteSettings, CmsService, PopularRoute, FaqItem, HomepageContent, Testimonial, CaseStudy, NewsletterSubscriber, NewsletterCampaign, QuoteLead, MarketingCta } = require('../models/CmsContent');
 
 const router = express.Router();
 const admin = [requireAuth, requireRole('admin')];
@@ -20,6 +20,12 @@ router.get('/public/site-settings', async (_req, res, next) => { try { ok(res, a
 router.get('/public/services', async (req, res, next) => { try { ok(res, await CmsService.find(activeQuery(req)).sort(sort).lean()); } catch (e) { next(e); } });
 router.get('/public/popular-routes', async (req, res, next) => { try { ok(res, await PopularRoute.find(activeQuery(req)).sort(sort).lean()); } catch (e) { next(e); } });
 router.get('/public/faq', async (req, res, next) => { try { ok(res, await FaqItem.find(activeQuery(req)).sort(sort).lean()); } catch (e) { next(e); } });
+router.get('/public/testimonials', async (req, res, next) => { try { ok(res, await Testimonial.find(activeQuery(req)).sort(sort).lean()); } catch (e) { next(e); } });
+router.get('/public/case-studies', async (req, res, next) => { try { ok(res, await CaseStudy.find(activeQuery(req)).sort(sort).lean()); } catch (e) { next(e); } });
+router.get('/public/marketing-ctas', async (req, res, next) => { try { ok(res, await MarketingCta.find(activeQuery(req)).sort(sort).lean()); } catch (e) { next(e); } });
+router.post('/public/newsletter/subscribe', async (req, res, next) => { try { ok(res, await NewsletterSubscriber.findOneAndUpdate({ email: req.body.email }, req.body, { upsert: true, new: true, setDefaultsOnInsert: true }), 201); } catch (e) { next(e); } });
+router.post('/public/quote-leads', async (req, res, next) => { try { ok(res, await QuoteLead.create(req.body), 201); } catch (e) { next(e); } });
+
 router.get('/public/homepage', async (_req, res, next) => { try { const [homepage, services, popularRoutes, faq, settings] = await Promise.all([getHomepage(), CmsService.find({ isActive: true }).sort(sort).lean(), PopularRoute.find({ isActive: true }).sort(sort).lean(), FaqItem.find({ isActive: true }).sort(sort).limit(6).lean(), getSettings()]); ok(res, { ...homepage, services, popularRoutes, faq, settings }); } catch (e) { next(e); } });
 
 router.get('/admin/site-settings', ...admin, async (_req, res, next) => { try { ok(res, await getSettings()); } catch (e) { next(e); } });
@@ -36,5 +42,11 @@ function crud(path, Model) {
 crud('services', CmsService);
 crud('popular-routes', PopularRoute);
 crud('faq', FaqItem);
+crud('testimonials', Testimonial);
+crud('case-studies', CaseStudy);
+crud('newsletter/subscribers', NewsletterSubscriber);
+crud('newsletter/campaigns', NewsletterCampaign);
+crud('quote-leads', QuoteLead);
+crud('marketing/ctas', MarketingCta);
 
 module.exports = router;
