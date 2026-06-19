@@ -58,4 +58,5 @@ export const endpoints = {
   settings: "/admin/settings",
   currencies: "/admin/currencies",
   shipping: "/admin/shipping",
+  auditLogs: "/admin/audit-logs",
 };

@@ -1,5 +1,5 @@
 import { api, endpoints } from "@/lib/api";
-import type { ApiCollection, ApiItem, CategoryItem, CategoryPayload, CollectionQuery, MediaAsset, OrderAdminItem, ProductItem, ProductPayload, Project, ProjectPayload, SlideItem, SlidePayload, VendorAdminItem, VendorDetailResponse, VendorRequestItem, AdminUserItem, UserDetailResponse } from "@/types/cms";
+import type { ApiCollection, ApiItem, CategoryItem, CategoryPayload, CollectionQuery, MediaAsset, OrderAdminItem, ProductItem, ProductPayload, Project, ProjectPayload, SlideItem, SlidePayload, VendorAdminItem, VendorDetailResponse, VendorRequestItem, AdminUserItem, UserDetailResponse, AdminAuditLogItem } from "@/types/cms";
 
 function toQueryString(query?: CollectionQuery) {
   const params = new URLSearchParams();
@@ -32,6 +32,7 @@ export async function fetchPaginatedCollection<T>(endpoint: string, query?: Coll
 
 export const cmsService = {
   getDashboard: () => api.get(endpoints.dashboard),
+  getAuditLogs: (query?: CollectionQuery) => fetchPaginatedCollection<AdminAuditLogItem>(endpoints.auditLogs, query),
   getUsers: (query?: CollectionQuery) => fetchPaginatedCollection<AdminUserItem>(endpoints.users, query),
   getUser: (id: string) => api.get<ApiItem<UserDetailResponse>>(`${endpoints.users}/${id}`),
   updateUserRole: (id: string, role: "admin" | "vendor" | "user") => api.put<ApiItem<AdminUserItem>>(`${endpoints.users}/${id}/role`, { role }),
