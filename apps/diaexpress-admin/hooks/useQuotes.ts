@@ -9,7 +9,7 @@ export type UseQuotesParams = QuoteListParams & {
   refreshKey?: number;
 };
 
-export function useQuotes({ pageSize = 10, page = 1, search = '', status, from, to, refreshKey }: UseQuotesParams = {}) {
+export function useQuotes({ pageSize = 10, page = 1, search = '', status, from, to, transportType, origin, destination, client, reference, refreshKey }: UseQuotesParams = {}) {
   const [data, setData] = useState<PaginatedResult<Quote> | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -21,7 +21,7 @@ export function useQuotes({ pageSize = 10, page = 1, search = '', status, from, 
       try {
         setLoading(true);
         setError(null);
-        const result = await fetchQuotes({ page, pageSize, search, status, from, to });
+        const result = await fetchQuotes({ page, pageSize, search, status, from, to, transportType, origin, destination, client, reference });
         if (isMounted) {
           setData(result);
         }
@@ -39,7 +39,7 @@ export function useQuotes({ pageSize = 10, page = 1, search = '', status, from, 
     return () => {
       isMounted = false;
     };
-  }, [page, pageSize, search, status, from, to, refreshKey, reloadKey]);
+  }, [page, pageSize, search, status, from, to, transportType, origin, destination, client, reference, refreshKey, reloadKey]);
 
   const totalPages = useMemo(() => {
     if (!data) return 1;

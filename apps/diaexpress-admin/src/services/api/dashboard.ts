@@ -74,7 +74,7 @@ export async function fetchDashboardSnapshot() {
 
   const shipmentsInTransit = shipments.items.filter((shipment) => shipment.status === 'in_transit').length;
   const shipmentsDelivered = shipments.items.filter((shipment) => shipment.status === 'delivered').length;
-  const pendingQuotes = quotes.items.filter((quote) => quote.status === 'pending').length;
+  const pendingQuotes = quotes.items.filter((quote) => quote.status === 'submitted').length;
 
   return {
     quotes,

@@ -61,6 +61,15 @@ export interface Quote {
   updatedAt?: string;
   shipmentId?: string;
   trackingNumber?: string;
+  source?: string;
+  priority?: string;
+  adminNotes?: string;
+  reviewNotes?: string;
+  pricingNote?: string;
+  declaredValue?: number;
+  services?: string[];
+  audit?: { history?: Array<{ action?: string; at?: string; actorLabel?: string; note?: string; fromStatus?: string; toStatus?: string }> };
+  auditLogs?: Array<{ _id?: string; action: string; oldValue?: unknown; newValue?: unknown; comment?: string; userLabel?: string; role?: string; createdAt?: string }>;
   packageTypeId?: { _id: string; name?: string } | string;
 }
 
