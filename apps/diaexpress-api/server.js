@@ -190,6 +190,7 @@ app.use('/api/shipments', require('./routes/shipments'));
 app.use('/api/bookings', require('./routes/bookings'));
 app.use('/api/tracking', require('./routes/tracking'));
 app.use('/api/pricing', require('./routes/pricing'));
+app.use('/api/integrations/diamarket', require('./routes/diamarketIntegration'));
 app.use('/api/package-types', require('./routes/packageType'));
 app.use('/api/expeditions', require('./routes/expeditions'));
 app.use('/api/admin/notifications', require('./routes/adminNotifications'));
