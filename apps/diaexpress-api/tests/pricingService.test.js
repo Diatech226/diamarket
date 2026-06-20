@@ -68,3 +68,35 @@ test('getInternalQuote supports exact boundary values', async () => {
   assert.strictEqual(result.estimatedPrice, 55);
   assert.strictEqual(String(result.appliedRule.matchedDimensionRangeId), 'r1');
 });
+
+test('getInternalQuote calculates air billable volumetric weight and minimum XOF', async () => {
+  Pricing.find = () => ({
+    lean: async () => ([
+      {
+        _id: 'air-xof', origin: 'Paris', destination: 'Dakar', currency: 'XOF', scopeType: 'legacy_route',
+        transportPrices: [{ _id: 'tp-air', transportType: 'air', unitType: 'kg', pricePerUnit: 1000, minimumPrice: 5000, dimensionRanges: [], packagePricing: [] }],
+      },
+    ]),
+  });
+  const result = await getInternalQuote({ origin: 'Paris', destination: 'Dakar', transportType: 'air', weight: 1, dimensions: { length: 50, width: 40, height: 30 } });
+  assert.strictEqual(result.estimatedPrice, 12000);
+  assert.strictEqual(result.currency, 'XOF');
+  assert.strictEqual(result.breakdown.weightActual, 1);
+  assert.strictEqual(result.breakdown.weightVolumetric, 12);
+  assert.strictEqual(result.breakdown.billableWeight, 12);
+});
+
+test('getInternalQuote supports sea volume, delays and home delivery service', async () => {
+  Pricing.find = () => ({
+    lean: async () => ([
+      {
+        _id: 'sea-xof', origin: 'Montreal', destination: 'Abidjan', currency: 'XOF', scopeType: 'legacy_route',
+        transportPrices: [{ _id: 'tp-sea', transportType: 'sea', unitType: 'm3', pricePerUnit: 100000, minDelayDays: 20, maxDelayDays: 35, additionalServices: { homeDelivery: 2500 }, dimensionRanges: [], packagePricing: [] }],
+      },
+    ]),
+  });
+  const result = await getInternalQuote({ origin: 'Montreal', destination: 'Abidjan', transportType: 'sea', weight: 5, volume: 0.2, additionalServices: ['home_delivery'] });
+  assert.strictEqual(result.estimatedPrice, 22500);
+  assert.strictEqual(result.estimatedDays, 35);
+  assert.deepStrictEqual(result.breakdown.servicesApplied, [{ service: 'homeDelivery', amount: 2500 }]);
+});

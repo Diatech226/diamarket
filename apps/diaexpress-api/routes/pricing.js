@@ -29,6 +29,8 @@ router.get('/locations', async (_req, res, next) => {
   } catch (e) { return next(e); }
 });
 
+router.post('/estimate', pricingController.estimatePricing);
+router.get('/currencies', requireAuth, requireRole('admin'), pricingController.listCurrencyRates);
 router.get('/warehouses', pricingController.getWarehouses);
 router.get('/meta', requireAuth, requireRole('admin'), pricingController.getPricingMeta);
 router.get('/', requireAuth, requireRole('admin'), pricingController.getAllPricing);

@@ -1,4 +1,5 @@
 const Pricing = require('../models/Pricing');
+const CurrencyRate = require('../models/CurrencyRate');
 
 const toNumber = (value) => {
   const parsed = Number(value);
@@ -95,12 +96,81 @@ function matchDimensionRange(ranges = [], context = {}) {
   return matches;
 }
 
-function computeUnitPrice(transportPricing, { weight, volume }) {
-  if (transportPricing.pricePerUnit == null) return null;
-  const unit = transportPricing.unitType || transportPricing.allowedUnits?.[0];
-  if (unit === 'kg' && weight != null) return { total: weight * transportPricing.pricePerUnit, unitApplied: 'kg' };
-  if (unit === 'm3' && volume != null) return { total: volume * transportPricing.pricePerUnit, unitApplied: 'm3' };
+
+function volumetricDivisorFor(transportType, configured) {
+  if (configured != null && Number(configured) > 0) return Number(configured);
+  if (['air', 'express'].includes(String(transportType || '').toLowerCase())) return 5000;
   return null;
+}
+
+function computeWeights({ transportType, weight, dimensions, volume, volumetricDivisor }) {
+  const actual = toNumber(weight) || 0;
+  const l = toNumber(dimensions?.length);
+  const w = toNumber(dimensions?.width);
+  const h = toNumber(dimensions?.height);
+  const cubicMeters = computeVolume(dimensions, volume) || 0;
+  const divisor = volumetricDivisorFor(transportType, volumetricDivisor);
+  const type = String(transportType || '').toLowerCase();
+  let volumetric = 0;
+  if (['air', 'express'].includes(type) && divisor && [l, w, h].every((v) => v != null)) {
+    volumetric = (l * w * h) / divisor;
+  } else if (['sea', 'road'].includes(type)) {
+    volumetric = cubicMeters;
+  }
+  return {
+    weightActual: Number(actual.toFixed(3)),
+    weightVolumetric: Number(volumetric.toFixed(3)),
+    billableWeight: Number(Math.max(actual, volumetric).toFixed(3)),
+    volume: Number(cubicMeters.toFixed(6)),
+  };
+}
+
+function normalizeServices(services) {
+  if (!services) return [];
+  if (Array.isArray(services)) return services.map((x) => String(x)).filter(Boolean);
+  return Object.entries(services).filter(([, enabled]) => Boolean(enabled)).map(([key]) => key);
+}
+
+function computeServiceCharges(config = {}, requested = [], subtotal = 0) {
+  return requested.map((service) => {
+    const keyMap = { collection: 'pickup', pickup: 'pickup', delivery: 'homeDelivery', home_delivery: 'homeDelivery', homeDelivery: 'homeDelivery', assurance: 'insurance' };
+    const key = keyMap[service] || service;
+    const raw = config?.[key] ?? 0;
+    const amount = typeof raw === 'object' ? (raw.unit === 'percent' ? subtotal * Number(raw.value || 0) / 100 : Number(raw.value || 0)) : Number(raw || 0);
+    return { service: key, amount: Number((Number.isFinite(amount) ? amount : 0).toFixed(2)) };
+  });
+}
+
+function computeUnitPrice(transportPricing, weights) {
+  const unit = transportPricing.unitType || transportPricing.allowedUnits?.[0];
+  if (transportPricing.flatPrice != null || unit === 'flat') return { total: Number(transportPricing.flatPrice ?? transportPricing.pricePerUnit ?? 0), unitApplied: 'flat' };
+  if (unit === 'kg' && weights.billableWeight != null) return { total: weights.billableWeight * Number(transportPricing.pricePerKg ?? transportPricing.pricePerUnit), unitApplied: 'kg' };
+  if (unit === 'm3' && weights.volume != null) return { total: weights.volume * Number(transportPricing.pricePerM3 ?? transportPricing.pricePerUnit), unitApplied: 'm3' };
+  return null;
+}
+
+async function ensureCurrencyRates() {
+  const seed = [
+    { code: 'XOF', name: 'West African CFA franc', symbol: 'F CFA', rateToDefault: 1, isDefault: true },
+    { code: 'USD', name: 'US dollar', symbol: '$', rateToDefault: 600 },
+    { code: 'EUR', name: 'Euro', symbol: '€', rateToDefault: 655.957 },
+    { code: 'CAD', name: 'Canadian dollar', symbol: 'C$', rateToDefault: 440 },
+  ];
+  await CurrencyRate.bulkWrite(seed.map((currency) => ({
+    updateOne: { filter: { code: currency.code }, update: { $setOnInsert: currency, $set: { lastUpdatedAt: new Date() } }, upsert: true },
+  })), { ordered: false });
+}
+
+async function convertCurrency(amount, from, to) {
+  const source = String(from || 'XOF').toUpperCase();
+  const target = String(to || source).toUpperCase();
+  if (source === target) return Number(amount.toFixed(2));
+  await ensureCurrencyRates();
+  const rates = await CurrencyRate.find({ code: { $in: [source, target] }, isActive: true }).lean();
+  const byCode = new Map(rates.map((r) => [r.code, r]));
+  if (!byCode.has(source) || !byCode.has(target)) return Number(amount.toFixed(2));
+  const inDefault = amount * Number(byCode.get(source).rateToDefault || 1);
+  return Number((inDefault / Number(byCode.get(target).rateToDefault || 1)).toFixed(2));
 }
 
 function buildScopeScore(pricing) {
@@ -118,7 +188,7 @@ function computeSurcharges(conditions = [], subtotal = 0) {
   }, 0);
 }
 
-async function getInternalQuote({ origin, destination, originMarketPointId, destinationMarketPointId, transportType, weight, dimensions, volume, packageTypeId, transportLineId }) {
+async function getInternalQuote({ origin, destination, originMarketPointId, destinationMarketPointId, transportType, weight, dimensions, volume, packageTypeId, transportLineId, additionalServices, currency }) {
   const currentDate = nowUtc();
   const query = {
     isActive: true,
@@ -148,9 +218,9 @@ async function getInternalQuote({ origin, destination, originMarketPointId, dest
   };
 
   const candidates = [];
-  pricings.forEach((pricing) => {
+  for (const pricing of pricings) {
     const tps = (pricing.transportPrices || []).filter((entry) => (!transportType ? true : entry.transportType === transportType));
-    tps.forEach((tp) => {
+    for (const tp of tps) {
       const warnings = [];
       const rangeMatches = matchDimensionRange(tp.dimensionRanges, context);
       if (rangeMatches.length > 1) warnings.push('multiple_dimension_ranges_matched_using_priority');
@@ -176,8 +246,10 @@ async function getInternalQuote({ origin, destination, originMarketPointId, dest
         unitApplied = 'dimension_range';
       }
 
+      const weights = computeWeights({ transportType: tp.transportType, weight, dimensions, volume, volumetricDivisor: tp.volumetricDivisor });
+
       if (baseAmount == null) {
-        const unitResult = computeUnitPrice(tp, context);
+        const unitResult = computeUnitPrice(tp, weights);
         if (unitResult) {
           baseAmount = Number(unitResult.total);
           unitApplied = unitResult.unitApplied;
@@ -186,17 +258,22 @@ async function getInternalQuote({ origin, destination, originMarketPointId, dest
 
       if (baseAmount == null || !Number.isFinite(baseAmount)) {
         warnings.push('no_pricing_formula_matched');
-        return;
+        continue;
       }
 
       const surchargeAmount = computeSurcharges(tp.conditions, baseAmount);
-      const total = Number((baseAmount + surchargeAmount).toFixed(2));
+      const servicesApplied = computeServiceCharges(tp.additionalServices, normalizeServices(additionalServices), baseAmount);
+      const serviceAmount = servicesApplied.reduce((sum, item) => sum + item.amount, 0);
+      const subtotal = baseAmount + surchargeAmount + serviceAmount;
+      const minimumApplied = tp.minimumPrice != null && subtotal < Number(tp.minimumPrice);
+      const totalInRuleCurrency = Number((minimumApplied ? Number(tp.minimumPrice) : subtotal).toFixed(2));
+      const total = await convertCurrency(totalInRuleCurrency, pricing.currency || 'XOF', currency || pricing.currency || 'XOF');
       const specificityScore = [matchedRange ? 3 : 0, packageApplied ? 2 : 0, buildScopeScore(pricing)].reduce((a, b) => a + b, 0);
 
       candidates.push({
         provider: 'internal',
         estimatedPrice: total,
-        currency: pricing.currency || 'USD',
+        currency: String(currency || pricing.currency || 'XOF').toUpperCase(),
         specificityScore,
         scopeScore: buildScopeScore(pricing),
         appliedRule: {
@@ -210,13 +287,24 @@ async function getInternalQuote({ origin, destination, originMarketPointId, dest
           packageTypeId: packageTypeId || null,
           matchedDimensionRangeId: matchedRange?._id || null,
           unitApplied,
+          minDelayDays: tp.minDelayDays ?? pricing.meta?.minDelayDays ?? null,
+          maxDelayDays: tp.maxDelayDays ?? pricing.meta?.maxDelayDays ?? null,
         },
         breakdown: {
           baseAmount,
           surchargeAmount,
-          total,
-          computedWeight: context.weight,
-          computedVolume: context.volume,
+          serviceAmount,
+          servicesApplied,
+          minimumPrice: tp.minimumPrice ?? null,
+          minimumApplied,
+          total: total,
+          totalInRuleCurrency,
+          ruleCurrency: pricing.currency || 'XOF',
+          weightActual: weights.weightActual,
+          weightVolumetric: weights.weightVolumetric,
+          billableWeight: weights.billableWeight,
+          computedWeight: weights.weightActual,
+          computedVolume: weights.volume,
           matchedRange: matchedRange || null,
           packageApplied,
           conditionsApplied: tp.conditions || [],
@@ -224,8 +312,8 @@ async function getInternalQuote({ origin, destination, originMarketPointId, dest
         },
         warnings,
       });
-    });
-  });
+    }
+  }
 
   if (!candidates.length) return { errorCode: 'PRICING_NOT_FOUND', warnings: ['no_eligible_rule_found'] };
   candidates.sort((a, b) => b.specificityScore - a.specificityScore || a.estimatedPrice - b.estimatedPrice || String(a.appliedRule.pricingId).localeCompare(String(b.appliedRule.pricingId)));
@@ -251,7 +339,7 @@ async function getInternalQuote({ origin, destination, originMarketPointId, dest
     };
   }
 
-  return { ...best, explanation };
+  return { ...best, estimatedDays: best.appliedRule.maxDelayDays || best.appliedRule.minDelayDays || null, explanation };
 }
 
 function validatePricingPayload(payload = {}) {
@@ -271,5 +359,8 @@ function validatePricingPayload(payload = {}) {
 module.exports = {
   getInternalQuote,
   validatePricingPayload,
+  computeWeights,
+  ensureCurrencyRates,
+  convertCurrency,
   overlapsDimensionRanges,
 };

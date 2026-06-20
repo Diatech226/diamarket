@@ -1,8 +1,10 @@
 const mongoose = require('mongoose');
 const Pricing = require('../models/Pricing');
+const PricingAuditLog = require('../models/PricingAuditLog');
+const CurrencyRate = require('../models/CurrencyRate');
 const PackageType = require('../models/PackageType');
 const { success, parseListQuery, ApiError } = require('../utils/http');
-const { validatePricingPayload } = require('../services/pricingService');
+const { validatePricingPayload, getInternalQuote, ensureCurrencyRates } = require('../services/pricingService');
 const {
   findTransportLine,
   applyLineDefaults,
@@ -10,6 +12,7 @@ const {
   listTransportLines,
 } = require('../src/domains/network/application/masterDataService');
 
+const actorOf = (req) => ({ actorId: req.identity?.principalId || req.user?._id?.toString?.() || null, actorLabel: req.identity?.label || req.user?.email || null });
 const toTrimmed = (value) => (typeof value === 'string' && value.trim() ? value.trim() : undefined);
 const parseObjectId = (value) => (mongoose.Types.ObjectId.isValid(String(value || '')) ? new mongoose.Types.ObjectId(String(value)) : null);
 
@@ -102,6 +105,7 @@ exports.createPricing = async (req, res, next) => {
     }
 
     const pricing = await Pricing.create(payload);
+    await PricingAuditLog.create({ pricingId: pricing._id, action: 'create', ...actorOf(req), before: null, after: pricing.toObject() });
     return success(res, pricing, { status: 201, legacy: pricing });
   } catch (error) { return next(error); }
 };
@@ -153,8 +157,10 @@ exports.updatePricing = async (req, res, next) => {
     const conflicts = await detectConflicts(merged, pricing._id);
     if (conflicts.length) throw new ApiError(409, 'PRICING_CONFLICT', 'Conflit de règle active détecté', { conflictingPricingIds: conflicts.map((c) => c._id) });
 
+    const before = pricing.toObject();
     Object.entries(payload).forEach(([k, v]) => { if (v !== undefined) pricing.set(k, v); });
     await pricing.save();
+    await PricingAuditLog.create({ pricingId: pricing._id, action: 'update', ...actorOf(req), before, after: pricing.toObject() });
     return success(res, pricing, { legacy: pricing });
   } catch (error) { return next(error); }
 };
@@ -163,6 +169,7 @@ exports.deletePricing = async (req, res, next) => {
   try {
     const pricing = await Pricing.findByIdAndDelete(req.params.id);
     if (!pricing) throw new ApiError(404, 'PRICING_NOT_FOUND', 'Tarif introuvable');
+    await PricingAuditLog.create({ pricingId: pricing._id, action: 'delete', ...actorOf(req), before: pricing.toObject(), after: null });
     return success(res, { deleted: true }, { legacy: { message: 'Tarif supprimé' } });
   } catch (error) { return next(error); }
 };
@@ -192,5 +199,46 @@ exports.getDistinctLocations = async (_req, res, next) => {
   try {
     const [origins, destinations] = await Promise.all([Pricing.distinct('origin'), Pricing.distinct('destination')]);
     return success(res, { origins, destinations }, { legacy: { origins, destinations } });
+  } catch (error) { return next(error); }
+};
+
+
+exports.estimatePricing = async (req, res, next) => {
+  try {
+    const { origin, destination, transportType, weight, volume, length, width, height, packageTypeId, transportLineId, additionalServices, services, currency } = req.body || {};
+    if (!origin || !destination || !transportType) throw new ApiError(400, 'VALIDATION_ERROR', 'origin, destination and transportType are required');
+    const estimate = await getInternalQuote({
+      origin,
+      destination,
+      transportType,
+      weight,
+      volume,
+      dimensions: { length, width, height },
+      packageTypeId,
+      transportLineId,
+      additionalServices: additionalServices || services,
+      currency,
+    });
+    if (!estimate || estimate.errorCode) throw new ApiError(estimate?.errorCode === 'PRICING_AMBIGUOUS' ? 409 : 404, estimate?.errorCode || 'PRICING_NOT_FOUND', 'Aucun tarif trouvé pour cette configuration', estimate?.explanation || null);
+    const payload = {
+      estimatedPrice: estimate.estimatedPrice,
+      currency: estimate.currency,
+      estimatedDays: estimate.estimatedDays,
+      weightActual: estimate.breakdown?.weightActual ?? null,
+      weightVolumetric: estimate.breakdown?.weightVolumetric ?? null,
+      billableWeight: estimate.breakdown?.billableWeight ?? null,
+      appliedRule: estimate.appliedRule,
+      breakdown: estimate.breakdown,
+      provider: estimate.provider || 'internal',
+    };
+    return success(res, payload, { legacy: payload });
+  } catch (error) { return next(error); }
+};
+
+exports.listCurrencyRates = async (_req, res, next) => {
+  try {
+    await ensureCurrencyRates();
+    const rates = await CurrencyRate.find({}).sort({ isDefault: -1, code: 1 }).lean();
+    return success(res, rates, { legacy: rates });
   } catch (error) { return next(error); }
 };

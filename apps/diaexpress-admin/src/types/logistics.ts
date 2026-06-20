@@ -113,6 +113,13 @@ export interface PricingRule {
     unitType: string;
     allowedUnits?: string[];
     pricePerUnit?: number;
+    pricePerKg?: number;
+    pricePerM3?: number;
+    flatPrice?: number;
+    minimumPrice?: number;
+    minDelayDays?: number;
+    maxDelayDays?: number;
+    additionalServices?: Record<string, number>;
     dimensionRanges?: Array<{ min?: number; max?: number; price: number; priority?: number }>;
     packagePricing?: Array<{ packageTypeId: string; basePrice: number; name?: string }>;
   }>;
@@ -120,6 +127,13 @@ export interface PricingRule {
   dimensionRanges?: string | { min: number; max: number; price: number }[];
   basePrice?: number;
   pricePerUnit?: number;
+    pricePerKg?: number;
+    pricePerM3?: number;
+    flatPrice?: number;
+    minimumPrice?: number;
+    minDelayDays?: number;
+    maxDelayDays?: number;
+    additionalServices?: Record<string, number>;
   unitType?: string;
   packagePricing?: { packageTypeId: string; basePrice: number }[];
   currency: string;
@@ -205,7 +219,7 @@ export interface AdminAddress {
   createdAt?: string;
 }
 
-export type TransportMode = 'air' | 'sea' | 'road';
+export type TransportMode = 'air' | 'sea' | 'road' | 'express';
 
 export interface TransportLine {
   _id: string;
