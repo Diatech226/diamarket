@@ -56,8 +56,12 @@ export default async function ShipmentDetailPage({ params }: { params: { id: str
         </div>
 
         <div className="panel">
-          <div className="panel__title">Notes</div>
-          <div className="empty-state">Les notes opérationnelles sont gérées via le drawer de la page Shipments.</div>
+          <div className="panel__title">Documents · Proofs · Notifications</div>
+          <div className="summary-grid">
+            <div><strong>Documents</strong><p>Upload, visibilité client/admin/public et suppression via API admin.</p></div>
+            <div><strong>Proofs</strong><p>Preuves de collecte et livraison avec photo, signature, agent, date et localisation.</p></div>
+            <div><strong>Notifications</strong><p>Historique notifications shipment relié aux changements de statut.</p></div>
+          </div>
         </div>
       </div>
     );

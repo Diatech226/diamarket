@@ -15,6 +15,8 @@ const {
 } = require('../src/domains/shipment/application/shipmentApplicationService');
 const { assignShipmentToOperation } = require('../src/domains/operations/application/operationsApplicationService');
 const { logger } = require('../src/lib/observability/logger');
+const notificationService = require('../services/notificationService');
+const { NOTIFICATION_EVENTS, STATUS_EVENT_MAP } = require('../src/lib/events/notificationEvents');
 
 function ensureIdentity(req) {
   const identity = ensureRequestIdentity(req);
@@ -51,6 +53,9 @@ exports.createFromQuote = async (req, res, next) => {
     }
 
     const result = await convertQuoteToShipment({ quoteId, identity, notes: note });
+    if (result.created) {
+      await notificationService.notify({ userId: result.shipment.userId, recipientEmail: result.shipment.clientSnapshot?.email || result.shipment.meta?.customerEmail, eventType: NOTIFICATION_EVENTS.ShipmentCreated, template: 'shipment_created', type: 'shipment', relatedType: 'Shipment', relatedId: result.shipment._id, metadata: { trackingCode: result.shipment.trackingCode } });
+    }
     return success(res, {
       shipment: formatShipmentResponse(result.shipment),
       conversion: {
@@ -167,6 +172,11 @@ exports.updateStatus = async (req, res, next) => {
     if (!identityHasRole(identity, 'admin') && shipment.principalId !== identity?.principalId) throw new ApiError(403, 'FORBIDDEN', 'Accès non autorisé');
 
     await updateShipmentStatus({ shipment, identity, input: req.body || {} });
+
+    const statusEventType = STATUS_EVENT_MAP[shipment.status];
+    if (statusEventType) {
+      await notificationService.notify({ userId: shipment.userId, recipientEmail: shipment.clientSnapshot?.email || shipment.meta?.customerEmail, eventType: statusEventType, template: shipment.status === 'delivered' ? 'shipment_delivered' : shipment.status === 'delayed' ? 'shipment_delayed' : shipment.status === 'out_for_delivery' ? 'shipment_out_for_delivery' : shipment.status === 'delivery_failed' || shipment.status === 'failed_delivery' ? 'delivery_failed' : 'shipment_in_transit', type: 'shipment', relatedType: 'Shipment', relatedId: shipment._id, metadata: { trackingCode: shipment.trackingCode, status: shipment.status } });
+    }
 
     logger.info('shipment_lifecycle', 'shipment.status_changed', {
       shipmentId: String(shipment._id),

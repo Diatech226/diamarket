@@ -1,0 +1,12 @@
+const express = require('express');
+const { requireAuth, requireRole } = require('../middleware/auth');
+const svc = require('../services/notificationService');
+const router = express.Router();
+const uid = (req) => req.user?._id || req.identity?.principalId;
+router.get('/', requireAuth, async (req,res,next)=>{ try{ res.json({ items: await svc.listForUser(uid(req), req.query) }); }catch(e){ next(e); } });
+router.get('/me', requireAuth, async (req,res,next)=>{ try{ res.json({ items: await svc.listForUser(uid(req), req.query) }); }catch(e){ next(e); } });
+router.patch('/read-all', requireAuth, async (req,res,next)=>{ try{ res.json(await svc.markAllAsRead(uid(req))); }catch(e){ next(e); } });
+router.patch('/:id/read', requireAuth, async (req,res,next)=>{ try{ res.json(await svc.markAsRead(req.params.id, uid(req))); }catch(e){ next(e); } });
+router.post('/:id/read', requireAuth, async (req,res,next)=>{ try{ res.json(await svc.markAsRead(req.params.id, uid(req))); }catch(e){ next(e); } });
+router.get('/admin/list', requireAuth, requireRole('admin'), async (req,res,next)=>{ try{ res.json({ items: await svc.listAdmin(req.query) }); }catch(e){ next(e); } });
+module.exports = router;
