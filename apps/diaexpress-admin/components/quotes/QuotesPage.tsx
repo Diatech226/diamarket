@@ -11,7 +11,7 @@ import { QuotesTable } from './QuotesTable';
 import { useToast } from '@/components/ui/toast';
 import { useQuotes } from '@/hooks/useQuotes';
 import { ApiError, buildQueryString } from '@/lib/api/client';
-import { confirmQuote, convertQuoteToShipment, rejectQuote, requestQuoteInfo, updateQuote } from '@/lib/api/quotes';
+import { confirmQuote, convertQuoteToShipment, fetchQuoteDashboard, rejectQuote, requestQuoteInfo, updateQuote } from '@/lib/api/quotes';
 import { formatCurrency } from '@/src/lib/format';
 import type { Quote } from '@/src/types/logistics';
 
@@ -37,6 +37,7 @@ export function QuotesPage() {
   const [submittingAction, setSubmittingAction] = useState(false);
   const [activeAction, setActiveAction] = useState<QuoteAction | null>(null);
   const [activeQuote, setActiveQuote] = useState<Quote | null>(null);
+  const [kpis, setKpis] = useState<{ pending: number; toReview: number; approved: number; converted: number } | null>(null);
   const { notify } = useToast();
 
   useEffect(() => {
@@ -69,6 +70,20 @@ export function QuotesPage() {
     client: customer,
     reference: search
   });
+
+  useEffect(() => {
+    let mounted = true;
+    fetchQuoteDashboard()
+      .then((data) => {
+        if (mounted) setKpis(data);
+      })
+      .catch(() => {
+        if (mounted) setKpis(null);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, [message]);
 
   const getPriority = (quote: Quote): 'low' | 'medium' | 'high' => {
     const amount = quote.finalPrice ?? quote.estimatedPrice ?? 0;
@@ -108,8 +123,8 @@ export function QuotesPage() {
       .filter((quote) => (destination ? String(quote.destination || '').toLowerCase().includes(destination.toLowerCase()) : true))
       .filter((quote) => {
         if (quickView === 'all') return true;
-        if (quickView === 'pending') return ['submitted', 'pending'].includes(quote.status);
-        if (quickView === 'under_review') return quote.status === 'under_review' || (quote.status === 'pending' && Boolean(quote.notes));
+        if (quickView === 'pending') return quote.status === 'submitted';
+        if (quickView === 'under_review') return quote.status === 'under_review';
         if (quickView === 'approved') return ['approved'].includes(quote.status);
         if (quickView === 'rejected') return quote.status === 'rejected';
         return true;
@@ -342,6 +357,25 @@ export function QuotesPage() {
         }}
         loading={loading}
       />
+
+      <div className="status-grid" aria-label="Dashboard opérationnel devis">
+        <div className="stat-card">
+          <p>Quotes en attente</p>
+          <strong>{kpis?.pending ?? '—'}</strong>
+        </div>
+        <div className="stat-card">
+          <p>Quotes à revoir</p>
+          <strong>{kpis?.toReview ?? '—'}</strong>
+        </div>
+        <div className="stat-card">
+          <p>Quotes approuvés</p>
+          <strong>{kpis?.approved ?? '—'}</strong>
+        </div>
+        <div className="stat-card">
+          <p>Quotes convertis</p>
+          <strong>{kpis?.converted ?? '—'}</strong>
+        </div>
+      </div>
 
       <QuotesTable
         items={visibleItems}

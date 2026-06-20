@@ -90,7 +90,7 @@ export interface CreateQuotePayload extends QuoteEstimateRequest {
 }
 
 export async function fetchQuotes(params: QuoteListParams = {}): Promise<PaginatedResult<Quote>> {
-  const data = await apiClient<{ quotes?: Quote[] } | Quote[]>('/api/admin/quotes', { searchParams: { status: params.status, transportType: params.transportType, origin: params.origin, destination: params.destination, client: params.client, reference: params.reference, from: params.from, to: params.to } });
+  const data = await apiClient<{ quotes?: Quote[] } | Quote[]>('/api/admin/quotes', { searchParams: { status: params.status, transportType: params.transportType, origin: params.origin, destination: params.destination, client: params.client, reference: params.reference, search: params.search, from: params.from, to: params.to } });
   const quotes = Array.isArray(data) ? data : Array.isArray(data?.quotes) ? data.quotes : [];
 
   const filteredByStatus = params.status
@@ -134,6 +134,10 @@ export async function fetchQuotes(params: QuoteListParams = {}): Promise<Paginat
         .filter(Boolean)
         .some((field) => String(field).toLowerCase().includes(searchTerm))
   );
+}
+
+export async function fetchQuoteDashboard() {
+  return apiClient<{ pending: number; toReview: number; approved: number; converted: number }>('/api/admin/quotes/dashboard');
 }
 
 export async function fetchQuoteById(id: string) {

@@ -33,6 +33,9 @@ export interface Quote {
   width?: number;
   height?: number;
   weight?: number;
+  weightActual?: number;
+  weightVolumetric?: number;
+  billableWeight?: number;
   volume?: number;
   status: QuoteStatus;
   provider?: string;
@@ -68,6 +71,9 @@ export interface Quote {
   pricingNote?: string;
   declaredValue?: number;
   services?: string[];
+  pricingSnapshot?: unknown;
+  pricingBreakdown?: unknown;
+  estimatedDelivery?: string;
   audit?: { history?: Array<{ action?: string; at?: string; actorLabel?: string; note?: string; fromStatus?: string; toStatus?: string }> };
   auditLogs?: Array<{ _id?: string; action: string; oldValue?: unknown; newValue?: unknown; comment?: string; userLabel?: string; role?: string; createdAt?: string }>;
   packageTypeId?: { _id: string; name?: string } | string;
