@@ -1,296 +1,38 @@
 const Quote = require('../models/Quote');
+const QuoteAuditLog = require('../models/QuoteAuditLog');
 const { push: notify } = require('../services/notificationService');
 const { ensureRequestIdentity } = require('../services/diaexpressAuthService');
 const { ApiError } = require('../utils/http');
-const {
-  assertValidTransition,
-  buildLifecyclePatch,
-  toCanonicalQuote,
-} = require('../services/quoteDomainService');
+const { createShipmentFromQuote } = require('../services/shipmentService');
+const { normalizeQuoteStatus } = require('../src/domain/statuses');
+const { assertValidTransition, buildLifecyclePatch, toCanonicalQuote } = require('../services/quoteDomainService');
+const hooks = require('../src/lib/events/quoteWorkflowHooks');
 
 const resolveIdentity = (req) => req.identity || ensureRequestIdentity(req);
-
-const appendReviewAction = (quote, action, req, extra = {}) => {
-  const identity = resolveIdentity(req);
-  quote.reviewHistory = Array.isArray(quote.reviewHistory) ? quote.reviewHistory : [];
-  quote.reviewHistory.push({
-    action,
-    fromStatus: extra.fromStatus || quote.status,
-    toStatus: extra.toStatus || quote.status,
-    actorId: identity?.principalId || null,
-    actorLabel: identity?.label || null,
-    role: identity?.type || 'admin',
-    note: extra.note || null,
-    metadata: extra.metadata || null,
-    at: new Date(),
-  });
-  return identity;
+const roleOf = (req) => String(req.user?.role || req.identity?.role || req.identity?.type || 'admin').toLowerCase();
+const can = (req, action) => {
+  const role = roleOf(req);
+  if (role === 'admin') return true;
+  if (role === 'manager') return ['read','write','validate','convert'].includes(action);
+  if (['operations','operator','ops'].includes(role)) return ['read','write','convert'].includes(action);
+  return action === 'read';
 };
+const requirePermission = (req, action) => { if (!can(req, action)) throw new ApiError(403, 'QUOTE_PERMISSION_DENIED', 'Permission insuffisante pour cette action'); };
+const actor = (req) => { const i=resolveIdentity(req)||{}; return { userId: i.principalId || req.user?._id?.toString?.() || null, userLabel: i.label || req.user?.email || null, role: roleOf(req) }; };
+const audit = async (quote, req, action, oldValue, newValue, comment) => QuoteAuditLog.create({ quoteId: quote._id, ...actor(req), action, oldValue, newValue, comment });
+const history = (quote, req, action, fromStatus, toStatus, note, metadata) => { const a=actor(req); quote.reviewHistory = Array.isArray(quote.reviewHistory)?quote.reviewHistory:[]; quote.reviewHistory.push({ action, fromStatus, toStatus, actorId:a.userId, actorLabel:a.userLabel, role:a.role, note: note || null, metadata: metadata || null, at:new Date() }); };
+const sendUserQuoteNotification = async (quote, title, message) => { if (!quote.userId) return; await notify({ userId: quote.userId, type:'quote', title, message, entity:{ entityType:'Quote', entityId:quote._id }, channels:{ inApp:true } }); };
 
-exports.listAll = async (req, res) => {
-  try {
-    const items = await Quote.find().sort({ createdAt: -1 });
-    res.json({ quotes: items.map(toCanonicalQuote) });
-  } catch (e) {
-    res.status(500).json({ message: e.message });
-  }
-};
+exports.listAll = async (req, res) => { try { requirePermission(req,'read'); const q={}; ['status','transportType','origin','destination','userEmail'].forEach(k=>{ if(req.query[k]) q[k]=k==='status'?normalizeQuoteStatus(req.query[k]):new RegExp(String(req.query[k]),'i'); }); if (req.query.reference) q._id = req.query.reference; if (req.query.client) q.$or = [{ userEmail:new RegExp(req.query.client,'i') },{ recipientContactName:new RegExp(req.query.client,'i') },{ requestedByLabel:new RegExp(req.query.client,'i') }]; if (req.query.from || req.query.to) q.createdAt = { ...(req.query.from && {$gte:new Date(req.query.from)}), ...(req.query.to && {$lte:new Date(req.query.to)}) }; const items=await Quote.find(q).sort({createdAt:-1}).limit(Math.min(Number(req.query.limit)||250,500)); res.json({ quotes: items.map(toCanonicalQuote), permissions: { read:true, modification:can(req,'write'), validation:can(req,'validate'), conversion:can(req,'convert') } }); } catch(e){ const s=e instanceof ApiError?e.status:500; res.status(s).json({message:e.message, code:e.code}); } };
+exports.getOne = async (req,res)=>{ try{ requirePermission(req,'read'); const q=await Quote.findById(req.params.id); if(!q) return res.status(404).json({message:'Quote non trouvé'}); const logs=await QuoteAuditLog.find({quoteId:q._id}).sort({createdAt:1}); res.json({ quote: toCanonicalQuote(q), auditLogs: logs }); } catch(e){ const s=e instanceof ApiError?e.status:500; res.status(s).json({message:e.message, code:e.code}); } };
 
-exports.updateByAdmin = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const {
-      finalPrice,
-      currency,
-      notes,
-      estimationMethod,
-      matchedPricingId,
-      productType,
-      productLocation,
-      contactPhone,
-      carrier,
-      pricingNote,
-      priority,
-      adminNotes,
-      reviewNotes,
-    } = req.body;
-
-    const q = await Quote.findById(id);
-    if (!q) return res.status(404).json({ message: 'Quote non trouvé' });
-
-    if (finalPrice != null) q.finalPrice = finalPrice;
-    if (currency) q.currency = currency;
-    if (notes) q.notes = notes;
-    if (estimationMethod) q.estimationMethod = estimationMethod;
-    if (matchedPricingId) q.matchedPricingId = matchedPricingId;
-    if (productType) q.productType = productType;
-    if (productLocation) q.productLocation = productLocation;
-    if (contactPhone) q.contactPhone = contactPhone;
-    if (carrier) q.carrier = carrier;
-    if (pricingNote) q.pricingNote = pricingNote;
-    if (priority) q.priority = priority;
-    if (adminNotes) q.adminNotes = adminNotes;
-    if (reviewNotes) q.reviewNotes = reviewNotes;
-
-    appendReviewAction(q, 'admin_update', req, {
-      note: 'Admin updated quote review fields',
-      metadata: { finalPrice, currency, priority, pricingNote },
-    });
-
-    await q.save();
-
-    if (q.userId) {
-      await notify({
-        userId: q.userId,
-        type: 'quote',
-        title: 'Devis mis à jour',
-        message: `Votre devis #${q._id} a été mis à jour par l’admin.`,
-        entity: { entityType: 'Quote', entityId: q._id },
-        channels: { inApp: true },
-      });
-    }
-
-    res.json({ quote: toCanonicalQuote(q) });
-  } catch (e) {
-    res.status(500).json({ message: e.message });
-  }
-};
-
-exports.markUnderReview = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const q = await Quote.findById(id);
-    if (!q) return res.status(404).json({ message: 'Quote non trouvé' });
-
-    const next = assertValidTransition(q.status, 'under_review');
-    const patch = buildLifecyclePatch({ status: next, note: req.body?.note, actorId: resolveIdentity(req)?.principalId });
-    const { reviewHistoryEntry, ...fields } = patch;
-    q.set(fields);
-    if (reviewHistoryEntry) {
-      q.reviewHistory = Array.isArray(q.reviewHistory) ? q.reviewHistory : [];
-      q.reviewHistory.push(reviewHistoryEntry);
-    }
-    await q.save();
-
-    res.json({ quote: toCanonicalQuote(q) });
-  } catch (e) {
-    const status = e instanceof ApiError ? e.status : 500;
-    res.status(status).json({ message: e.message, code: e.code || 'QUOTE_REVIEW_ERROR' });
-  }
-};
-
-exports.approve = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { finalPrice, currency = 'USD', note } = req.body;
-
-    const q = await Quote.findById(id);
-    if (!q) return res.status(404).json({ message: 'Quote non trouvé' });
-
-    let next = 'approved';
-    if (q.status === 'under_review') {
-      const priced = assertValidTransition(q.status, 'priced');
-      const pricedPatch = buildLifecyclePatch({ status: priced, actorId: resolveIdentity(req)?.principalId, note: 'Prix final proposé' });
-      const { reviewHistoryEntry: pricedHistoryEntry, ...pricedFields } = pricedPatch;
-      q.set(pricedFields);
-      if (pricedHistoryEntry) {
-        q.reviewHistory = Array.isArray(q.reviewHistory) ? q.reviewHistory : [];
-        q.reviewHistory.push(pricedHistoryEntry);
-      }
-    }
-    next = assertValidTransition(q.status, 'approved');
-    if (finalPrice != null) q.finalPrice = finalPrice;
-    q.currency = currency;
-
-    const patch = buildLifecyclePatch({
-      status: next,
-      actorId: resolveIdentity(req)?.principalId,
-      note: note || 'Quote approved by admin',
-    });
-    const { reviewHistoryEntry, ...fields } = patch;
-    q.set(fields);
-    if (reviewHistoryEntry) {
-      q.reviewHistory = Array.isArray(q.reviewHistory) ? q.reviewHistory : [];
-      q.reviewHistory.push(reviewHistoryEntry);
-    }
-
-    await q.save();
-
-    if (q.userId) {
-      await notify({
-        userId: q.userId,
-        type: 'quote',
-        title: 'Devis approuvé',
-        message: `Votre devis #${q._id} a été approuvé. Montant: ${q.finalPrice || q.estimatedPrice} ${q.currency}.`,
-        entity: { entityType: 'Quote', entityId: q._id },
-      });
-    }
-
-    res.json({ quote: toCanonicalQuote(q) });
-  } catch (e) {
-    const status = e instanceof ApiError ? e.status : 500;
-    res.status(status).json({ message: e.message, code: e.code || 'QUOTE_APPROVE_ERROR' });
-  }
-};
-
-exports.reject = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { reason, note } = req.body;
-
-    const q = await Quote.findById(id);
-    if (!q) return res.status(404).json({ message: 'Quote non trouvé' });
-
-    const next = assertValidTransition(q.status, 'rejected');
-    const patch = buildLifecyclePatch({
-      status: next,
-      actorId: resolveIdentity(req)?.principalId,
-      reason: reason || 'Rejeté par l’admin',
-      note: note || reason,
-    });
-    const { reviewHistoryEntry, ...fields } = patch;
-    q.set(fields);
-    if (reviewHistoryEntry) {
-      q.reviewHistory = Array.isArray(q.reviewHistory) ? q.reviewHistory : [];
-      q.reviewHistory.push(reviewHistoryEntry);
-    }
-
-    await q.save();
-
-    if (q.userId) {
-      await notify({
-        userId: q.userId,
-        type: 'quote',
-        title: 'Devis refusé',
-        message: `Votre devis #${q._id} a été refusé. Motif: ${reason || '—'}.`,
-        entity: { entityType: 'Quote', entityId: q._id },
-      });
-    }
-
-    res.json({ quote: toCanonicalQuote(q) });
-  } catch (e) {
-    const status = e instanceof ApiError ? e.status : 500;
-    res.status(status).json({ message: e.message, code: e.code || 'QUOTE_REJECT_ERROR' });
-  }
-};
-
-exports.requestMoreInfo = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const q = await Quote.findById(id);
-    if (!q) return res.status(404).json({ message: 'Quote non trouvé' });
-
-    const next = assertValidTransition(q.status, 'info_requested');
-    const patch = buildLifecyclePatch({
-      status: next,
-      actorId: resolveIdentity(req)?.principalId,
-      note: req.body?.note || 'Admin requested customer confirmation',
-    });
-    const { reviewHistoryEntry, ...fields } = patch;
-    q.set(fields);
-    if (reviewHistoryEntry) {
-      q.reviewHistory = Array.isArray(q.reviewHistory) ? q.reviewHistory : [];
-      q.reviewHistory.push(reviewHistoryEntry);
-    }
-
-    if (req.body?.reviewNotes) q.reviewNotes = req.body.reviewNotes;
-
-    await q.save();
-    res.json({ quote: toCanonicalQuote(q) });
-  } catch (e) {
-    const status = e instanceof ApiError ? e.status : 500;
-    res.status(status).json({ message: e.message, code: e.code || 'QUOTE_REQUEST_INFO_ERROR' });
-  }
-};
-
-exports.markReadyForShipment = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const q = await Quote.findById(id);
-    if (!q) return res.status(404).json({ message: 'Quote non trouvé' });
-
-    const next = assertValidTransition(q.status, 'approved');
-    const patch = buildLifecyclePatch({
-      status: next,
-      actorId: resolveIdentity(req)?.principalId,
-      note: req.body?.note || 'Quote marked ready for shipment',
-    });
-    const { reviewHistoryEntry, ...fields } = patch;
-    q.set(fields);
-    if (reviewHistoryEntry) {
-      q.reviewHistory = Array.isArray(q.reviewHistory) ? q.reviewHistory : [];
-      q.reviewHistory.push(reviewHistoryEntry);
-    }
-
-    await q.save();
-    res.json({ quote: toCanonicalQuote(q) });
-  } catch (e) {
-    const status = e instanceof ApiError ? e.status : 500;
-    res.status(status).json({ message: e.message, code: e.code || 'QUOTE_READY_ERROR' });
-  }
-};
-
-exports.dispatch = exports.markReadyForShipment;
-
-exports.updateTracking = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { status, trackingNumber, trackingUrl, eta } = req.body;
-
-    const q = await Quote.findByIdAndUpdate(
-      id,
-      {
-        ...(status && { deliveryStatus: status }),
-        ...(trackingNumber && { trackingNumber }),
-        ...(trackingUrl && { trackingUrl }),
-        ...(eta && { eta }),
-      },
-      { new: true, runValidators: true }
-    );
-    if (!q) return res.status(404).json({ message: 'Quote non trouvé' });
-
-    res.json({ quote: toCanonicalQuote(q) });
-  } catch (e) {
-    res.status(500).json({ message: e.message });
-  }
-};
+exports.updateByAdmin = async (req,res)=>{ try{ requirePermission(req,'write'); const q=await Quote.findById(req.params.id); if(!q) return res.status(404).json({message:'Quote non trouvé'}); const before={ finalPrice:q.finalPrice, currency:q.currency, notes:q.notes, adminNotes:q.adminNotes, pricingNote:q.pricingNote }; ['finalPrice','currency','notes','adminNotes','reviewNotes','pricingNote','priority','carrier','productType','productLocation','contactPhone'].forEach(k=>{ if(req.body[k]!==undefined) q[k]=req.body[k]; }); if (req.body.finalPrice!==undefined && !req.body.overrideReason) throw new ApiError(400,'QUOTE_OVERRIDE_REASON_REQUIRED','Une raison est obligatoire pour override price'); if (req.body.finalPrice!==undefined) history(q,req,'price_overridden',q.status,q.status,req.body.overrideReason,{ oldPrice: before.finalPrice, newPrice: q.finalPrice }); else history(q,req,'admin_note_updated',q.status,q.status,req.body.notes || req.body.adminNotes); await q.save(); await audit(q,req, req.body.finalPrice!==undefined?'price_overridden':'admin_update', before, { finalPrice:q.finalPrice,currency:q.currency,notes:q.notes,adminNotes:q.adminNotes,pricingNote:q.pricingNote }, req.body.overrideReason || req.body.notes); res.json({quote:toCanonicalQuote(q)}); } catch(e){ const s=e instanceof ApiError?e.status:500; res.status(s).json({message:e.message, code:e.code}); } };
+const transition = async (req,res,to,opts={})=>{ requirePermission(req, opts.permission||'write'); const q=await Quote.findById(req.params.id); if(!q) return res.status(404).json({message:'Quote non trouvé'}); const from=q.status; const next=assertValidTransition(q.status,to); const patch=buildLifecyclePatch({status:next, actorId:actor(req).userId, actorLabel:actor(req).userLabel, role:actor(req).role, note:opts.note(req), reason:opts.reason?.(req), metadata:opts.metadata?.(req)}); const {reviewHistoryEntry,...fields}=patch; q.set(fields); if(reviewHistoryEntry){ reviewHistoryEntry.fromStatus=from; q.reviewHistory=[...(q.reviewHistory||[]),reviewHistoryEntry]; } opts.apply?.(q,req); await q.save(); await audit(q,req,opts.action||'status_transition',{status:from},{status:next},opts.note(req)); await opts.hook?.({quoteId:q._id, status:next, actor:actor(req), message:opts.note(req)}); await opts.notify?.(q); return res.json({quote:toCanonicalQuote(q)}); };
+exports.markUnderReview=(req,res)=>transition(req,res,'under_review',{action:'review_started',note:r=>r.body?.note||'Revue admin démarrée'}).catch(e=>res.status(e.status||500).json({message:e.message,code:e.code}));
+exports.patchStatus=(req,res)=>transition(req,res,req.body.status,{action:'status_changed',note:r=>r.body?.note||r.body?.comment||'Statut modifié',reason:r=>r.body?.reason}).catch(e=>res.status(e.status||500).json({message:e.message,code:e.code}));
+exports.requestMoreInfo=(req,res)=>transition(req,res,'info_requested',{action:'info_requested',note:r=>r.body?.message||r.body?.note||'Informations complémentaires demandées',apply:(q,r)=>{q.reviewNotes=r.body?.message||r.body?.note||q.reviewNotes;},hook:hooks.QuoteInfoRequested,notify:q=>sendUserQuoteNotification(q,'Informations demandées',`Votre devis #${q._id} nécessite des informations complémentaires.`)}).catch(e=>res.status(e.status||500).json({message:e.message,code:e.code}));
+exports.approve=async(req,res)=>{ try{ requirePermission(req,'validate'); const q=await Quote.findById(req.params.id); if(!q) return res.status(404).json({message:'Quote non trouvé'}); const from=q.status; if(req.body?.finalPrice!==undefined) q.finalPrice=req.body.finalPrice; if(req.body?.currency) q.currency=req.body.currency; const nowNote=req.body?.note||'Quote approved by admin'; const steps=[]; let current=normalizeQuoteStatus(q.status); if(current==='submitted'){ steps.push('under_review','priced','approved'); } else if(current==='under_review'){ steps.push('priced','approved'); } else if(current==='info_requested'){ steps.push('under_review','priced','approved'); } else { steps.push('approved'); } for (const step of steps){ const next=assertValidTransition(current,step); const patch=buildLifecyclePatch({status:next, actorId:actor(req).userId, actorLabel:actor(req).userLabel, role:actor(req).role, note: next==='approved'?nowNote:'Transition automatique avant approbation'}); const {reviewHistoryEntry,...fields}=patch; q.set(fields); if(reviewHistoryEntry){ reviewHistoryEntry.fromStatus=current; q.reviewHistory=[...(q.reviewHistory||[]),reviewHistoryEntry]; } current=next; } await q.save(); await audit(q,req,'approved',{status:from},{status:q.status, finalPrice:q.finalPrice, currency:q.currency},nowNote); await hooks.QuoteApproved({quoteId:q._id,status:q.status,actor:actor(req)}); await sendUserQuoteNotification(q,'Devis approuvé',`Votre devis #${q._id} a été approuvé.`); res.json({quote:toCanonicalQuote(q)}); } catch(e){res.status(e.status||500).json({message:e.message,code:e.code});} };
+exports.reject=async(req,res)=>{ try{ if(!req.body?.reason) return res.status(400).json({message:'Commentaire obligatoire pour rejet',code:'QUOTE_REJECTION_REASON_REQUIRED'}); requirePermission(req,'validate'); const q=await Quote.findById(req.params.id); if(!q) return res.status(404).json({message:'Quote non trouvé'}); const from=q.status; let current=normalizeQuoteStatus(q.status); const steps=current==='submitted'?['under_review','rejected']:current==='info_requested'?['under_review','rejected']:['rejected']; for(const step of steps){ const next=assertValidTransition(current,step); const patch=buildLifecyclePatch({status:next,actorId:actor(req).userId,actorLabel:actor(req).userLabel,role:actor(req).role,note: step==='rejected'?req.body.reason:'Transition automatique avant refus',reason:req.body.reason}); const {reviewHistoryEntry,...fields}=patch; q.set(fields); if(reviewHistoryEntry){ reviewHistoryEntry.fromStatus=current; q.reviewHistory=[...(q.reviewHistory||[]),reviewHistoryEntry]; } current=next; } await q.save(); await audit(q,req,'rejected',{status:from},{status:q.status,reason:req.body.reason},req.body.reason); await hooks.QuoteRejected({quoteId:q._id,status:q.status,actor:actor(req),reason:req.body.reason}); await sendUserQuoteNotification(q,'Devis refusé',`Votre devis #${q._id} a été refusé.`); res.json({quote:toCanonicalQuote(q)}); } catch(e){res.status(e.status||500).json({message:e.message,code:e.code});} };
+exports.convert=async(req,res)=>{ try{ requirePermission(req,'convert'); const q=await Quote.findById(req.params.id); if(!q) return res.status(404).json({message:'Quote non trouvé'}); if(normalizeQuoteStatus(q.status)!=='approved') throw new ApiError(409,'QUOTE_NOT_APPROVED','Seuls les devis approved peuvent être convertis'); const before={status:q.status,shipmentId:q.shipmentId}; const result=await createShipmentFromQuote({quoteId:q._id, identity:resolveIdentity(req)||{}, notes:req.body?.note}); await audit(result.quote,req,'converted_to_shipment',before,{status:result.quote.status,shipmentId:result.shipment._id,trackingCode:result.shipment.trackingCode},req.body?.note); await hooks.QuoteConverted({quoteId:q._id, shipmentId:result.shipment._id, trackingCode:result.shipment.trackingCode, actor:actor(req)}); res.json({shipment:result.shipment, quote:toCanonicalQuote(result.quote)}); } catch(e){ res.status(e.status||500).json({message:e.message,code:e.code}); } };
+exports.dashboard=async(req,res)=>{ try{ requirePermission(req,'read'); const agg=await Quote.aggregate([{ $group:{ _id:'$status', count:{ $sum:1 } } }]); const by=Object.fromEntries(agg.map(i=>[normalizeQuoteStatus(i._id),i.count])); res.json({ pending:by.submitted||0, toReview:(by.under_review||0)+(by.info_requested||0), approved:by.approved||0, converted:by.converted_to_shipment||0 }); } catch(e){res.status(e.status||500).json({message:e.message,code:e.code});} };
+exports.dispatch=exports.convert; exports.updateTracking=async(req,res)=>res.status(410).json({message:'Tracking lives on Shipment flow',code:'QUOTE_TRACKING_DEPRECATED'});

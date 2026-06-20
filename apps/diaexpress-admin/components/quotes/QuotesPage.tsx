@@ -11,7 +11,7 @@ import { QuotesTable } from './QuotesTable';
 import { useToast } from '@/components/ui/toast';
 import { useQuotes } from '@/hooks/useQuotes';
 import { ApiError, buildQueryString } from '@/lib/api/client';
-import { confirmQuote, convertQuoteToShipment, rejectQuote, updateQuote } from '@/lib/api/quotes';
+import { confirmQuote, convertQuoteToShipment, rejectQuote, requestQuoteInfo, updateQuote } from '@/lib/api/quotes';
 import { formatCurrency } from '@/src/lib/format';
 import type { Quote } from '@/src/types/logistics';
 
@@ -62,7 +62,12 @@ export function QuotesPage() {
     search,
     status,
     from: dateFrom,
-    to: dateTo
+    to: dateTo,
+    transportType,
+    origin,
+    destination,
+    client: customer,
+    reference: search
   });
 
   const getPriority = (quote: Quote): 'low' | 'medium' | 'high' => {
@@ -181,15 +186,15 @@ export function QuotesPage() {
         await updateQuote(activeQuote._id, {
           finalPrice: payload.finalPrice,
           notes: payload.notes,
+          adminNotes: payload.notes,
+          overrideReason: payload.reason || payload.notes || 'Ajustement manuel admin',
         });
         setMessage('Devis mis à jour.');
         notify({ title: 'Devis mis à jour', type: 'success' });
       }
 
       if (activeAction === 'request_info') {
-        await updateQuote(activeQuote._id, {
-          notes: payload.notes || 'Informations complémentaires demandées au client.',
-        });
+        await requestQuoteInfo(activeQuote._id, payload.notes || 'Informations complémentaires demandées au client.');
         setMessage('Demande d\'information enregistrée.');
         notify({ title: 'Demande envoyée', type: 'info' });
       }
