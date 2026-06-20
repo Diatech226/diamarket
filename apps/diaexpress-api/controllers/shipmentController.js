@@ -102,7 +102,7 @@ exports.getAll = async (req, res, next) => {
 
     const list = parseListQuery(req.query, { allowedSortBy: ['createdAt', 'updatedAt', 'status', 'provider'] });
     const filters = {};
-    ['status', 'provider', 'principalId'].forEach((k) => {
+    ['status', 'provider', 'principalId', 'source'].forEach((k) => {
       if (req.query[k]) filters[k] = k === 'status' ? normalizeShipmentStatus(req.query[k]) : req.query[k];
     });
     if (req.query.trackingCode) filters.trackingCode = { $regex: req.query.trackingCode, $options: 'i' };
