@@ -4,6 +4,7 @@ const { normalizeShipmentStatus, normalizeTrackingEvents } = require('../../../.
 const { applyShipmentLifecycleToQuote } = require('../../quote/application/quoteOwnershipService');
 const { publishDomainEvent } = require('../../../lib/events/domainEventPublisher');
 const { DOMAIN_EVENT_NAMES } = require('../../../lib/events/domainEventCatalog');
+const ShipmentIncident = require('../../../../models/ShipmentIncident');
 
 function convertEvents(events = []) {
   return events
@@ -21,6 +22,21 @@ function convertEvents(events = []) {
     }));
 }
 
+function publicShipmentView(shipment, incidents = []) {
+  if (!shipment) return null;
+  const obj = typeof shipment.toObject === 'function' ? shipment.toObject() : { ...shipment };
+  delete obj.assignedAgent; delete obj.assignedTeam; delete obj.assignedHub; delete obj.assignmentNote; delete obj.assignmentReason; delete obj.assignedBy; delete obj.meta;
+  delete obj.returnReason; delete obj.returnComment;
+  if (incidents.some((incident) => ['open', 'in_progress'].includes(incident.status))) {
+    obj.publicNotice = {
+      type: 'delay',
+      message: 'Votre colis rencontre un retard. Notre équipe traite la situation.',
+      lastUpdate: obj.updatedAt || new Date(),
+    };
+  }
+  return obj;
+}
+
 async function syncTracking({ trackingCode, provider: requestedProvider, identity }) {
   const shipment = await Shipment.findOne({ trackingCode });
   const provider = normaliseProvider(requestedProvider || shipment?.provider);
@@ -33,9 +49,10 @@ async function syncTracking({ trackingCode, provider: requestedProvider, identit
   if (!trackingPayload) {
     if (shipment) {
       const events = normalizeTrackingEvents(shipment.trackingUpdates || []);
+      const publicIncidents = await ShipmentIncident.find({ shipmentId: shipment._id, customerVisible: true, status: { $in: ['open', 'in_progress'] } }).lean();
       return {
         code: 200,
-        payload: { provider, trackingCode, status: shipment.status, currentStatus: shipment.status, events, timeline: events, shipment },
+        payload: { provider, trackingCode, status: shipment.status, currentStatus: shipment.status, events, timeline: events, shipment: publicShipmentView(shipment, publicIncidents) },
       };
     }
     return { code: 502, payload: { message: 'Impossible de récupérer le suivi transporteur' } };
@@ -72,6 +89,7 @@ async function syncTracking({ trackingCode, provider: requestedProvider, identit
   }
 
   const normalizedEvents = normalizeTrackingEvents(shipment?.trackingUpdates || events);
+  const publicIncidents = shipment ? await ShipmentIncident.find({ shipmentId: shipment._id, customerVisible: true, status: { $in: ['open', 'in_progress'] } }).lean() : [];
   return {
     code: 200,
     payload: {
@@ -82,7 +100,7 @@ async function syncTracking({ trackingCode, provider: requestedProvider, identit
       estimatedDelivery: trackingPayload.estimatedDelivery || shipment?.estimatedDelivery || null,
       events: normalizedEvents,
       timeline: normalizedEvents,
-      shipment,
+      shipment: publicShipmentView(shipment, publicIncidents),
     },
   };
 }

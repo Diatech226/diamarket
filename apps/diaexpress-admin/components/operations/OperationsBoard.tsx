@@ -1,0 +1,8 @@
+import { Card } from '@/components/ui/card';
+import { SlaBadge } from './OperationsBadges';
+import type { Incident, OpsShipment } from '@/src/services/api/operations';
+const columns = [ ['todo','À traiter'], ['progress','En cours'], ['late','En retard'], ['failed','Échec livraison'], ['returns','Retours'], ['resolved','Résolus'] ];
+function bucket(s: OpsShipment, incidents: Incident[]) { const open=incidents.find(i=>i.trackingNumber===s.trackingCode && ['open','in_progress'].includes(i.status)); if(s.status==='returned') return 'returns'; if(s.status==='delivery_failed') return 'failed'; if(s.sla?.status==='late' || s.operationsAlerts?.length) return 'late'; if(open?.status==='in_progress') return 'progress'; if(open) return 'todo'; if(['delivered','cancelled'].includes(s.status)) return 'resolved'; return 'progress'; }
+export function OperationsBoard({ shipments, incidents }: { shipments: OpsShipment[]; incidents: Incident[] }) {
+  return <div style={{ display:'grid', gridTemplateColumns:'repeat(3,minmax(0,1fr))', gap:16 }}>{columns.map(([key,label]) => <Card key={key} title={label}><div style={{ display:'grid', gap:10 }}>{shipments.filter(s=>bucket(s,incidents)===key).map(s=>{ const inc=incidents.find(i=>i.trackingNumber===s.trackingCode); return <div key={s._id} className="card" style={{ padding:12 }}><strong>{s.trackingCode}</strong><div>{s.clientSnapshot?.name || s.clientSnapshot?.email || 'Client'}</div><div>{s.status} {s.sla ? <SlaBadge status={s.sla.status} /> : null}</div><small>{inc?.title || 'Aucun incident'} · {s.assignedAgent || s.assignedHub || 'Non assigné'}</small></div>})}</div></Card>)}</div>;
+}

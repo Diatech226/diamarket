@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const shipmentController = require('../controllers/shipmentController');
+const { assignShipment, transitionReturn } = require('../services/operationsIncidentService');
 const { requireAuth, requireRole } = require('../middleware/auth');
 const { validateBody, validators } = require('../middleware/validate');
 
@@ -30,6 +31,8 @@ router.patch('/:shipmentId/status', requireAuth, requireRole('admin'), validateB
 router.post('/:shipmentId/history', requireAuth, requireRole('admin'), shipmentController.addHistory);
 router.patch('/:shipmentId/assign-embarkment', requireAuth, requireRole('admin'), shipmentController.assignEmbarkment);
 router.patch('/:shipmentId/assign-operation', requireAuth, requireRole('admin'), shipmentController.assignEmbarkment);
+router.patch('/:shipmentId/assign', requireAuth, requireRole('admin'), async (req, res, next) => { try { res.json(await assignShipment(req.params.shipmentId, req.body || {}, req.identity || {})); } catch (error) { next(error); } });
+router.patch('/:shipmentId/return', requireAuth, requireRole('admin'), async (req, res, next) => { try { res.json(await transitionReturn(req.params.shipmentId, req.body || {})); } catch (error) { next(error); } });
 router.delete('/:shipmentId', requireAuth, requireRole('admin'), shipmentController.deleteShipment);
 
 module.exports = router;
