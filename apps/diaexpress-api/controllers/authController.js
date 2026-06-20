@@ -23,7 +23,7 @@ exports.exchangeToken = (req, res) => {
   try {
     const credentials = extractClientCredentials(req);
     if (!credentials) {
-      return res.status(400).json({ message: 'Client credentials manquants' });
+      return res.status(400).json({ success: false, message: 'Client credentials manquants' });
     }
 
     const { token, tokenType, expiresIn, identity } = issueClientToken(
@@ -32,6 +32,8 @@ exports.exchangeToken = (req, res) => {
     );
 
     return res.json({
+      success: true,
+      token,
       access_token: token,
       token_type: tokenType,
       expires_in: expiresIn,
@@ -42,11 +44,11 @@ exports.exchangeToken = (req, res) => {
     });
   } catch (error) {
     if (error.code === 'INVALID_CLIENT') {
-      return res.status(401).json({ message: 'Identifiants client invalides' });
+      return res.status(401).json({ success: false, message: 'Identifiants client invalides' });
     }
 
     console.error('Erreur échange token DiaExpress:', error);
-    return res.status(500).json({ message: "Échec de l'émission du token" });
+    return res.status(500).json({ success: false, message: "Échec de l'émission du token" });
   }
 };
 
@@ -54,18 +56,18 @@ exports.syncUser = async (req, res) => {
   try {
     const identity = ensureRequestIdentity(req);
     if (!identity) {
-      return res.status(401).json({ error: 'Unauthorized: no identity' });
+      return res.status(401).json({ success: false, message: 'Unauthorized: no identity' });
     }
 
     const user = await syncUserFromIdentity(identity);
     if (!user) {
-      return res.status(500).json({ error: 'User sync failed' });
+      return res.status(500).json({ success: false, message: 'User sync failed' });
     }
 
-    res.json({ user, identity });
+    res.json({ success: true, user, identity });
   } catch (err) {
     console.error('❌ Sync error:', err);
-    res.status(500).json({ error: 'User sync failed' });
+    res.status(500).json({ success: false, message: 'User sync failed' });
   }
 };
 
@@ -73,17 +75,17 @@ exports.getMe = async (req, res) => {
   try {
     const identity = ensureRequestIdentity(req);
     if (!identity) {
-      return res.status(401).json({ error: 'Unauthorized: no identity' });
+      return res.status(401).json({ success: false, message: 'Unauthorized: no identity' });
     }
 
     const user = await syncUserFromIdentity(identity);
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ success: false, message: 'User not found' });
     }
 
-    res.json({ identity, user });
+    res.json({ success: true, identity, user });
   } catch (err) {
     console.error('❌ getMe error:', err);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 };

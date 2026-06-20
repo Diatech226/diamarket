@@ -59,15 +59,18 @@ function deriveUsername(identity) {
 function derivePrimaryRole(identity) {
   if (!identity) return 'client';
 
+  const allowedRoles = new Set(['admin', 'client', 'delivery']);
   const roles = [identity.role, ...(identity.roles || [])]
-    .map((role) => (role ? String(role).trim() : ''))
+    .map((role) => (role ? String(role).trim().toLowerCase() : ''))
     .filter(Boolean);
 
-  if (!roles.length) {
-    return 'client';
+  for (const role of roles) {
+    if (allowedRoles.has(role)) {
+      return role;
+    }
   }
 
-  return roles[0];
+  return 'client';
 }
 
 const ADMIN_WHITELIST = (() => {

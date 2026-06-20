@@ -33,14 +33,6 @@ const RoleProtected = ({ role, children }) => {
     const dbRoles = authUser?.dbUser?.roles;
     normaliseRoles(dbRoles).forEach((entry) => collected.add(String(entry)));
 
-    const clerkUser = authUser?.clerkUser;
-    if (clerkUser) {
-      normaliseRoles(clerkUser.publicMetadata?.role).forEach((entry) => collected.add(String(entry)));
-      normaliseRoles(clerkUser.publicMetadata?.roles).forEach((entry) => collected.add(String(entry)));
-      normaliseRoles(clerkUser.privateMetadata?.role).forEach((entry) => collected.add(String(entry)));
-      normaliseRoles(clerkUser.privateMetadata?.roles).forEach((entry) => collected.add(String(entry)));
-    }
-
     if (!collected.size) {
       collected.add('client');
     }

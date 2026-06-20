@@ -10,7 +10,7 @@ class ApiError extends Error {
 }
 
 const success = (res, data, { status = 200, meta, pagination, legacy } = {}) => {
-  const payload = { data, meta: meta || {} };
+  const payload = { success: true, data, meta: meta || {} };
   if (pagination) payload.pagination = pagination;
   if (legacy && typeof legacy === 'object') Object.assign(payload, legacy);
   return res.status(status).json(payload);
@@ -19,6 +19,8 @@ const success = (res, data, { status = 200, meta, pagination, legacy } = {}) => 
 const error = (res, { status = 500, code = 'INTERNAL_ERROR', message = 'Internal server error', details, category } = {}) => {
   const requestId = res.getHeader('x-correlation-id') || res.getHeader('x-request-id') || null;
   return res.status(status).json({
+    success: false,
+    message,
     error: {
       code,
       category: category || null,
