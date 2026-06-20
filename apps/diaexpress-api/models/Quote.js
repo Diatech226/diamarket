@@ -57,7 +57,7 @@ const quoteSchema = new mongoose.Schema({
   },
   source: {
     type: String,
-    enum: ['client', 'admin', 'partner', 'import'],
+    enum: ['client', 'admin', 'partner', 'import', 'manual', 'diamarket'],
     default: 'client',
   },
   rejectionReason: { type: String },
@@ -130,6 +130,9 @@ const quoteSchema = new mongoose.Schema({
   requestedBy: { type: String },
   requestedByType: { type: String, default: 'user' },
   requestedByLabel: { type: String },
+  declaredValue: { type: Number },
+  services: { type: [String], default: [] },
+  estimatedDelivery: { type: Date },
 }, {
   timestamps: true,
 });

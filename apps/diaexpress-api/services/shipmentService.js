@@ -1,6 +1,8 @@
 const Shipment = require('../models/Shipment');
 const Quote = require('../models/Quote');
 const { ApiError } = require('../utils/http');
+const ShipmentAuditLog = require('../models/ShipmentAuditLog');
+const { generateTrackingNumber } = require('./trackingNumberService');
 
 const {
   SHIPMENT_STATUSES,
@@ -13,13 +15,8 @@ const TERMINAL_STATUSES = new Set(['delivered', 'returned', 'cancelled']);
 
 const ELIGIBLE_QUOTE_STATUSES = new Set(['approved']);
 
-function generateTrackingCode() {
-  const date = new Date();
-  const yyyymmdd = `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(
-    date.getDate(),
-  ).padStart(2, '0')}`;
-  const random = Math.random().toString(36).slice(2, 8).toUpperCase();
-  return `SH-${yyyymmdd}-${random}`;
+async function generateTrackingCode() {
+  return generateTrackingNumber();
 }
 
 function resolveIdentityRole(identity = {}) {
@@ -80,25 +77,29 @@ async function createShipmentFromQuote({ quoteId, identity, notes }) {
 
   const { normalizeQuoteStatus } = require('../src/domain/statuses');
   const normalizedQuoteStatus = normalizeQuoteStatus(quote.status || '');
-  if (!ELIGIBLE_QUOTE_STATUSES.has(normalizedQuoteStatus) && quote.deliveryStatus !== 'assigned') {
-    throw new ApiError(409, 'QUOTE_NOT_ELIGIBLE_FOR_SHIPMENT', `Quote status ${quote.status} cannot be converted to shipment`);
+  if (!ELIGIBLE_QUOTE_STATUSES.has(normalizedQuoteStatus)) {
+    throw new ApiError(409, 'QUOTE_NOT_ELIGIBLE_FOR_SHIPMENT', 'Quote not eligible for shipment conversion');
   }
 
   const existing = await Shipment.findOne({ quoteId: quote._id });
-  if (existing) return { shipment: existing, quote, created: false };
+  if (existing || quote.shipmentId) throw new ApiError(409, 'QUOTE_ALREADY_CONVERTED', 'Quote already converted to shipment');
 
-  const trackingCode = quote.trackingNumber || generateTrackingCode();
+  const trackingCode = quote.trackingNumber || await generateTrackingCode();
   const previousQuoteStatus = quote.status;
   const now = new Date();
 
-  const shipment = await Shipment.create({
+  let shipment;
+  try {
+    shipment = await Shipment.create({
     quoteId: quote._id,
+    source: quote.source === 'diamarket' ? 'diamarket' : 'manual',
     userId: quote.userId || null,
     principalId: quote.requestedBy || identity.principalId,
     principalLabel: quote.requestedByLabel || identity.label || null,
     provider: quote.provider || 'internal',
     carrier: quote.carrier || 'DiaExpress',
     trackingCode,
+    shipmentReference: trackingCode,
     status: 'created',
     currentLocation: quote.origin || null,
     currentMarketPointId: quote.originMarketPointId || null,
@@ -106,6 +107,12 @@ async function createShipmentFromQuote({ quoteId, identity, notes }) {
     originMarketPointId: quote.originMarketPointId || null,
     destinationMarketPointId: quote.destinationMarketPointId || null,
     transportLineId: quote.transportLineId || null,
+    clientSnapshot: { userId: quote.userId || null, email: quote.userEmail || null, requestedBy: quote.requestedBy || null, label: quote.requestedByLabel || null, recipientContactName: quote.recipientContactName || null, recipientContactEmail: quote.recipientContactEmail || null, recipientContactPhone: quote.recipientContactPhone || null, contactPhone: quote.contactPhone || null },
+    originSnapshot: { label: quote.origin, marketPointId: quote.originMarketPointId || null, senderAddressId: quote.senderAddressId || null },
+    destinationSnapshot: { label: quote.destination, marketPointId: quote.destinationMarketPointId || null, recipientAddressId: quote.recipientAddressId || null },
+    transportSnapshot: { transportType: quote.transportType, transportLineId: quote.transportLineId || null, provider: quote.provider || 'internal', carrier: quote.carrier || 'DiaExpress', delay: quote.pricingSnapshot?.delay || quote.pricingSnapshot?.deliveryDelay || null, estimatedDelivery: quote.estimatedDelivery || null },
+    packageSnapshot: { packageTypeId: quote.packageTypeId || null, quantity: quote.quantity || null, unitType: quote.unitType || null, weight: quote.weight || null, weightActual: quote.weightActual ?? quote.weight ?? null, weightVolumetric: quote.weightVolumetric ?? null, billableWeight: quote.billableWeight ?? quote.weight ?? null, dimensions: { length: quote.length || null, width: quote.width || null, height: quote.height || null }, volume: quote.volume || null, declaredValue: quote.declaredValue || null },
+    serviceSnapshot: { services: quote.services || [], pickupOption: quote.pickupOption || 'pickup' },
     weight: quote.billableWeight || quote.weight || null,
     volume: quote.volume || null,
     priceAccepted: quote.finalPrice ?? quote.estimatedPrice ?? null,
@@ -128,18 +135,29 @@ async function createShipmentFromQuote({ quoteId, identity, notes }) {
     },
     createdAtOperational: now,
     trackingUpdates: [{
-      eventType: 'quote_converted',
+      eventType: 'shipment_created',
       location: quote.origin || null,
       status: 'created',
-      note: 'Shipment créé depuis le devis',
+      note: 'Shipment Created',
       source: 'system',
       actorId: identity?.principalId || null,
       actorLabel: identity?.label || null,
       carrierReference: null,
       timestamp: now,
+    }, {
+      eventType: 'converted_from_quote',
+      location: quote.origin || null,
+      status: 'created',
+      note: 'Converted From Quote',
+      source: 'system',
+      actorId: identity?.principalId || null,
+      actorLabel: identity?.label || null,
+      carrierReference: trackingCode,
+      timestamp: now,
     }],
     meta: {
       ...(quote.meta || {}),
+      source: quote.source === 'diamarket' ? 'diamarket' : 'manual',
       quote: {
         origin: quote.origin,
         destination: quote.destination,
@@ -149,6 +167,10 @@ async function createShipmentFromQuote({ quoteId, identity, notes }) {
         estimatedPrice: quote.estimatedPrice,
         finalPrice: quote.finalPrice,
         currency: quote.currency,
+        userEmail: quote.userEmail || null,
+        recipientContactName: quote.recipientContactName || null,
+        services: quote.services || [],
+        declaredValue: quote.declaredValue || null,
         weightActual: quote.weightActual ?? quote.weight ?? null,
         weightVolumetric: quote.weightVolumetric ?? null,
         billableWeight: quote.billableWeight ?? quote.weight ?? null,
@@ -169,6 +191,10 @@ async function createShipmentFromQuote({ quoteId, identity, notes }) {
     convertedAt: now,
     convertedBy: identity?.principalId || null,
   });
+  } catch (error) {
+    if (error?.code === 11000) throw new ApiError(409, 'TRACKING_ALREADY_EXISTS', 'Tracking number already exists');
+    throw error;
+  }
 
   quote.shipmentId = shipment._id;
   quote.trackingNumber = trackingCode;
@@ -176,6 +202,8 @@ async function createShipmentFromQuote({ quoteId, identity, notes }) {
   quote.status = 'converted_to_shipment';
   quote.convertedAt = now;
   quote.reviewHistory = Array.isArray(quote.reviewHistory) ? quote.reviewHistory : [];
+  await ShipmentAuditLog.create({ shipmentId: shipment._id, quoteId: quote._id, userId: identity?.principalId || null, userLabel: identity?.label || null, role: resolveIdentityRole(identity), action: 'conversion', oldValue: { quoteStatus: previousQuoteStatus }, newValue: { shipmentId: shipment._id, trackingCode, status: 'created' }, comment: notes || 'Converted From Quote' }).catch(() => null);
+
   quote.reviewHistory.push({
     action: 'quote_converted_to_shipment',
     fromStatus: previousQuoteStatus,

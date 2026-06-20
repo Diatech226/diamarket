@@ -192,6 +192,7 @@ app.use('/api/pricing', require('./routes/pricing'));
 app.use('/api/package-types', require('./routes/packageType'));
 app.use('/api/expeditions', require('./routes/expeditions'));
 app.use('/api/admin/quotes', require('./routes/adminQuotes'));
+app.use('/api/admin/shipments', require('./routes/shipments'));
 app.use('/api/admin/market-points', require('./routes/marketPoints'));
 app.use('/api/payments', require('./routes/payments'));
 app.use('/api/addresses', require('./routes/addresses'));

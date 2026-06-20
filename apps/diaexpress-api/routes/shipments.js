@@ -22,7 +22,9 @@ const SHIPMENT_STATUSES = [
 router.post('/from-quote', requireAuth, requireRole('admin'), validateBody([{ field: 'quoteId', checks: [{ fn: validators.required, message: 'quoteId is required' }, { fn: validators.objectId, message: 'quoteId must be an objectId' }] }]), shipmentController.createFromQuote);
 router.post('/create-from-quote', requireAuth, requireRole('admin'), shipmentController.createFromQuote);
 router.get('/me', requireAuth, shipmentController.getMine);
+router.get('/dashboard', requireAuth, requireRole('admin'), shipmentController.dashboard);
 router.get('/', requireAuth, requireRole('admin'), shipmentController.getAll);
+router.get('/:shipmentId/timeline', requireAuth, shipmentController.getTimeline);
 router.get('/:shipmentId', requireAuth, shipmentController.getById);
 router.patch('/:shipmentId/status', requireAuth, requireRole('admin'), validateBody([{ field: 'status', checks: [{ fn: validators.required, message: 'status is required' }, { fn: validators.enum(SHIPMENT_STATUSES), message: 'invalid status' }] }]), shipmentController.updateStatus);
 router.post('/:shipmentId/history', requireAuth, requireRole('admin'), shipmentController.addHistory);
