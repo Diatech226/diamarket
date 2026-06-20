@@ -6,8 +6,9 @@ import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/ui/page-header';
 import { QuoteNotes } from '@/components/quotes/QuoteNotes';
 import { QuoteTimeline } from '@/components/quotes/QuoteTimeline';
+import { ConvertQuoteButton } from '@/components/quotes/ConvertQuoteButton';
 import { StatusBadge } from '@/components/quotes/StatusBadge';
-import { confirmQuote, convertQuoteToShipment, deleteQuote, fetchQuoteById, markQuoteReadyForShipment, markQuoteUnderReview, rejectQuote, requestQuoteInfo } from '@/lib/api/quotes';
+import { confirmQuote, deleteQuote, fetchQuoteById, markQuoteReadyForShipment, markQuoteUnderReview, rejectQuote, requestQuoteInfo } from '@/lib/api/quotes';
 import { formatCurrency, toTitle } from '@/src/lib/format';
 import type { Quote } from '@/src/types/logistics';
 
@@ -92,23 +93,6 @@ if (!window.confirm('Refuser définitivement ce devis ?')) return;
     });
   };
 
-  const handleConvert = async () => {
-    if (!quote) return;
-    try {
-      setBusyAction('convert');
-      setActionError(null);
-      const result = await convertQuoteToShipment(quote._id);
-      setActionMessage('Shipment créé depuis ce devis.');
-      if (result?.shipment?._id) {
-        router.push(`/admin/shipments/${result.shipment._id}`);
-      }
-    } catch (err) {
-      setActionError((err as Error).message || 'Conversion en shipment impossible.');
-    } finally {
-      setBusyAction(null);
-    }
-  };
-
   if (!id) return null;
 
   return (
@@ -163,11 +147,7 @@ if (!window.confirm('Refuser définitivement ce devis ?')) return;
                     {busyAction === 'ready' ? 'MAJ...' : 'Prêt expédition'}
                   </Button>
                 ) : null}
-                {['approved', 'approved', 'approved'].includes(quote.status) ? (
-                  <Button variant="primary" onClick={handleConvert} disabled={busyAction === 'convert'}>
-                    {busyAction === 'convert' ? 'Conversion...' : 'Convertir en shipment'}
-                  </Button>
-                ) : null}
+                {quote.status === 'approved' ? <ConvertQuoteButton quote={quote} onError={setActionError} /> : null}
                 {!['converted_to_shipment'].includes(quote.status) ? (
                   <Button variant="ghost" onClick={handleDelete} disabled={busyAction === 'delete'}>
                     {busyAction === 'delete' ? 'Suppression...' : 'Supprimer'}

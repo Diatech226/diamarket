@@ -19,6 +19,7 @@ const ShipmentHistorySchema = new mongoose.Schema({
 
 const ShipmentSchema = new mongoose.Schema({
   quoteId: { type: mongoose.Schema.Types.ObjectId, ref: 'Quote', required: true, index: true },
+  source: { type: String, enum: ['manual', 'diamarket'], default: 'manual', index: true },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   principalId: { type: String, index: true },
   principalLabel: { type: String },
@@ -41,6 +42,14 @@ const ShipmentSchema = new mongoose.Schema({
   destinationMarketPointId: { type: mongoose.Schema.Types.ObjectId, ref: 'MarketPoint', default: null },
   transportLineId: { type: mongoose.Schema.Types.ObjectId, ref: 'TransportLine', default: null },
 
+  clientSnapshot: { type: mongoose.Schema.Types.Mixed },
+  originSnapshot: { type: mongoose.Schema.Types.Mixed },
+  destinationSnapshot: { type: mongoose.Schema.Types.Mixed },
+  transportSnapshot: { type: mongoose.Schema.Types.Mixed },
+  packageSnapshot: { type: mongoose.Schema.Types.Mixed },
+  serviceSnapshot: { type: mongoose.Schema.Types.Mixed },
+  documentSnapshot: { type: mongoose.Schema.Types.Mixed },
+  shipmentReference: { type: String, index: true },
   weight: Number,
   volume: Number,
   priceAccepted: Number,
@@ -79,6 +88,8 @@ const ShipmentSchema = new mongoose.Schema({
 }, {
   timestamps: true,
 });
+
+ShipmentSchema.index({ status: 1, createdAt: -1 });
 
 ShipmentSchema.pre('validate', function normalizeShipmentStatusBeforeValidate(next) {
   if (this.status) this.status = normalizeShipmentStatus(this.status);

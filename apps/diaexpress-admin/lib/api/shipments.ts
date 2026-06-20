@@ -4,7 +4,7 @@ import { paginateCollection } from '@/src/lib/pagination';
 import type { Shipment } from '@/src/types/logistics';
 
 export async function fetchShipments(params: PaginatedParams = {}): Promise<PaginatedResult<Shipment>> {
-  const data = await apiClient<{ shipments?: Shipment[] } | Shipment[]>('/api/shipments', {
+  const data = await apiClient<{ shipments?: Shipment[] } | Shipment[]>('/api/admin/shipments', {
     searchParams: {
       status: params.status,
       search: params.search

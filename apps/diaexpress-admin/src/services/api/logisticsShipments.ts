@@ -10,7 +10,7 @@ export type ShipmentListParams = PaginatedParams & {
 };
 
 export async function fetchShipments(params: ShipmentListParams = {}): Promise<PaginatedResult<Shipment>> {
-  const data = await apiClient<{ shipments: Shipment[] }>('api/shipments', {
+  const data = await apiClient<{ shipments: Shipment[] }>('api/admin/shipments', {
     searchParams: {
       status: params.status as string | undefined,
       provider: params.provider as string | undefined,
@@ -43,15 +43,24 @@ export async function fetchShipments(params: ShipmentListParams = {}): Promise<P
 }
 
 export async function fetchShipmentById(id: string) {
-  const data = await apiClient<{ shipment: Shipment }>(`api/shipments/${id}`);
-  return data.shipment;
+  const data = await apiClient<{ shipment?: Shipment } | Shipment>(`api/admin/shipments/${id}`);
+  return 'shipment' in data && data.shipment ? data.shipment : data as Shipment;
+}
+
+export async function fetchShipmentTimeline(id: string) {
+  const data = await apiClient<{ timeline?: Shipment['timeline'] }>(`api/admin/shipments/${id}/timeline`);
+  return data.timeline || [];
+}
+
+export async function fetchShipmentDashboard() {
+  return apiClient<{ createdToday: number; active: number; delayed: number; delivered: number }>('api/admin/shipments/dashboard');
 }
 
 export async function updateShipmentStatus(
   id: string,
   payload: { status?: Shipment['status']; location?: string; note?: string; paymentStatus?: string; eventType?: string; eventTimestamp?: string; carrierReference?: string }
 ) {
-  return apiClient<Shipment>(`api/shipments/${id}/status`, {
+  return apiClient<Shipment>(`api/admin/shipments/${id}/status`, {
     method: 'PATCH',
     json: payload
   });
@@ -61,14 +70,14 @@ export async function addShipmentHistory(
   id: string,
   payload: { status?: Shipment['status']; location?: string; note?: string; eventType?: string; eventTimestamp?: string; carrierReference?: string }
 ) {
-  return apiClient<Shipment>(`api/shipments/${id}/history`, {
+  return apiClient<Shipment>(`api/admin/shipments/${id}/history`, {
     method: 'POST',
     json: payload
   });
 }
 
 export async function assignShipmentEmbarkment(id: string, embarkmentId: string) {
-  return apiClient<Shipment>(`api/shipments/${id}/assign-embarkment`, {
+  return apiClient<Shipment>(`api/admin/shipments/${id}/assign-embarkment`, {
     method: 'PATCH',
     json: { embarkmentId }
   });
