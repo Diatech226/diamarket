@@ -1,12 +1,14 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/ui/page-header';
-import { QuoteStatusBadge } from '@/components/quotes/QuoteStatusBadge';
+import { QuoteNotes } from '@/components/quotes/QuoteNotes';
+import { QuoteTimeline } from '@/components/quotes/QuoteTimeline';
+import { StatusBadge } from '@/components/quotes/StatusBadge';
 import { confirmQuote, convertQuoteToShipment, deleteQuote, fetchQuoteById, markQuoteReadyForShipment, markQuoteUnderReview, rejectQuote, requestQuoteInfo } from '@/lib/api/quotes';
-import { formatCurrency, formatDate, toTitle } from '@/src/lib/format';
+import { formatCurrency, toTitle } from '@/src/lib/format';
 import type { Quote } from '@/src/types/logistics';
 
 export default function QuoteDetailPage() {
@@ -37,17 +39,6 @@ export default function QuoteDetailPage() {
   useEffect(() => {
     void load();
   }, [load]);
-
-  const timeline = useMemo(() => {
-    if (!quote) return [];
-    return [
-      quote.createdAt ? { label: 'Création', date: quote.createdAt } : null,
-      quote.updatedAt ? { label: 'Dernière mise à jour', date: quote.updatedAt } : null,
-      quote.convertedAt ? { label: 'Conversion shipment', date: quote.convertedAt } : null,
-      quote.dispatchedAt ? { label: 'Dispatch', date: quote.dispatchedAt } : null,
-      quote.deliveredAt ? { label: 'Livraison', date: quote.deliveredAt } : null,
-    ].filter(Boolean) as Array<{ label: string; date: string }>;
-  }, [quote]);
 
   const runAction = async (key: NonNullable<typeof busyAction>, success: string, action: () => Promise<Quote | void>) => {
     try {
@@ -144,7 +135,7 @@ if (!window.confirm('Refuser définitivement ce devis ?')) return;
             <div className="panel__header">
               <div>
                 <div className="panel__title">Statut & actions</div>
-                <QuoteStatusBadge status={quote.status} />
+                <StatusBadge status={quote.status} />
               </div>
               <div className="panel__actions">
                 {!['under_review', 'approved', 'approved', 'approved', 'converted_to_shipment', 'rejected', 'cancelled'].includes(quote.status) ? (
@@ -206,14 +197,7 @@ if (!window.confirm('Refuser définitivement ce devis ?')) return;
 
           <div className="panel">
             <div className="panel__title">Timeline</div>
-            <div className="stack gap-3">
-              {timeline.length ? timeline.map((item) => (
-                <div key={`${item.label}-${item.date}`} className="border p-3 rounded">
-                  <strong>{item.label}</strong>
-                  <p className="muted">{formatDate(item.date)}</p>
-                </div>
-              )) : <div className="empty-state">Aucun événement de timeline.</div>}
-            </div>
+            <QuoteTimeline quote={quote} />
           </div>
 
           <div className="panel">
@@ -230,7 +214,7 @@ if (!window.confirm('Refuser définitivement ce devis ?')) return;
 
           <div className="panel">
             <div className="panel__title">Notes admin</div>
-            {quote.notes ? <p>{quote.notes}</p> : <div className="empty-state">Aucune note interne.</div>}
+            <QuoteNotes quote={quote} />
           </div>
         </>
       ) : (

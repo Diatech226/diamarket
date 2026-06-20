@@ -134,8 +134,21 @@ export function QuoteActionDrawer({
                   <textarea
                     className="textarea"
                     rows={3}
-                    placeholder="Expliquez la raison du rejet (optionnel)"
+                    placeholder="Expliquez la raison du rejet (obligatoire)"
                     value={reason}
+                    required
+                    onChange={(event) => setReason(event.target.value)}
+                  />
+                </label>
+              ) : null}
+
+              {action === 'edit' ? (
+                <label className="stack">
+                  <span className="text-sm font-medium">Raison de l'override prix</span>
+                  <Input
+                    placeholder="Remise, client entreprise, prix négocié..."
+                    value={reason}
+                    required
                     onChange={(event) => setReason(event.target.value)}
                   />
                 </label>

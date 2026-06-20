@@ -1,8 +1,8 @@
 const router = require('express').Router();
 const adminQuote = require('../controllers/adminQuoteController');
-const { requireAuth } = require('../middleware/auth');
+const { requireAuth, requireRole } = require('../middleware/auth');
 
-router.use(requireAuth);
+router.use(requireAuth, requireRole('admin'));
 
 router.get('/', adminQuote.listAll);
 router.get('/dashboard', adminQuote.dashboard);
