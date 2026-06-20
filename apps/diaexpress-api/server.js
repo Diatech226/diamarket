@@ -198,6 +198,7 @@ app.use('/api/payments', require('./routes/payments'));
 app.use('/api/addresses', require('./routes/addresses'));
 app.use('/api/reservations', require('./routes/reservations'));
 app.use('/api/schedules', require('./routes/Schedules'));
+app.use('/api/admin/operations', require('./routes/operationsIncidents'));
 app.use('/api/admin', require('./routes/logisticsAdmin'));
 const adminRouter = require('./routes/v1/admin');
 

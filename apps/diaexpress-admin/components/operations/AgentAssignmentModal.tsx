@@ -1,0 +1,1 @@
+export function AgentAssignmentModal() { return <div className="card"><strong>Assignation agent / équipe</strong><p>Sélectionner un agent, une équipe ou un hub depuis le détail shipment pour réassigner l’action opérationnelle.</p></div>; }

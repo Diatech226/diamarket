@@ -1,0 +1,17 @@
+const express = require('express');
+const { requireAuth, requireRole } = require('../middleware/auth');
+const svc = require('../services/operationsIncidentService');
+const router = express.Router();
+router.use(requireAuth, requireRole('admin'));
+router.get('/incidents', async (req,res,next)=>{ try { res.json({items: await svc.listIncidents(req.query)}); } catch(e){ next(e); } });
+router.post('/incidents', async (req,res,next)=>{ try { res.status(201).json(await svc.createIncident(req.body, req.identity || {})); } catch(e){ next(e); } });
+router.get('/incidents/:id', async (req,res,next)=>{ try { const items=await svc.listIncidents({limit:500}); const item=items.find(i=>String(i._id)===req.params.id); if(!item) return res.status(404).json({message:'Incident introuvable'}); res.json(item); } catch(e){ next(e); } });
+router.patch('/incidents/:id', async (req,res,next)=>{ try { res.json(await svc.updateIncident(req.params.id, req.body)); } catch(e){ next(e); } });
+router.patch('/incidents/:id/resolve', async (req,res,next)=>{ try { res.json(await svc.resolveIncident(req.params.id, req.body)); } catch(e){ next(e); } });
+router.get('/hubs', async (_req,res,next)=>{ try { res.json({items: await svc.listHubs()}); } catch(e){ next(e); } });
+router.post('/hubs', async (req,res,next)=>{ try { res.status(201).json(await svc.upsertHub(req.body)); } catch(e){ next(e); } });
+router.patch('/hubs/:id', async (req,res,next)=>{ try { res.json(await svc.upsertHub(req.body, req.params.id)); } catch(e){ next(e); } });
+router.get('/alerts', async (_req,res,next)=>{ try { const snap=await svc.operationsSnapshot(); res.json({items:snap.alerts}); } catch(e){ next(e); } });
+router.get('/sla', async (_req,res,next)=>{ try { const snap=await svc.operationsSnapshot(); res.json(snap.sla); } catch(e){ next(e); } });
+router.get('/board', async (_req,res,next)=>{ try { res.json(await svc.operationsSnapshot()); } catch(e){ next(e); } });
+module.exports = router;

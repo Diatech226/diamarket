@@ -67,6 +67,19 @@ const ShipmentSchema = new mongoose.Schema({
 
   trackingUpdates: { type: [ShipmentHistorySchema], default: [] },
 
+  assignedAgent: { type: String, default: null, index: true },
+  assignedTeam: { type: String, default: null, index: true },
+  assignedHub: { type: String, default: null, index: true },
+  sla: {
+    deadline: { type: Date, default: null },
+    status: { type: String, enum: ['on_time', 'at_risk', 'late'], default: 'on_time' },
+    rule: { type: String, default: null },
+  },
+  operationsAlerts: { type: [String], default: [] },
+  returnReason: { type: String, default: null },
+  returnComment: { type: String, default: null },
+  returnCustomerVisible: { type: Boolean, default: false },
+
   createdAtOperational: { type: Date },
   scheduledAt: { type: Date },
   dispatchedAt: { type: Date },
