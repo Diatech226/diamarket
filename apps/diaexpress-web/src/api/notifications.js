@@ -1,7 +1,7 @@
 import { buildApiUrl } from './api';
 
-export const myNotifications = async (token) => {
-  const r = await fetch(buildApiUrl('/api/notifications/me'), {
+export const myNotifications = async (token, unread = false) => {
+  const r = await fetch(buildApiUrl('/api/notifications', unread ? { unread: true } : undefined), {
     headers: { Authorization: `Bearer ${token}` }
   });
   return r.json();
@@ -9,7 +9,7 @@ export const myNotifications = async (token) => {
 
 export const markRead = async (token, id) => {
   const r = await fetch(buildApiUrl(`/api/notifications/${id}/read`), {
-    method: 'POST',
+    method: 'PATCH',
     headers: { Authorization: `Bearer ${token}` }
   });
   return r.json();

@@ -4,6 +4,7 @@ const shipmentController = require('../controllers/shipmentController');
 const { assignShipment, transitionReturn } = require('../services/operationsIncidentService');
 const { requireAuth, requireRole } = require('../middleware/auth');
 const { validateBody, validators } = require('../middleware/validate');
+const documents = require('../controllers/shipmentDocumentsController');
 
 const SHIPMENT_STATUSES = [
   'draft',
@@ -25,6 +26,13 @@ router.post('/create-from-quote', requireAuth, requireRole('admin'), shipmentCon
 router.get('/me', requireAuth, shipmentController.getMine);
 router.get('/dashboard', requireAuth, requireRole('admin'), shipmentController.dashboard);
 router.get('/', requireAuth, requireRole('admin'), shipmentController.getAll);
+
+router.get('/:id/documents', requireAuth, documents.clientList);
+router.get('/:id/documents/admin', requireAuth, requireRole('admin'), documents.adminList);
+router.post('/:id/documents', requireAuth, requireRole('admin'), documents.upload);
+router.delete('/:id/documents/:documentId', requireAuth, requireRole('admin'), documents.remove);
+router.post('/:id/proof-pickup', requireAuth, requireRole('admin'), documents.proofPickup);
+router.post('/:id/proof-delivery', requireAuth, requireRole('admin'), documents.proofDelivery);
 router.get('/:shipmentId/timeline', requireAuth, shipmentController.getTimeline);
 router.get('/:shipmentId', requireAuth, shipmentController.getById);
 router.patch('/:shipmentId/status', requireAuth, requireRole('admin'), validateBody([{ field: 'status', checks: [{ fn: validators.required, message: 'status is required' }, { fn: validators.enum(SHIPMENT_STATUSES), message: 'invalid status' }] }]), shipmentController.updateStatus);
