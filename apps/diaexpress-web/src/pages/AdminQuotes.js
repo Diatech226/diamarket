@@ -4,8 +4,8 @@ import { fetchAdminQuotes as apiFetchAdminQuotes, updateQuoteStatus as apiUpdate
 
 const STATUS_VARIANTS = {
   pending: { label: "En attente", tone: "warning", icon: "⏳" },
-  confirmed: { label: "Confirmé", tone: "success", icon: "✅" },
-  dispatched: { label: "Expédié", tone: "info", icon: "📦" },
+  confirmed: { label: "Devis approuvé", tone: "success", icon: "✅" },
+  dispatched: { label: "Expédition créée", tone: "info", icon: "📦" },
   paid: { label: "Payé", tone: "success", icon: "💳" },
   rejected: { label: "Rejeté", tone: "danger", icon: "❌" },
 };
@@ -75,7 +75,7 @@ const formatPaymentStatus = (status) => {
 
   const normalised = String(status).toLowerCase();
   switch (normalised) {
-    case 'confirmed':
+    case 'approved':
       return 'confirmé';
     case 'failed':
       return 'échoué';
@@ -158,7 +158,7 @@ const AdminQuotes = () => {
   };
 
   const updateStatus = async (id, newStatus) => {
-    if (newStatus === "confirmed") {
+    if (newStatus === "approved") {
       const confirmAction = window.confirm("Confirmer ce devis ?");
       if (!confirmAction) return;
     }
@@ -362,8 +362,8 @@ const AdminQuotes = () => {
             </div>
           </div>
           <div className="dx-chip-list">
-            <span className="dx-chip">✅ Confirmés : {summary.confirmed}</span>
-            <span className="dx-chip">📦 Expédiés : {summary.dispatched}</span>
+            <span className="dx-chip">✅ Devis approuvés : {summary.confirmed}</span>
+            <span className="dx-chip">📦 Expédition créées : {summary.dispatched}</span>
             <span className="dx-chip">💳 Payés : {summary.paid}</span>
             <span className="dx-chip">❌ Rejetés : {summary.rejected}</span>
           </div>
@@ -535,7 +535,7 @@ const AdminQuotes = () => {
                               </strong>
                               {quote.finalPrice && (
                                 <span className="dx-meta__hint">
-                                  Confirmé : {formatCurrency(quote.finalPrice, quote.currency)}
+                                  Devis approuvé : {formatCurrency(quote.finalPrice, quote.currency)}
                                 </span>
                               )}
                               {quote.paymentStatus && (
@@ -562,16 +562,16 @@ const AdminQuotes = () => {
                               {quote.status === "pending" && (
                                 <button
                                   className="dx-button dx-button--primary dx-button--sm"
-                                  onClick={() => updateStatus(quote._id, "confirmed")}
+                                  onClick={() => updateStatus(quote._id, "approved")}
                                 >
                                   Valider
                                 </button>
                               )}
-                              {quote.status === "confirmed" && (
+                              {quote.status === "approved" && (
                                 <>
                                   <button
                                     className="dx-button dx-button--outline dx-button--sm"
-                                    onClick={() => updateStatus(quote._id, "dispatched")}
+                                    onClick={() => updateStatus(quote._id, "converted_to_shipment")}
                                   >
                                     Expédier
                                   </button>
@@ -583,7 +583,7 @@ const AdminQuotes = () => {
                                   </button>
                                 </>
                               )}
-                              {quote.status === "dispatched" && (
+                              {quote.status === "converted_to_shipment" && (
                                 <button
                                   className="dx-button dx-button--ghost dx-button--sm"
                                   onClick={() => updateStatus(quote._id, "paid")}

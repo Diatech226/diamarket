@@ -30,18 +30,15 @@ export type QuoteFiltersProps = {
 };
 
 const STATUS_OPTIONS = [
-  { value: '', label: 'Tous les statuts' },
-  { value: 'requested', label: 'Demandé' },
-  { value: 'pending', label: 'En attente' },
-  { value: 'under_review', label: 'En revue' },
-  { value: 'info_requested', label: 'Infos demandées' },
-  { value: 'approved', label: 'Approuvé' },
-  { value: 'confirmed', label: 'Confirmé' },
-  { value: 'rejected', label: 'Rejeté' },
-  { value: 'ready_for_shipment', label: 'Prêt expédition' },
-  { value: 'converted_to_shipment', label: 'Converti shipment' },
-  { value: 'dispatched', label: 'Expédié' },
-  { value: 'cancelled', label: 'Annulé' }
+  { value: 'submitted', label: 'Demande envoyée' },
+  { value: 'under_review', label: 'En cours d’étude' },
+  { value: 'info_requested', label: 'Informations demandées' },
+  { value: 'priced', label: 'Prix proposé' },
+  { value: 'approved', label: 'Devis approuvé' },
+  { value: 'rejected', label: 'Devis refusé' },
+  { value: 'expired', label: 'Devis expiré' },
+  { value: 'converted_to_shipment', label: 'Expédition créée' },
+  { value: 'cancelled', label: 'Devis annulé' },
 ];
 
 const PRIORITY_OPTIONS = [

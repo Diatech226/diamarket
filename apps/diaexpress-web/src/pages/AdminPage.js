@@ -10,8 +10,8 @@ import {
 
 const QUOTE_STATUS_VARIANTS = {
   pending: { label: 'En attente', tone: 'warning', icon: '⏳' },
-  confirmed: { label: 'Confirmé', tone: 'success', icon: '✅' },
-  dispatched: { label: 'Expédié', tone: 'info', icon: '🚚' },
+  confirmed: { label: 'Devis approuvé', tone: 'success', icon: '✅' },
+  dispatched: { label: 'Expédition créée', tone: 'info', icon: '🚚' },
   paid: { label: 'Payé', tone: 'success', icon: '💳' },
   rejected: { label: 'Rejeté', tone: 'danger', icon: '❌' },
 };

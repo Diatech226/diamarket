@@ -1,30 +1,28 @@
 export type QuoteStatus =
-  | 'requested'
-  | 'pending'
+  | 'draft'
+  | 'submitted'
   | 'under_review'
   | 'info_requested'
+  | 'priced'
   | 'approved'
-  | 'confirmed'
   | 'rejected'
-  | 'ready_for_shipment'
+  | 'expired'
   | 'converted_to_shipment'
-  | 'dispatched'
   | 'cancelled';
-export type QuotePaymentStatus = 'pending' | 'confirmed' | 'failed';
+export type QuotePaymentStatus = 'pending' | 'approved' | 'failed';
 export type ShipmentStatus =
-  | 'draft'
   | 'created'
-  | 'pending_dispatch'
-  | 'scheduled'
+  | 'awaiting_pickup'
   | 'picked_up'
+  | 'at_origin_hub'
   | 'in_transit'
-  | 'delayed'
-  | 'at_hub'
+  | 'at_destination_hub'
   | 'out_for_delivery'
   | 'delivered'
-  | 'failed_delivery'
+  | 'delivery_failed'
   | 'returned'
-  | 'cancelled';
+  | 'cancelled'
+  | 'delayed';
 
 export interface Quote {
   _id: string;
@@ -236,7 +234,7 @@ export interface TransportLine {
   destinationMarketPointId?: MarketPoint | string | null;
 }
 
-export type ExpeditionStatus = 'pending' | 'scheduled' | 'in_transit' | 'delivered' | 'cancelled';
+export type ExpeditionStatus = 'pending' | 'awaiting_pickup' | 'in_transit' | 'delivered' | 'cancelled';
 
 export interface Expedition {
   _id: string;

@@ -27,22 +27,22 @@ type ShipmentDetailsDrawerProps = {
 };
 
 const STATUS_OPTIONS: Shipment['status'][] = [
-  'draft',
   'created',
-  'pending_dispatch',
-  'scheduled',
+  'awaiting_pickup',
+  'picked_up',
+  'at_origin_hub',
   'in_transit',
-  'delayed',
-  'at_hub',
+  'at_destination_hub',
   'out_for_delivery',
   'delivered',
-  'failed_delivery',
+  'delivery_failed',
   'returned',
   'cancelled',
+  'delayed',
 ];
 
 const QUICK_ACTIONS: Array<{ label: string; status: Shipment['status']; eventType: string }> = [
-  { label: 'Planifier', status: 'scheduled', eventType: 'shipment_scheduled' },
+  { label: 'Planifier', status: 'awaiting_pickup', eventType: 'shipment_scheduled' },
   { label: 'Dispatcher', status: 'in_transit', eventType: 'shipment_dispatched' },
   { label: 'Marquer livré', status: 'delivered', eventType: 'shipment_delivered' },
   { label: 'Annuler', status: 'cancelled', eventType: 'shipment_cancelled' },

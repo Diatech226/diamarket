@@ -3,7 +3,7 @@ import { diaexpressTokens, getReadableTextColor } from './diaexpressTokens';
 import { formatShipmentStatus, SHIPMENT_STATUS_MAP } from '../constants/shipmentStatus';
 
 const quoteLabels = {
-  requested: 'Demandé', under_review: 'En revue', info_requested: 'Infos demandées', approved: 'Approuvé', rejected: 'Rejeté', ready_for_shipment: 'Prêt à expédier', converted_to_shipment: 'Converti', cancelled: 'Annulé',
+  submitted: 'Demande envoyée', under_review: 'En cours d’étude', info_requested: 'Informations demandées', priced: 'Prix proposé', approved: 'Devis approuvé', rejected: 'Devis refusé', expired: 'Devis expiré', converted_to_shipment: 'Expédition créée', cancelled: 'Devis annulé',
 };
 const transportLabels = { air: 'Aérien', sea: 'Maritime', road: 'Routier', local: 'Local' };
 

@@ -147,7 +147,7 @@ export function NewQuoteWizard({ onQuoteCreated, onOpenList }: NewQuoteWizardPro
               Ouvrir la liste des devis
             </button>
           ) : null}
-          <QuoteStatusBadge status="confirmed" />
+          <QuoteStatusBadge status="approved" />
         </div>
       ) : null}
 

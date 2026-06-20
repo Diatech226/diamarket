@@ -3,14 +3,14 @@ import type { MarketPoint, Quote, Shipment, ShipmentStatus } from '@/src/types/l
 export const SHIPMENT_STATUSES: ShipmentStatus[] = [
   'draft',
   'created',
-  'pending_dispatch',
-  'scheduled',
+  'awaiting_pickup',
+  'awaiting_pickup',
   'picked_up',
   'in_transit',
-  'at_hub',
+  'at_origin_hub',
   'out_for_delivery',
   'delivered',
-  'failed_delivery',
+  'delivery_failed',
   'delayed',
   'returned',
   'cancelled',
@@ -34,22 +34,22 @@ export function isToday(value?: string) {
 export function getQuoteMetrics(quotes: Quote[]) {
   return {
     today: quotes.filter((quote) => isToday(quote.createdAt || quote.createdAtOperational)).length,
-    pending: quotes.filter((quote) => ['requested', 'pending', 'under_review', 'info_requested'].includes(quote.status)).length,
-    approved: quotes.filter((quote) => ['approved', 'confirmed', 'ready_for_shipment'].includes(quote.status)).length,
-    converted: quotes.filter((quote) => ['converted_to_shipment', 'dispatched'].includes(quote.status) || Boolean(quote.shipmentId)).length,
+    pending: quotes.filter((quote) => ['submitted', 'under_review', 'info_requested'].includes(quote.status)).length,
+    approved: quotes.filter((quote) => ['approved'].includes(quote.status)).length,
+    converted: quotes.filter((quote) => ['converted_to_shipment'].includes(quote.status) || Boolean(quote.shipmentId)).length,
   };
 }
 
 export function getShipmentMetrics(shipments: Shipment[]) {
   const trackingEvents = shipments.flatMap((shipment) => shipment.timeline?.length ? shipment.timeline : shipment.trackingUpdates || []);
   return {
-    created: shipments.filter((shipment) => ['draft', 'created', 'pending_dispatch', 'scheduled'].includes(shipment.status)).length,
-    inTransit: shipments.filter((shipment) => ['picked_up', 'in_transit', 'at_hub', 'out_for_delivery'].includes(shipment.status)).length,
+    created: shipments.filter((shipment) => ['created', 'awaiting_pickup'].includes(shipment.status)).length,
+    inTransit: shipments.filter((shipment) => ['picked_up', 'in_transit', 'at_origin_hub', 'out_for_delivery'].includes(shipment.status)).length,
     delivered: shipments.filter((shipment) => shipment.status === 'delivered').length,
     delayed: shipments.filter((shipment) => shipment.status === 'delayed').length,
     cancelled: shipments.filter((shipment) => shipment.status === 'cancelled').length,
     movementsToday: trackingEvents.filter((event) => isToday(event.timestamp)).length,
-    anomalies: shipments.filter((shipment) => ['delayed', 'failed_delivery', 'returned', 'cancelled'].includes(shipment.status)).length,
+    anomalies: shipments.filter((shipment) => ['delayed', 'delivery_failed', 'returned', 'cancelled'].includes(shipment.status)).length,
   };
 }
 
@@ -83,11 +83,11 @@ export function getShipmentSource(shipment: Shipment) {
 
 export function buildAlerts(shipments: Shipment[], quotes: Quote[]) {
   const shipmentAlerts = shipments
-    .filter((shipment) => ['delayed', 'failed_delivery'].includes(shipment.status))
+    .filter((shipment) => ['delayed', 'delivery_failed'].includes(shipment.status))
     .map((shipment) => ({
       id: shipment._id,
-      priority: shipment.status === 'failed_delivery' ? 'Critique' : 'Important',
-      type: shipment.status === 'failed_delivery' ? 'Livraison échouée' : 'Retard',
+      priority: shipment.status === 'delivery_failed' ? 'Critique' : 'Important',
+      type: shipment.status === 'delivery_failed' ? 'Livraison échouée' : 'Retard',
       subject: shipment.trackingCode,
       detail: `${shipment.origin || shipment.meta?.quote?.origin || '—'} → ${shipment.destination || shipment.meta?.quote?.destination || '—'}`,
       date: shipment.updatedAt,
@@ -106,7 +106,7 @@ export function buildAlerts(shipments: Shipment[], quotes: Quote[]) {
     }));
 
   const paymentAlerts = quotes
-    .filter((quote) => quote.paymentStatus === 'pending' || ['approved', 'confirmed', 'ready_for_shipment'].includes(quote.status))
+    .filter((quote) => quote.paymentStatus === 'pending' || ['approved'].includes(quote.status))
     .slice(0, 8)
     .map((quote) => ({
       id: `payment-${quote._id}`,

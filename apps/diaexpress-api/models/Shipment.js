@@ -1,19 +1,5 @@
 const mongoose = require('mongoose');
-
-const SHIPMENT_STATUSES = [
-  'draft',
-  'created',
-  'pending_dispatch',
-  'scheduled',
-  'in_transit',
-  'delayed',
-  'at_hub',
-  'out_for_delivery',
-  'delivered',
-  'failed_delivery',
-  'returned',
-  'cancelled',
-];
+const { SHIPMENT_STATUSES, normalizeShipmentStatus } = require('../src/domain/statuses');
 
 const ShipmentHistorySchema = new mongoose.Schema({
   eventType: { type: String, default: 'status_update' },
@@ -46,7 +32,7 @@ const ShipmentSchema = new mongoose.Schema({
   status: {
     type: String,
     enum: SHIPMENT_STATUSES,
-    default: 'draft',
+    default: 'created',
   },
   currentLocation: { type: String },
   currentMarketPointId: { type: mongoose.Schema.Types.ObjectId, ref: 'MarketPoint', default: null },
@@ -85,6 +71,16 @@ const ShipmentSchema = new mongoose.Schema({
   assignedBy: { type: String, default: null },
 }, {
   timestamps: true,
+});
+
+ShipmentSchema.pre('validate', function normalizeShipmentStatusBeforeValidate(next) {
+  if (this.status) this.status = normalizeShipmentStatus(this.status);
+  if (Array.isArray(this.trackingUpdates)) {
+    this.trackingUpdates.forEach((entry) => {
+      if (entry.status) entry.status = normalizeShipmentStatus(entry.status);
+    });
+  }
+  next();
 });
 
 module.exports = mongoose.models.Shipment || mongoose.model('Shipment', ShipmentSchema);

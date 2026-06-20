@@ -7,15 +7,15 @@ async function applyShipmentLifecycleToQuote({ quoteId, shipmentStatus, tracking
     trackingNumber: trackingCode || null,
   };
 
-  if (['created', 'pending_dispatch', 'scheduled'].includes(shipmentStatus)) {
+  if (['created', 'awaiting_pickup'].includes(shipmentStatus)) {
     patch.deliveryStatus = 'assigned';
-  } else if (['in_transit', 'at_hub', 'out_for_delivery'].includes(shipmentStatus)) {
+  } else if (['picked_up', 'at_origin_hub', 'in_transit', 'at_destination_hub', 'out_for_delivery'].includes(shipmentStatus)) {
     patch.deliveryStatus = 'in_transit';
   } else if (shipmentStatus === 'delivered') {
     patch.deliveryStatus = 'delivered';
-    patch.status = 'converted';
+    patch.status = 'converted_to_shipment';
     patch.deliveredAt = deliveredAt || new Date();
-  } else if (['cancelled', 'returned', 'failed_delivery'].includes(shipmentStatus)) {
+  } else if (['cancelled', 'returned', 'delivery_failed'].includes(shipmentStatus)) {
     patch.deliveryStatus = 'not_assigned';
     patch.status = 'cancelled';
     patch.deliveredAt = null;

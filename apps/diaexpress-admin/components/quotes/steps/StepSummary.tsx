@@ -83,7 +83,7 @@ export function StepSummary({
                       <p className="muted">{estimate.provider || 'Interne'}</p>
                       <strong>{formatCurrency(estimate.estimatedPrice, estimate.currency)}</strong>
                     </div>
-                    {isSelected ? <QuoteStatusBadge status="confirmed" /> : <QuoteStatusBadge status="pending" />}
+                    {isSelected ? <QuoteStatusBadge status="approved" /> : <QuoteStatusBadge status="submitted" />}
                   </div>
                   {estimate.transportType ? <p className="muted">Transport {estimate.transportType}</p> : null}
                 </button>
@@ -99,7 +99,7 @@ export function StepSummary({
         </Button>
         <div className="wizard__footer-actions">
           {createdQuoteId ? (
-            <QuoteStatusBadge status="confirmed" />
+            <QuoteStatusBadge status="approved" />
           ) : null}
           <Button type="button" onClick={onCreate} disabled={!selectedEstimate || creating}>
             {creating ? 'Enregistrement...' : createdQuoteId ? 'Enregistrer un nouveau devis' : 'Enregistrer le devis'}

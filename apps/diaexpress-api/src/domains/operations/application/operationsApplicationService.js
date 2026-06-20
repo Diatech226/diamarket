@@ -341,7 +341,7 @@ async function assignShipmentToOperation({ shipmentId, input, identity }) {
   shipment.assignedAt = new Date();
   shipment.assignedBy = identity?.principalId || null;
   shipment.planningStatus = shipment.scheduleId ? 'scheduled' : 'assigned';
-  shipment.status = shipment.status === 'created' ? 'scheduled' : shipment.status;
+  shipment.status = shipment.status === 'created' ? 'awaiting_pickup' : shipment.status;
   shipment.scheduledAt = shipment.scheduledAt || new Date();
 
   shipment.meta = {

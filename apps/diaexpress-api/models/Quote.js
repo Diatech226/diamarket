@@ -1,22 +1,5 @@
 const mongoose = require('mongoose');
-
-const QUOTE_STATUSES = [
-  'draft',
-  'requested',
-  'under_review',
-  'approved',
-  'rejected',
-  'awaiting_customer_approval',
-  'customer_approved',
-  'expired',
-  'cancelled',
-  'ready_for_shipment',
-  'converted',
-  // legacy compatibility
-  'pending',
-  'confirmed',
-  'dispatched',
-];
+const { QUOTE_STATUSES, normalizeQuoteStatus } = require('../src/domain/statuses');
 
 const quoteActionSchema = new mongoose.Schema(
   {
@@ -65,7 +48,7 @@ const quoteSchema = new mongoose.Schema({
   status: {
     type: String,
     enum: QUOTE_STATUSES,
-    default: 'requested',
+    default: 'submitted',
   },
   priority: {
     type: String,
@@ -145,6 +128,17 @@ const quoteSchema = new mongoose.Schema({
   requestedByLabel: { type: String },
 }, {
   timestamps: true,
+});
+
+quoteSchema.pre('validate', function normalizeQuoteStatusBeforeValidate(next) {
+  if (this.status) this.status = normalizeQuoteStatus(this.status);
+  if (Array.isArray(this.reviewHistory)) {
+    this.reviewHistory.forEach((entry) => {
+      if (entry.fromStatus) entry.fromStatus = normalizeQuoteStatus(entry.fromStatus);
+      if (entry.toStatus) entry.toStatus = normalizeQuoteStatus(entry.toStatus);
+    });
+  }
+  next();
 });
 
 module.exports = mongoose.models.Quote || mongoose.model('Quote', quoteSchema);

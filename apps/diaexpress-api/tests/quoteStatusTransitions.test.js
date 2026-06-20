@@ -10,7 +10,7 @@ const adminQuoteController = require('../controllers/adminQuoteController');
 const quotes = new Map();
 
 function createQuote(data) {
-  const quote = new Quote({ status: 'requested', ...data });
+  const quote = new Quote({ status: 'submitted', ...data });
   const validationError = quote.validateSync();
   if (validationError) throw validationError;
   quotes.set(quote._id.toString(), quote);
@@ -49,12 +49,12 @@ test('admin review then approve follows canonical lifecycle', { concurrency: fal
   assert.strictEqual(resApprove.payload.quote.status, 'approved');
 });
 
-test('invalid transition requested -> ready_for_shipment is rejected', { concurrency: false }, async () => {
+test('invalid transition submitted -> converted_to_shipment is rejected', { concurrency: false }, async () => {
   const quote = createQuote({ origin: 'Paris', destination: 'Accra', transportType: 'sea' });
 
   const res = createMockRes();
   await adminQuoteController.markReadyForShipment({ params: { id: quote._id.toString() }, body: {}, identity: { principalId: 'admin-2' } }, res);
 
   assert.strictEqual(res.statusCode, 409);
-  assert.ok(String(res.payload.message).includes('Cannot transition'));
+  assert.ok(String(res.payload.message).includes('Transition de statut non autorisée'));
 });

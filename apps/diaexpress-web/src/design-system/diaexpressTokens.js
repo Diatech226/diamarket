@@ -7,8 +7,8 @@ export const diaexpressTokens = {
   shadow: { card: '0 20px 50px rgba(17, 24, 39, 0.10)', lift: '0 28px 70px rgba(23, 50, 77, 0.18)' },
   typography: { base: "Inter, Manrope, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", display: "Manrope, Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" },
   statusColors: {
-    quote: { requested: '#00B8D9', under_review: '#FF9F1C', info_requested: '#D9B382', approved: '#2ECC71', rejected: '#E63946', ready_for_shipment: '#17324D', converted_to_shipment: '#111827', cancelled: '#E5E7EB' },
-    shipment: { draft: '#E5E7EB', created: '#00B8D9', pending_dispatch: '#FF9F1C', scheduled: '#D9B382', picked_up: '#38BDF8', in_transit: '#17324D', at_hub: '#8B5CF6', out_for_delivery: '#FB8500', delivered: '#2ECC71', failed_delivery: '#E63946', delayed: '#F59E0B', returned: '#9A6B3F', cancelled: '#4B5563' },
+    quote: { submitted: '#00B8D9', under_review: '#FF9F1C', info_requested: '#D9B382', priced: '#17324D', approved: '#2ECC71', rejected: '#E63946', expired: '#E5E7EB', converted_to_shipment: '#111827', cancelled: '#E5E7EB' },
+    shipment: { created: '#00B8D9', awaiting_pickup: '#FF9F1C', picked_up: '#38BDF8', at_origin_hub: '#8B5CF6', in_transit: '#17324D', at_destination_hub: '#8B5CF6', out_for_delivery: '#FB8500', delivered: '#2ECC71', delivery_failed: '#E63946', delayed: '#F59E0B', returned: '#9A6B3F', cancelled: '#4B5563' },
   },
   transportColors: { air: '#00B8D9', sea: '#17324D', road: '#FF9F1C', local: '#2ECC71' },
 };

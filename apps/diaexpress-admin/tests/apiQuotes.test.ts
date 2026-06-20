@@ -27,11 +27,11 @@ describe('api/quotes client', () => {
   });
 
   it('confirmQuote envoie un payload de confirmation', async () => {
-    mockFetch.mockResolvedValueOnce(buildResponse({ quote: { _id: '1', status: 'confirmed' } }));
+    mockFetch.mockResolvedValueOnce(buildResponse({ quote: { _id: '1', status: 'approved' } }));
 
     const data = await confirmQuote('1', { finalPrice: 1200 });
 
-    expect(data.status).toBe('confirmed');
+    expect(data.status).toBe('approved');
     const [, options] = mockFetch.mock.calls[0];
     expect(options?.method).toBe('POST');
     expect(options?.body).toContain('1200');

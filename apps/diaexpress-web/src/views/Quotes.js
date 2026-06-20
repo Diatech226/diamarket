@@ -89,14 +89,14 @@ const Quotes = () => {
 
   const formatStatus = (status) => {
     switch (status) {
-      case "confirmed":
-        return <span className="status-badge status-confirmed">✅ Confirmé</span>;
+      case "approved":
+        return <span className="status-badge status-confirmed">✅ Devis approuvé</span>;
       case "paid":
         return <span className="status-badge status-paid">💳 Payé</span>;
       case "rejected":
         return <span className="status-badge status-rejected">❌ Rejeté</span>;
-      case "dispatched":
-        return <span className="status-badge status-dispatched">📦 Expédié</span>;
+      case "converted_to_shipment":
+        return <span className="status-badge status-dispatched">📦 Expédition créée</span>;
       default:
         return <span className="status-badge status-pending">⏳ En attente</span>;
     }
@@ -135,7 +135,7 @@ const Quotes = () => {
                 <td>{q.estimatedPrice || "-"} {q.currency || "USD"}</td>
                 <td>{formatStatus(q.status)}</td>
                 <td>
-                  {q.status === "confirmed" && (
+                  {q.status === "approved" && (
                     <button
                       className="action-btn action-pay"
                       onClick={() => handlePayment(q)}

@@ -237,7 +237,7 @@ export async function markQuoteReadyForShipment(id: string): Promise<Quote> {
     const data = await apiClient<{ quote: Quote }>(`/api/quotes/${id}/ready-for-shipment`, { method: 'POST' });
     return data.quote;
   } catch {
-    return updateQuoteStatus(id, 'ready_for_shipment');
+    return updateQuoteStatus(id, 'approved');
   }
 }
 

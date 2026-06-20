@@ -16,8 +16,8 @@ const AccountQuoteDetail = () => {
   const linkedShipment = useMemo(() => shipments.find((s) => String(s.quoteId?._id || s.quoteId || s.quote) === String(id)), [shipments, id]);
   const history = quote?.history || quote?.statusHistory || quote?.events || [];
   const parcels = quote?.packages || quote?.parcels || quote?.items || [];
-  const canPay = ['approved', 'ready_for_shipment'].includes(String(quote?.status || '').toLowerCase());
-  const canCancel = ['requested', 'under_review', 'info_requested', 'approved'].includes(String(quote?.status || '').toLowerCase());
+  const canPay = ['approved', 'approved'].includes(String(quote?.status || '').toLowerCase());
+  const canCancel = ['submitted', 'under_review', 'info_requested', 'approved'].includes(String(quote?.status || '').toLowerCase());
   const pay = async () => { setAction('payment'); try { const result = await createPayment(await getToken(), { quoteId: id }); if (result?.checkoutUrl) window.location.href = result.checkoutUrl; else alert('Paiement préparé.'); } catch(e) { alert(e.message || 'Paiement indisponible'); } finally { setAction(''); } };
   const convert = async () => { setAction('convert'); try { await createShipmentFromQuote(id, await getToken()); await load(); } catch(e) { alert(e.message || 'Conversion indisponible'); } finally { setAction(''); } };
   if (loading) return <ProtectedRoute><main className="dx-dashboard-shell"><div className="dx-empty">Chargement du devis…</div></main></ProtectedRoute>;
