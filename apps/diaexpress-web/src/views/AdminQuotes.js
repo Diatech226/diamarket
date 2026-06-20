@@ -52,12 +52,12 @@ const AdminQuotes = () => {
 
   const formatStatus = (status) => {
     switch (status) {
-      case "confirmed":
-        return <span className="status-badge status-confirmed">✅ Confirmé</span>;
+      case "approved":
+        return <span className="status-badge status-confirmed">✅ Devis approuvé</span>;
       case "rejected":
         return <span className="status-badge status-rejected">❌ Rejeté</span>;
-      case "dispatched":
-        return <span className="status-badge status-dispatched">📦 Expédié</span>;
+      case "converted_to_shipment":
+        return <span className="status-badge status-dispatched">📦 Expédition créée</span>;
       default:
         return <span className="status-badge status-pending">⏳ En attente</span>;
     }
@@ -105,7 +105,7 @@ const AdminQuotes = () => {
                     <div className="action-buttons">
                       <button
                         className="action-btn action-confirm"
-                        onClick={() => updateStatus(q._id, "confirmed")}
+                        onClick={() => updateStatus(q._id, "approved")}
                       >
                         Confirmer
                       </button>
@@ -117,7 +117,7 @@ const AdminQuotes = () => {
                       </button>
                       <button
                         className="action-btn action-dispatch"
-                        onClick={() => updateStatus(q._id, "dispatched")}
+                        onClick={() => updateStatus(q._id, "converted_to_shipment")}
                       >
                         Expédier
                       </button>
@@ -182,7 +182,7 @@ const AdminQuotes = () => {
   }, [loadQuotes]);
 
   const updateStatus = async (id, newStatus) => {
-    if (newStatus === "confirmed") {
+    if (newStatus === "approved") {
       const confirmAction = window.confirm("Confirmer ce devis ?");
       if (!confirmAction) return;
     }
@@ -205,14 +205,14 @@ const AdminQuotes = () => {
 
   const formatStatus = (status) => {
     switch (status) {
-      case "confirmed":
-        return <span className="status-badge status-confirmed">✅ Confirmé</span>;
+      case "approved":
+        return <span className="status-badge status-confirmed">✅ Devis approuvé</span>;
       case "paid":
         return <span className="status-badge status-paid">💳 Payé</span>;
       case "rejected":
         return <span className="status-badge status-rejected">❌ Rejeté</span>;
-      case "dispatched":
-        return <span className="status-badge status-dispatched">📦 Expédié</span>;
+      case "converted_to_shipment":
+        return <span className="status-badge status-dispatched">📦 Expédition créée</span>;
       default:
         return <span className="status-badge status-pending">⏳ En attente</span>;
     }
@@ -261,12 +261,12 @@ const AdminQuotes = () => {
                       {q.status === "pending" && (
                         <button
                           className="action-btn action-confirm"
-                          onClick={() => updateStatus(q._id, "confirmed")}
+                          onClick={() => updateStatus(q._id, "approved")}
                         >
                           Confirmer
                         </button>
                       )}
-                      {q.status === "confirmed" && (
+                      {q.status === "approved" && (
                         <>
                           <button
                             className="action-btn action-reject"
@@ -276,7 +276,7 @@ const AdminQuotes = () => {
                           </button>
                           <button
                             className="action-btn action-dispatch"
-                            onClick={() => updateStatus(q._id, "dispatched")}
+                            onClick={() => updateStatus(q._id, "converted_to_shipment")}
                           >
                             Expédier
                           </button>

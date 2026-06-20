@@ -20,19 +20,18 @@ import { getShipmentSource } from '@/src/lib/operations';
 import type { Embarkment, Shipment } from '@/src/types/logistics';
 
 const STATUS_OPTIONS: Shipment['status'][] = [
-  'draft',
   'created',
-  'pending_dispatch',
-  'scheduled',
+  'awaiting_pickup',
   'picked_up',
+  'at_origin_hub',
   'in_transit',
-  'delayed',
-  'at_hub',
+  'at_destination_hub',
   'out_for_delivery',
   'delivered',
-  'failed_delivery',
+  'delivery_failed',
   'returned',
   'cancelled',
+  'delayed',
 ];
 
 export function ShipmentsPage() {

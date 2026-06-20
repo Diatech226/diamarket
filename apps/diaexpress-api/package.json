@@ -10,7 +10,8 @@
     "start": "node server.js",
     "migrate:payments": "node scripts/migratePaymentsToDiaPay.js",
     "seed:admin": "node scripts/seed-admin.js",
-    "typecheck": "echo \"No TypeScript typecheck configured for diaexpress-api\""
+    "typecheck": "echo \"No TypeScript typecheck configured for diaexpress-api\"",
+    "migrate:statuses": "node scripts/migrate-statuses.js"
   },
   "keywords": [],
   "author": "",

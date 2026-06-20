@@ -103,9 +103,9 @@ export function QuotesPage() {
       .filter((quote) => (destination ? String(quote.destination || '').toLowerCase().includes(destination.toLowerCase()) : true))
       .filter((quote) => {
         if (quickView === 'all') return true;
-        if (quickView === 'pending') return ['requested', 'pending'].includes(quote.status);
+        if (quickView === 'pending') return ['submitted', 'pending'].includes(quote.status);
         if (quickView === 'under_review') return quote.status === 'under_review' || (quote.status === 'pending' && Boolean(quote.notes));
-        if (quickView === 'approved') return ['approved', 'confirmed', 'ready_for_shipment'].includes(quote.status);
+        if (quickView === 'approved') return ['approved'].includes(quote.status);
         if (quickView === 'rejected') return quote.status === 'rejected';
         return true;
       });
@@ -161,7 +161,7 @@ export function QuotesPage() {
   };
 
   const canConvert = (quote: Quote) =>
-    ['approved', 'confirmed', 'ready_for_shipment'].includes(quote.status) && (!quote.shipmentId || quote.shipmentId === '');
+    ['approved'].includes(quote.status) && (!quote.shipmentId || quote.shipmentId === '');
 
   const handleActionSubmit = async (payload: QuoteActionPayload) => {
     if (!activeAction || !activeQuote) return;

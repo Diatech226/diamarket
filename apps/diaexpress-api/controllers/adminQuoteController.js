@@ -127,7 +127,18 @@ exports.approve = async (req, res) => {
     const q = await Quote.findById(id);
     if (!q) return res.status(404).json({ message: 'Quote non trouvé' });
 
-    const next = assertValidTransition(q.status, 'approved');
+    let next = 'approved';
+    if (q.status === 'under_review') {
+      const priced = assertValidTransition(q.status, 'priced');
+      const pricedPatch = buildLifecyclePatch({ status: priced, actorId: resolveIdentity(req)?.principalId, note: 'Prix final proposé' });
+      const { reviewHistoryEntry: pricedHistoryEntry, ...pricedFields } = pricedPatch;
+      q.set(pricedFields);
+      if (pricedHistoryEntry) {
+        q.reviewHistory = Array.isArray(q.reviewHistory) ? q.reviewHistory : [];
+        q.reviewHistory.push(pricedHistoryEntry);
+      }
+    }
+    next = assertValidTransition(q.status, 'approved');
     if (finalPrice != null) q.finalPrice = finalPrice;
     q.currency = currency;
 
@@ -209,7 +220,7 @@ exports.requestMoreInfo = async (req, res) => {
     const q = await Quote.findById(id);
     if (!q) return res.status(404).json({ message: 'Quote non trouvé' });
 
-    const next = assertValidTransition(q.status, 'awaiting_customer_approval');
+    const next = assertValidTransition(q.status, 'info_requested');
     const patch = buildLifecyclePatch({
       status: next,
       actorId: resolveIdentity(req)?.principalId,
@@ -238,7 +249,7 @@ exports.markReadyForShipment = async (req, res) => {
     const q = await Quote.findById(id);
     if (!q) return res.status(404).json({ message: 'Quote non trouvé' });
 
-    const next = assertValidTransition(q.status, 'ready_for_shipment');
+    const next = assertValidTransition(q.status, 'approved');
     const patch = buildLifecyclePatch({
       status: next,
       actorId: resolveIdentity(req)?.principalId,

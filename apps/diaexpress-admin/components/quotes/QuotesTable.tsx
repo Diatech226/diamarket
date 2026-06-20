@@ -44,9 +44,9 @@ export function QuotesTable({
   actionError,
   getPriority,
 }: QuotesTableProps) {
-  const canConfirm = (quote: Quote) => ['requested', 'pending', 'under_review', 'info_requested'].includes(quote.status);
+  const canConfirm = (quote: Quote) => ['submitted', 'under_review', 'info_requested'].includes(quote.status);
   const canConvert = (quote: Quote) =>
-    ['approved', 'confirmed', 'ready_for_shipment'].includes(quote.status) && !quote.shipmentId;
+    ['approved'].includes(quote.status) && !quote.shipmentId;
   const canReject = (quote: Quote) => !['rejected', 'converted_to_shipment', 'cancelled'].includes(quote.status);
   const canEdit = (quote: Quote) => !['converted_to_shipment', 'cancelled'].includes(quote.status);
 

@@ -2,55 +2,16 @@ const Shipment = require('../models/Shipment');
 const Quote = require('../models/Quote');
 const { ApiError } = require('../utils/http');
 
-const SHIPMENT_STATUSES = [
-  'draft',
-  'created',
-  'pending_dispatch',
-  'scheduled',
-  'in_transit',
-  'delayed',
-  'at_hub',
-  'out_for_delivery',
-  'delivered',
-  'failed_delivery',
-  'returned',
-  'cancelled',
-];
+const {
+  SHIPMENT_STATUSES,
+  SHIPMENT_TRANSITIONS: ROLE_TRANSITIONS,
+  normalizeShipmentStatus,
+  canTransitionShipment,
+} = require('../src/domain/statuses');
 
 const TERMINAL_STATUSES = new Set(['delivered', 'returned', 'cancelled']);
 
-const ROLE_TRANSITIONS = {
-  admin: {
-    draft: ['created', 'cancelled'],
-    created: ['pending_dispatch', 'scheduled', 'cancelled'],
-    pending_dispatch: ['scheduled', 'in_transit', 'cancelled'],
-    scheduled: ['in_transit', 'delayed', 'cancelled'],
-    in_transit: ['at_hub', 'out_for_delivery', 'delayed', 'delivered', 'failed_delivery', 'cancelled'],
-    delayed: ['scheduled', 'in_transit', 'at_hub', 'out_for_delivery', 'cancelled'],
-    at_hub: ['out_for_delivery', 'in_transit', 'delayed', 'cancelled'],
-    out_for_delivery: ['delivered', 'failed_delivery', 'delayed', 'cancelled'],
-    failed_delivery: ['out_for_delivery', 'returned', 'cancelled'],
-    delivered: [],
-    returned: [],
-    cancelled: [],
-  },
-  operations: {
-    draft: ['created'],
-    created: ['pending_dispatch', 'scheduled'],
-    pending_dispatch: ['scheduled', 'in_transit'],
-    scheduled: ['in_transit', 'delayed'],
-    in_transit: ['at_hub', 'out_for_delivery', 'delayed'],
-    delayed: ['scheduled', 'in_transit', 'at_hub', 'out_for_delivery'],
-    at_hub: ['out_for_delivery', 'in_transit', 'delayed'],
-    out_for_delivery: ['delivered', 'failed_delivery', 'delayed'],
-    failed_delivery: ['out_for_delivery', 'returned'],
-    delivered: [],
-    returned: [],
-    cancelled: [],
-  },
-};
-
-const ELIGIBLE_QUOTE_STATUSES = new Set(['ready_for_shipment', 'approved', 'customer_approved']);
+const ELIGIBLE_QUOTE_STATUSES = new Set(['approved']);
 
 function generateTrackingCode() {
   const date = new Date();
@@ -59,12 +20,6 @@ function generateTrackingCode() {
   ).padStart(2, '0')}`;
   const random = Math.random().toString(36).slice(2, 8).toUpperCase();
   return `SH-${yyyymmdd}-${random}`;
-}
-
-function normalizeShipmentStatus(status) {
-  if (!status) return status;
-  const normalized = String(status).trim().toLowerCase();
-  return normalized === 'booked' ? 'created' : normalized === 'arrived' ? 'at_hub' : normalized;
 }
 
 function resolveIdentityRole(identity = {}) {
@@ -77,7 +32,7 @@ function resolveIdentityRole(identity = {}) {
 }
 
 function assertShipmentTransition({ currentStatus, nextStatus, identityRole }) {
-  const current = normalizeShipmentStatus(currentStatus || 'draft');
+  const current = normalizeShipmentStatus(currentStatus || 'created');
   const next = normalizeShipmentStatus(nextStatus);
   if (!next || current === next) return;
 
@@ -85,11 +40,8 @@ function assertShipmentTransition({ currentStatus, nextStatus, identityRole }) {
     throw new ApiError(400, 'SHIPMENT_INVALID_STATUS', `Unsupported shipment status: ${next}`);
   }
 
-  const role = identityRole || 'operations';
-  const transitions = ROLE_TRANSITIONS[role] || ROLE_TRANSITIONS.operations;
-  const allowed = transitions[current] || [];
-  if (!allowed.includes(next)) {
-    throw new ApiError(409, 'INVALID_STATUS_TRANSITION', `Invalid transition: ${current} -> ${next}`);
+  if (!canTransitionShipment(current, next)) {
+    throw new ApiError(409, 'INVALID_STATUS_TRANSITION', 'Transition de statut non autorisée');
   }
 }
 
@@ -115,7 +67,7 @@ function applyLifecycleDates(shipment, status, identity) {
   shipment.meta.lastStatusChangedBy = identity?.principalId || shipment.meta.lastStatusChangedBy || null;
   shipment.meta.lastStatusChangedAt = now;
 
-  if (status === 'scheduled') shipment.scheduledAt = shipment.scheduledAt || now;
+  if (status === 'awaiting_pickup') shipment.scheduledAt = shipment.scheduledAt || now;
   if (status === 'in_transit') shipment.dispatchedAt = shipment.dispatchedAt || now;
   if (status === 'delivered') shipment.deliveredAt = shipment.deliveredAt || now;
   if (status === 'cancelled') shipment.cancelledAt = shipment.cancelledAt || now;
@@ -126,7 +78,8 @@ async function createShipmentFromQuote({ quoteId, identity, notes }) {
   const quote = await Quote.findById(quoteId);
   if (!quote) throw new ApiError(404, 'QUOTE_NOT_FOUND', 'Quote introuvable');
 
-  const normalizedQuoteStatus = String(quote.status || '').toLowerCase();
+  const { normalizeQuoteStatus } = require('../src/domain/statuses');
+  const normalizedQuoteStatus = normalizeQuoteStatus(quote.status || '');
   if (!ELIGIBLE_QUOTE_STATUSES.has(normalizedQuoteStatus) && quote.deliveryStatus !== 'assigned') {
     throw new ApiError(409, 'QUOTE_NOT_ELIGIBLE_FOR_SHIPMENT', `Quote status ${quote.status} cannot be converted to shipment`);
   }
@@ -201,13 +154,13 @@ async function createShipmentFromQuote({ quoteId, identity, notes }) {
   quote.shipmentId = shipment._id;
   quote.trackingNumber = trackingCode;
   quote.deliveryStatus = 'assigned';
-  quote.status = 'converted';
+  quote.status = 'converted_to_shipment';
   quote.convertedAt = now;
   quote.reviewHistory = Array.isArray(quote.reviewHistory) ? quote.reviewHistory : [];
   quote.reviewHistory.push({
     action: 'quote_converted_to_shipment',
     fromStatus: previousQuoteStatus,
-    toStatus: 'converted',
+    toStatus: 'converted_to_shipment',
     actorId: identity?.principalId || null,
     actorLabel: identity?.label || null,
     role: resolveIdentityRole(identity),

@@ -8,7 +8,7 @@ export function ShipmentsSection() {
       <FilteredShipmentsTable
         title="À venir / Booking"
         description="Expéditions planifiées ou en attente de chargement"
-        statuses={['pending_dispatch', 'scheduled', 'in_transit', 'at_hub', 'out_for_delivery']}
+        statuses={['awaiting_pickup', 'awaiting_pickup', 'in_transit', 'at_origin_hub', 'out_for_delivery']}
       />
       <FilteredShipmentsTable
         title="Livrées / archivées"

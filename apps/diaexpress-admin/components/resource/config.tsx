@@ -87,10 +87,13 @@ export const resourceConfigs: Record<ResourceName, ResourceConfig<any>> = {
     ],
     fetcher: fetchQuotes,
     statusOptions: [
-      { value: 'pending', label: 'En attente' },
-      { value: 'confirmed', label: 'Confirmé' },
-      { value: 'rejected', label: 'Rejeté' },
-      { value: 'dispatched', label: 'Dispatché' }
+      { value: 'submitted', label: 'Demande envoyée' },
+      { value: 'under_review', label: 'En cours d’étude' },
+      { value: 'priced', label: 'Prix proposé' },
+      { value: 'approved', label: 'Devis approuvé' },
+      { value: 'rejected', label: 'Devis refusé' },
+      { value: 'converted_to_shipment', label: 'Expédition créée' },
+      { value: 'cancelled', label: 'Devis annulé' }
     ],
     getRowId: (quote: Quote) => quote._id
   },
@@ -122,13 +125,14 @@ export const resourceConfigs: Record<ResourceName, ResourceConfig<any>> = {
     ],
     fetcher: fetchShipments,
     statusOptions: [
-      { value: 'pending', label: 'Pending' },
-      { value: 'booked', label: 'Booked' },
-      { value: 'dispatched', label: 'Dispatched' },
-      { value: 'scheduled', label: 'Programmé' },
-      { value: 'in_transit', label: 'In transit' },
+      { value: 'created', label: 'Expédition créée' },
+      { value: 'awaiting_pickup', label: 'En attente de collecte' },
+      { value: 'picked_up', label: 'Colis collecté' },
+      { value: 'in_transit', label: 'En transit' },
+      { value: 'out_for_delivery', label: 'En livraison' },
       { value: 'delivered', label: 'Livré' },
-      { value: 'cancelled', label: 'Annulé' }
+      { value: 'delivery_failed', label: 'Livraison échouée' },
+      { value: 'cancelled', label: 'Expédition annulée' }
     ],
     getRowId: (shipment: Shipment) => shipment._id
   },

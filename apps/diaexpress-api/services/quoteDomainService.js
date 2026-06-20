@@ -2,54 +2,12 @@ const { ApiError } = require('../utils/http');
 
 const isValidObjectId = (value) => /^[a-fA-F0-9]{24}$/.test(String(value || ''));
 
-const LEGACY_STATUS_MAP = {
-  pending: 'requested',
-  confirmed: 'approved',
-  dispatched: 'ready_for_shipment',
-};
-
-const CANONICAL_STATUSES = [
-  'draft',
-  'requested',
-  'under_review',
-  'approved',
-  'rejected',
-  'awaiting_customer_approval',
-  'customer_approved',
-  'expired',
-  'cancelled',
-  'ready_for_shipment',
-  'converted',
-];
-
-const STATUS_TRANSITIONS = {
-  draft: ['requested', 'cancelled'],
-  requested: ['under_review', 'cancelled', 'expired'],
-  under_review: ['approved', 'rejected', 'awaiting_customer_approval', 'cancelled'],
-  approved: ['ready_for_shipment', 'cancelled'],
-  rejected: ['under_review'],
-  awaiting_customer_approval: ['customer_approved', 'rejected', 'expired', 'cancelled'],
-  customer_approved: ['ready_for_shipment', 'cancelled'],
-  expired: [],
-  cancelled: [],
-  ready_for_shipment: ['converted', 'cancelled'],
-  converted: [],
-};
-
-const normalizeStatus = (status) => {
-  if (!status) return status;
-  const key = String(status).trim().toLowerCase();
-  return LEGACY_STATUS_MAP[key] || key;
-};
-
-const canTransition = (from, to) => {
-  const fromStatus = normalizeStatus(from);
-  const toStatus = normalizeStatus(to);
-  if (!fromStatus || !toStatus) return false;
-  if (fromStatus === toStatus) return true;
-  const allowed = STATUS_TRANSITIONS[fromStatus] || [];
-  return allowed.includes(toStatus);
-};
+const {
+  QUOTE_STATUSES: CANONICAL_STATUSES,
+  QUOTE_TRANSITIONS: STATUS_TRANSITIONS,
+  normalizeQuoteStatus: normalizeStatus,
+  canTransitionQuote: canTransition,
+} = require('../src/domain/statuses');
 
 const assertValidTransition = (from, to) => {
   const normalizedFrom = normalizeStatus(from);
@@ -62,7 +20,7 @@ const assertValidTransition = (from, to) => {
   }
 
   if (!canTransition(normalizedFrom, normalizedTo)) {
-    throw new ApiError(409, 'QUOTE_INVALID_TRANSITION', `Cannot transition quote from ${normalizedFrom} to ${normalizedTo}`);
+    throw new ApiError(409, 'QUOTE_INVALID_TRANSITION', 'Transition de statut non autorisée');
   }
 
   return normalizedTo;
@@ -86,11 +44,11 @@ const buildLifecyclePatch = ({ status, actorId, actorLabel, role, note, reason, 
     },
   };
 
-  if (nextStatus === 'requested' && !metadata?.keepSubmittedAt) {
+  if (nextStatus === 'submitted' && !metadata?.keepSubmittedAt) {
     patch.submittedAt = now;
   }
 
-  if (['under_review', 'approved', 'rejected', 'awaiting_customer_approval'].includes(nextStatus)) {
+  if (['under_review', 'approved', 'rejected', 'priced'].includes(nextStatus)) {
     patch.reviewedAt = now;
     if (isValidObjectId(actorId)) patch.reviewedBy = actorId;
   }
@@ -107,11 +65,11 @@ const buildLifecyclePatch = ({ status, actorId, actorLabel, role, note, reason, 
     patch.rejectionReason = reason || patch.rejectionReason || 'Rejected by admin';
   }
 
-  if (nextStatus === 'customer_approved') {
+  if (nextStatus === 'approved') {
     patch.customerApprovedAt = now;
   }
 
-  if (nextStatus === 'converted') {
+  if (nextStatus === 'converted_to_shipment') {
     patch.convertedAt = now;
   }
 
@@ -121,7 +79,7 @@ const buildLifecyclePatch = ({ status, actorId, actorLabel, role, note, reason, 
 const toCanonicalQuote = (quoteDoc) => {
   if (!quoteDoc) return null;
   const quote = typeof quoteDoc.toObject === 'function' ? quoteDoc.toObject() : quoteDoc;
-  const status = normalizeStatus(quote.status || 'requested');
+  const status = normalizeStatus(quote.status || 'submitted');
 
   const createdAt = quote.createdAt ? new Date(quote.createdAt) : null;
   const reviewedAt = quote.reviewedAt ? new Date(quote.reviewedAt) : null;
@@ -196,7 +154,7 @@ const toCanonicalQuote = (quoteDoc) => {
     operations: {
       ageHours,
       reviewAgeHours,
-      isOverdueReview: status === 'requested' && ageHours !== null ? ageHours >= 24 : false,
+      isOverdueReview: status === 'submitted' && ageHours !== null ? ageHours >= 24 : false,
     },
   };
 };

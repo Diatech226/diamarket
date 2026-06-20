@@ -4,6 +4,7 @@ const { success, parseListQuery, ApiError } = require('../utils/http');
 const {
   SHIPMENT_STATUSES,
   normalizeTrackingEvents,
+  normalizeShipmentStatus,
 } = require('../services/shipmentService');
 const {
   convertQuoteToShipment,

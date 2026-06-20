@@ -46,11 +46,11 @@ async function requestQuote({ body, identity }) {
     requestedBy: identity.principalId,
     requestedByType: identity.type || 'user',
     requestedByLabel: identity.label || null,
-    status: 'requested',
+    status: 'submitted',
     submittedAt: now,
     reviewHistory: [{
       action: 'created',
-      toStatus: 'requested',
+      toStatus: 'submitted',
       actorId: identity.principalId,
       actorLabel: identity.label || null,
       role: identity.type || 'user',

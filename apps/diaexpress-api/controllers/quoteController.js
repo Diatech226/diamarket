@@ -169,7 +169,7 @@ exports.payQuote = async (req, res, next) => {
 
     await transitionQuoteStatus({
       quote,
-      requestedStatus: 'customer_approved',
+      requestedStatus: 'approved',
       identity,
       note: 'Customer approved quote after payment',
       metadata: { source: 'payment' },
@@ -383,4 +383,4 @@ const adminStatusUpdate = (status, legacyStatus) => async (req, res, next) => {
 
 exports.confirmQuote = adminStatusUpdate('approved', 'confirmed');
 exports.rejectQuote = adminStatusUpdate('rejected', 'rejected');
-exports.dispatchQuote = adminStatusUpdate('ready_for_shipment', 'dispatched');
+exports.dispatchQuote = adminStatusUpdate('approved', 'approved');

@@ -23,7 +23,7 @@ const ClientPage = () => {
     finally { setLoading(false); }
   }, [getToken]);
   useEffect(() => { load(); }, [load]);
-  const kpis = useMemo(() => ({ quotesPending: quotes.filter((q) => ['pending', 'requested', 'submitted'].includes(String(q.status || '').toLowerCase())).length, activeShipments: shipments.filter((s) => !['delivered', 'completed'].includes(String(s.status || '').toLowerCase())).length, paymentsCount: payments.length, addressesCta: 'Gérer' }), [quotes, shipments, payments]);
+  const kpis = useMemo(() => ({ quotesPending: quotes.filter((q) => ['pending', 'submitted', 'submitted'].includes(String(q.status || '').toLowerCase())).length, activeShipments: shipments.filter((s) => !['delivered', 'completed'].includes(String(s.status || '').toLowerCase())).length, paymentsCount: payments.length, addressesCta: 'Gérer' }), [quotes, shipments, payments]);
   return <ClientAppShell eyebrow="espace client · dashboard" title="Centre logistique" subtitle="Pilotez vos devis, expéditions, paiements et actions prioritaires en un coup d’œil." actions={<><Link href="/quote-request" className="dx-button dx-button--primary">Nouvelle demande</Link><Link href="/track-shipment" className="dx-button dx-button--outline">Suivre un colis</Link></>}>
     {loading ? <div className="dx-empty"><p>Chargement du dashboard…</p></div> : null}
     {!loading && error ? <ClientErrorState message={error} onRetry={load} /> : null}

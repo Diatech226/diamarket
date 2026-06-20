@@ -13,15 +13,15 @@ const toReference = (quote) => quote?.reference || quote?.quoteReference || quot
 const normalizeStatus = (status) => {
   const value = (status || '').toLowerCase();
 
-  if (['approved', 'confirmed', 'paid', 'dispatched'].includes(value)) return 'approved';
+  if (['approved', 'paid', 'converted_to_shipment'].includes(value)) return 'approved';
   if (['rejected', 'declined'].includes(value)) return 'rejected';
-  if (['requested', 'submitted'].includes(value)) return 'requested';
+  if (['submitted'].includes(value)) return 'submitted';
 
   return 'pending';
 };
 
 const STATUS_CONFIG = {
-  requested: { label: 'Demandé', tone: 'info' },
+  submitted: { label: 'Demande envoyée', tone: 'info' },
   pending: { label: 'En attente', tone: 'warning' },
   approved: { label: 'Approuvé', tone: 'success' },
   rejected: { label: 'Rejeté', tone: 'danger' },
@@ -72,7 +72,7 @@ const Quotes = () => {
 
     return {
       total: quotes.length,
-      pending: normalized.filter((status) => status === 'pending' || status === 'requested').length,
+      pending: normalized.filter((status) => status === 'pending' || status === 'submitted').length,
       approved: normalized.filter((status) => status === 'approved').length,
       rejected: normalized.filter((status) => status === 'rejected').length,
     };
@@ -190,7 +190,7 @@ const Quotes = () => {
                           <td>
                             <div className="dx-actions">
                               <Link href={`/new-shipment/${quote._id}`} className="dx-button dx-button--outline dx-button--sm">{nextActionLabel(quote)}</Link>
-                              {quote.status === 'confirmed' ? (
+                              {quote.status === 'approved' ? (
                                 <button type="button" className="dx-button dx-button--primary dx-button--sm" onClick={() => handlePayment(quote)}>
                                   Payer
                                 </button>
@@ -224,7 +224,7 @@ const Quotes = () => {
 
                       <div className="dx-actions">
                         <Link href={`/new-shipment/${quote._id}`} className="dx-button dx-button--outline dx-button--sm">{nextActionLabel(quote)}</Link>
-                        {quote.status === 'confirmed' ? (
+                        {quote.status === 'approved' ? (
                           <button type="button" className="dx-button dx-button--primary dx-button--sm" onClick={() => handlePayment(quote)}>
                             Payer
                           </button>

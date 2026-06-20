@@ -147,17 +147,17 @@ if (!window.confirm('Refuser définitivement ce devis ?')) return;
                 <QuoteStatusBadge status={quote.status} />
               </div>
               <div className="panel__actions">
-                {!['under_review', 'approved', 'confirmed', 'ready_for_shipment', 'converted_to_shipment', 'rejected', 'cancelled'].includes(quote.status) ? (
+                {!['under_review', 'approved', 'approved', 'approved', 'converted_to_shipment', 'rejected', 'cancelled'].includes(quote.status) ? (
                   <Button variant="ghost" onClick={handleReview} disabled={busyAction === 'review'}>
                     {busyAction === 'review' ? 'Revue...' : 'Marquer en revue'}
                   </Button>
                 ) : null}
-                {!['approved', 'confirmed', 'ready_for_shipment', 'converted_to_shipment', 'rejected', 'cancelled'].includes(quote.status) ? (
+                {!['approved', 'approved', 'approved', 'converted_to_shipment', 'rejected', 'cancelled'].includes(quote.status) ? (
                   <Button variant="ghost" onClick={handleRequestInfo} disabled={busyAction === 'info'}>
                     {busyAction === 'info' ? 'Envoi...' : 'Demander infos'}
                   </Button>
                 ) : null}
-                {['requested', 'pending', 'under_review', 'info_requested'].includes(quote.status) ? (
+                {['submitted', 'under_review', 'info_requested'].includes(quote.status) ? (
                   <Button variant="secondary" onClick={handleConfirm} disabled={busyAction === 'confirm'}>
                     {busyAction === 'confirm' ? 'Validation...' : 'Approuver'}
                   </Button>
@@ -167,12 +167,12 @@ if (!window.confirm('Refuser définitivement ce devis ?')) return;
                     {busyAction === 'reject' ? 'Rejet...' : 'Rejeter'}
                   </Button>
                 ) : null}
-                {['approved', 'confirmed'].includes(quote.status) ? (
+                {['approved', 'approved'].includes(quote.status) ? (
                   <Button variant="secondary" onClick={handleReady} disabled={busyAction === 'ready'}>
                     {busyAction === 'ready' ? 'MAJ...' : 'Prêt expédition'}
                   </Button>
                 ) : null}
-                {['approved', 'confirmed', 'ready_for_shipment'].includes(quote.status) ? (
+                {['approved', 'approved', 'approved'].includes(quote.status) ? (
                   <Button variant="primary" onClick={handleConvert} disabled={busyAction === 'convert'}>
                     {busyAction === 'convert' ? 'Conversion...' : 'Convertir en shipment'}
                   </Button>
