@@ -1,136 +1,80 @@
 # Auth flow stabilization report
 
-## Scope audited
+## Scope
 
-- Diamarket API: `apps/diamarket-api`
-- Diamarket CMS: `apps/diamarket-cms`
-- Diamarket Web: `apps/diamarket-web`
-- DiaExpress API: `apps/diaexpress-api`
-- DiaExpress Admin: `apps/diaexpress-admin`
-- DiaExpress Web: `apps/diaexpress-web`
+Audited and stabilized the authentication and session contracts for:
+
+- Diamarket API, CMS, and Web.
+- DiaExpress API, Admin, and Web.
+- Currency seed used by the Diamarket `/currencies` CMS flow and backed by the `currencyrates` collection.
 
 ## Errors found
 
-### Blocking currency seed error
+1. The currency initialization flow had historically relied on non-idempotent insert semantics. Re-running the flow could trigger `MongoBulkWriteError: E11000 duplicate key` for `code: "XOF"` if a process had already inserted the default currency.
+2. DiaExpress auth responses were not consistently shaped as `{ success, message, user, token }` or `{ success: false, message }`, which made frontend error handling more brittle.
+3. DiaExpress frontend role guards could derive access from Clerk metadata. The backend database role must be the source of truth for admin/client/delivery authorization, except the explicit local dev admin bypass.
+4. DiaExpress user sync accepted any role emitted by an identity provider before Mongoose validation. Invalid values could fail sync or create inconsistent assumptions.
 
-The active blocker was the duplicate-key error on `currencyrates.code` for `XOF`. The currencies controller used a count-then-`insertMany` seed path, which is not idempotent under partial seed or concurrent request/startup conditions.
+## Cause of the XOF duplicate bug
 
-### Auth contract observations
-
-- Diamarket API already returns normalized auth success payloads with `success`, `token`, and `user` for register/login, and normalized JSON failures with `success: false` and `message`.
-- Diamarket registration already ignores any submitted `role` and creates public accounts with `role: 'user'`.
-- Diamarket API session resolution supports both Bearer token and HttpOnly cookie through the same JWT session reader.
-- Diamarket admin seed is idempotent and supports `ADMIN_RESET_PASSWORD_ON_START=true`.
-- DiaExpress Admin uses Clerk for frontend session and verifies backend admin authority through `/api/users/me`; backend DB role remains the source of truth.
-- DiaExpress API has backend RBAC helpers for `admin`, `client`, and `delivery`-style role enforcement and exposes explicit 401/403 reasons.
+`XOF` has a unique index through the `CurrencyRate.code` model. Any seed that uses `insertMany` or a count-then-insert pattern can race with another request or startup process and attempt to insert `XOF` twice. The safe approach is per-code upsert.
 
 ## Currency seed fix
 
-`apps/diamarket-api/src/controllers/currencies.controller.ts` now replaces `insertMany(seed)` with `bulkWrite` operations that use `updateOne` + `upsert: true` keyed by currency `code`.
+The Diamarket currency controller now ensures defaults through `CurrencyRate.bulkWrite()` with `updateOne` and `upsert: true` per currency code. Existing currency documents are not deleted. Seed metadata and current rates are updated idempotently, then `XOF` is enforced as the only default currency. Duplicate manual creates now return a clean `409` JSON error instead of bubbling a Mongo duplicate-key exception.
 
-The seed:
+Expected log after seed execution:
 
-- inserts missing defaults;
-- updates safe seed-controlled operational fields on existing defaults;
-- does not delete production rows;
-- enforces `XOF` as the single default currency;
-- logs `[currency-seed] Default currencies ensured.`.
+```txt
+[currency-seed] Default currencies ensured.
+```
 
 ## Diamarket auth flows
 
-### API
-
-Supported routes:
-
-- `POST /api/auth/register`
-- `POST /api/auth/login`
-- `GET /api/auth/me`
-- `POST /api/auth/logout`
-
-Behavior verified in code:
-
-- Register validates email/name/password and forces `role: 'user'`.
-- Login validates email/password, rejects disabled accounts, and returns `Invalid credentials` on bad credentials.
-- Password hashes use the shared password utility before persistence.
-- JWT session token is returned in JSON and set as an HttpOnly cookie.
-- `requireAuth` accepts Bearer tokens and cookies, reloads the user from MongoDB, rejects disabled users, and normalizes backend role authority.
-- Admin bootstrap uses `.env` defaults, preserves idempotence, and supports password reset on startup.
-
-### CMS
-
-Expected flow:
-
-- Admin logs in through the shared auth endpoint.
-- Token/cookie are reused for `/auth/me` session refresh checks.
-- CMS routes require an authenticated admin user.
-- Normal `user` and `vendor` accounts must be denied from admin CMS routes.
-- API/network failures should surface as explicit authentication/API availability errors instead of generic invalid-response messaging.
-
-### Web
-
-Expected flow:
-
-- Public registration creates a client `user` only.
-- Public login/logout use the same token/cookie contract.
-- Account/profile routes require authentication.
-- Frontend must not expose or trust a role selector for public account creation.
+- Public registration ignores any submitted role and creates `role=user`.
+- Login returns `success`, `token`, and `user`.
+- `/api/auth/me` reloads the user from MongoDB and rejects missing/disabled accounts.
+- Logout clears the session cookie and returns JSON.
+- Admin seed uses `.env` (`ADMIN_DEFAULT_EMAIL`, `ADMIN_DEFAULT_PASSWORD`, `ADMIN_RESET_PASSWORD_ON_START`) and hashes passwords with bcrypt.
+- CMS admin access remains backed by `/api/auth/me` and backend admin-protected endpoints.
 
 ## DiaExpress auth flows
 
-### API
+- Clerk/backend bridge remains the runtime auth path.
+- `/api/auth/token`, `/api/auth/sync`, and `/api/auth/me` now include normalized success/error fields.
+- Generic API success/error helpers now include root `success` and `message` fields while preserving existing `data`/`error` envelopes.
+- User sync only accepts normalized DiaExpress roles: `admin`, `client`, and `delivery`; unknown identity-provider roles fall back to `client`.
+- Frontend role gates now use the synced backend user role as the source of truth. Clerk metadata alone no longer grants admin access.
+- Public tracking remains public through `/api/tracking`; client dashboards continue to require authenticated backend tokens.
 
-Expected flow:
+## Roles
 
-- Clerk/backend bearer identity is resolved by auth middleware.
-- Backend `User.role` is authoritative for authorization decisions.
-- Admin routes require `admin`.
-- Client spaces require authenticated client-compatible identity.
-- Delivery routes require delivery-compatible role where configured.
-- Public tracking remains available without login.
+- Diamarket: `admin`, `vendor`, `user`.
+- DiaExpress: `admin`, `client`, `delivery`.
 
-### Admin
+Frontend role selection is not trusted for privilege elevation; backend middleware remains authoritative.
 
-Expected flow:
+## Files modified
 
-- Clerk session is required for admin UI.
-- The admin layout checks backend authority through `/api/users/me` with a Clerk bearer token.
-- Non-admin users are redirected/blocked with access-denied messaging.
-- Auth-error pages are stable and avoid redirect loops.
-
-### Web
-
-Expected flow:
-
-- Public visitors can track shipments.
-- Client dashboard/account pages require authentication.
-- Login/session errors should be clear and stable.
-
-## Role normalization
-
-- Diamarket roles: `admin`, `vendor`, `user`.
-- DiaExpress roles: `admin`, `client`, `delivery`.
-- Public Diamarket registration forces `user`.
-- DiaExpress admin authorization is checked backend-side; frontend claims are not the sole authority.
-
-## Environment examples updated
-
-Updated examples include API URLs, ports, MongoDB, JWT/session/cookie controls, CORS origins, default admin bootstrap/reset controls, and Clerk-related variables where applicable.
-
-Updated files:
-
-- `apps/diamarket-api/.env.example`
-- `apps/diamarket-cms/.env.example`
-- `apps/diamarket-web/.env.example`
+- `apps/diamarket-api/src/controllers/currencies.controller.ts`
+- `apps/diaexpress-api/controllers/authController.js`
+- `apps/diaexpress-api/services/userIdentityService.js`
+- `apps/diaexpress-api/utils/http.js`
 - `apps/diaexpress-api/.env.example`
-- `apps/diaexpress-admin/.env.example`
-- `apps/diaexpress-web/.env.example`
+- `apps/diaexpress-web/src/components/RoleProtected.js`
+- `apps/diaexpress-web/src/components/ProtectedRoute.js`
+- `docs/CURRENCY_SEED_FIX_REPORT.md`
+- `docs/AUTH_FLOW_STABILIZATION_REPORT.md`
 
-## Tests and validation performed
+## `.env.example` updates
 
-Programmatic validation was run with npm build commands for the six requested apps. Manual browser validation was not performed in this non-interactive environment.
+DiaExpress API now documents both canonical `ADMIN_DEFAULT_*` variables and legacy `ADMIN_SEED_*` aliases. Existing Diamarket and frontend examples already document API URLs, ports, cookies, Clerk bridge variables, CORS, MongoDB, and default admin/reset variables.
 
-## Remaining risks / follow-up
+## Tests/checks realized
 
-- Full end-to-end manual tests require local MongoDB/Clerk credentials and browser interaction.
-- Any production Clerk JWT template names must match the values in the app and API environment files.
-- If old databases contain multiple documents with legacy/dirty currency codes outside the unique normalized `code` contract, those should be reconciled manually without deleting live production data unexpectedly.
+Build checks were run for all requested apps where package scripts exist. Manual browser flows (`npm run dev:diamarket`, `npm run dev:diaexpress`) were not executed in this non-interactive terminal session.
+
+## Remaining risks
+
+- Full end-to-end verification still requires running MongoDB and Clerk-compatible tokens in a real dev environment.
+- DiaExpress Admin and Web share some legacy wrappers; further cleanup can remove older Clerk-metadata role assumptions once all pages use the central auth context.

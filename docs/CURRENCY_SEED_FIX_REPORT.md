@@ -1,40 +1,37 @@
 # Currency seed fix report
 
-## Problem
-
-The Diamarket currencies page could trigger this MongoDB duplicate key error when default currencies were initialized more than once:
+## Blocking error
 
 ```txt
 MongoBulkWriteError: E11000 duplicate key error collection: diaexpress.currencyrates index: code_1 dup key: { code: "XOF" }
 ```
 
-## Root cause
+## Cause
 
-`apps/diamarket-api/src/controllers/currencies.controller.ts` seeded default currencies with `CurrencyRate.insertMany(seed)` when the collection appeared empty. That check was not safe for repeated or concurrent startup/page-load scenarios: if one process inserted `XOF` between the count check and `insertMany`, or if the collection had been partially seeded, the unique `code` index could reject the operation.
+The default currency seed must never rely on `insertMany` or count-then-insert logic. `XOF` is uniquely indexed by `code`, so repeated page loads, startup hooks, or concurrent processes can try to insert the same default currency twice and fail.
 
 ## Fix
 
-The seed now uses `CurrencyRate.bulkWrite()` with `updateOne` and `upsert: true` for every default currency code. Existing production currency documents are not deleted. New default documents are inserted only when missing, and runtime seed fields such as `rateToDefault`, `isActive`, `isDefault`, `source`, and `lastUpdatedAt` are updated idempotently.
+`apps/diamarket-api/src/controllers/currencies.controller.ts` uses `CurrencyRate.bulkWrite()` with `updateOne` and `upsert: true` for each default currency code.
 
-After the upserts, `XOF` is enforced as the single default currency through the existing single-default helper, which clears `isDefault` on all other currency rows and marks `XOF` active/default with `rateToDefault: 1`.
+The seed:
 
-Expected log after successful seed:
+- inserts a currency only when its code is missing;
+- updates runtime fields (`rateToDefault`, `isActive`, `isDefault`, `source`, `lastUpdatedAt`) idempotently;
+- does not delete production currencies;
+- normalizes `FCFA` to `XOF` through the model/controller path;
+- enforces `XOF` as the single default after upsert;
+- logs `[currency-seed] Default currencies ensured.` after successful execution.
 
-```txt
-[currency-seed] Default currencies ensured.
+Manual creation of an already-existing currency code now returns:
+
+```json
+{
+  "success": false,
+  "message": "Currency code already exists"
+}
 ```
 
-## Guarantees
+## Validation notes
 
-- The seed can run multiple times without throwing duplicate-key errors for existing currency codes.
-- There is still one document per unique `code` via the existing unique index.
-- Only one currency is default after seeding.
-- Existing documents are upserted, not deleted.
-- The `/currencies` CMS flow no longer depends on a non-idempotent `insertMany` seed.
-
-## Files changed
-
-- `apps/diamarket-api/src/controllers/currencies.controller.ts`
-- `docs/CURRENCY_SEED_FIX_REPORT.md`
-- `docs/AUTH_FLOW_STABILIZATION_REPORT.md`
-- `.env.example` files for Diamarket and DiaExpress apps
+The `/currencies` CMS flow can call the seed repeatedly without crashing on duplicate `XOF`. A full runtime verification still requires a MongoDB instance with the `currencyrates` collection available.
