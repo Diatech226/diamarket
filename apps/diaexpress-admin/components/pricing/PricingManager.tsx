@@ -12,7 +12,8 @@ import { createPricingRule, fetchPackageTypes, fetchPricingRules } from '@/src/s
 import { fetchTransportLines } from '@/src/services/api/expeditions';
 import type { PackageType, PricingRule, TransportLine, TransportMode } from '@/src/types/logistics';
 
-const UNIT_OPTIONS = ['kg', 'm3'];
+const UNIT_OPTIONS = ['kg', 'm3', 'flat'];
+const CURRENCY_OPTIONS = ['XOF', 'USD', 'EUR', 'CAD'];
 
 type DimensionRangeInput = { min: string; max: string; price: string; priority: string };
 
@@ -23,6 +24,15 @@ type PricingFormState = {
   transportType: PricingRule['transportType'] | '';
   unitType: string;
   pricePerUnit: string;
+  minimumPrice: string;
+  minDelayDays: string;
+  maxDelayDays: string;
+  currency: string;
+  insurance: string;
+  pickup: string;
+  homeDelivery: string;
+  fragile: string;
+  priority: string;
   dimensionRanges: DimensionRangeInput[];
   packagePricing: PackagePricingInput[];
 };
@@ -32,6 +42,15 @@ const DEFAULT_FORM: PricingFormState = {
   transportType: '',
   unitType: 'kg',
   pricePerUnit: '',
+  minimumPrice: '5000',
+  minDelayDays: '',
+  maxDelayDays: '',
+  currency: 'XOF',
+  insurance: '',
+  pickup: '',
+  homeDelivery: '',
+  fragile: '',
+  priority: '',
   dimensionRanges: [{ min: '', max: '', price: '', priority: '1' }],
   packagePricing: [{ packageTypeId: '', basePrice: '' }],
 };
@@ -129,12 +148,26 @@ export function PricingManager() {
       setSubmitting(true);
       const payload: Partial<PricingRule> = {
         transportLineId: form.transportLineId,
+        currency: form.currency,
         transportPrices: [
           {
             transportType: form.transportType,
             unitType: form.unitType,
             allowedUnits: [form.unitType],
             pricePerUnit: form.pricePerUnit ? Number(form.pricePerUnit) : undefined,
+            pricePerKg: form.unitType === 'kg' && form.pricePerUnit ? Number(form.pricePerUnit) : undefined,
+            pricePerM3: form.unitType === 'm3' && form.pricePerUnit ? Number(form.pricePerUnit) : undefined,
+            flatPrice: form.unitType === 'flat' && form.pricePerUnit ? Number(form.pricePerUnit) : undefined,
+            minimumPrice: form.minimumPrice ? Number(form.minimumPrice) : undefined,
+            minDelayDays: form.minDelayDays ? Number(form.minDelayDays) : undefined,
+            maxDelayDays: form.maxDelayDays ? Number(form.maxDelayDays) : undefined,
+            additionalServices: {
+              insurance: form.insurance ? Number(form.insurance) : 0,
+              pickup: form.pickup ? Number(form.pickup) : 0,
+              homeDelivery: form.homeDelivery ? Number(form.homeDelivery) : 0,
+              fragile: form.fragile ? Number(form.fragile) : 0,
+              priority: form.priority ? Number(form.priority) : 0,
+            },
             dimensionRanges: form.dimensionRanges
               .filter((range) => range.min || range.max || range.price)
               .map((range) => ({
@@ -236,6 +269,12 @@ export function PricingManager() {
 
           <div className="grid grid-cols-3 gap-3">
             <label className="stack">
+              <span className="text-sm font-medium">Devise</span>
+              <Select value={form.currency} onChange={(e) => updateForm({ currency: e.target.value })}>
+                {CURRENCY_OPTIONS.map((option) => (<option key={option} value={option}>{option}</option>))}
+              </Select>
+            </label>
+            <label className="stack">
               <span className="text-sm font-medium">Prix / unité</span>
               <Input
                 type="number"
@@ -246,6 +285,20 @@ export function PricingManager() {
                 placeholder="12.5"
               />
             </label>
+            <label className="stack">
+              <span className="text-sm font-medium">Minimum facturable</span>
+              <Input type="number" min={0} step="0.01" value={form.minimumPrice} onChange={(e) => updateForm({ minimumPrice: e.target.value })} />
+            </label>
+          </div>
+
+          <div className="grid grid-cols-4 gap-3">
+            <label className="stack"><span className="text-sm font-medium">Délai min (jours)</span><Input type="number" min={0} value={form.minDelayDays} onChange={(e) => updateForm({ minDelayDays: e.target.value })} /></label>
+            <label className="stack"><span className="text-sm font-medium">Délai max (jours)</span><Input type="number" min={0} value={form.maxDelayDays} onChange={(e) => updateForm({ maxDelayDays: e.target.value })} /></label>
+            <label className="stack"><span className="text-sm font-medium">Assurance</span><Input type="number" min={0} value={form.insurance} onChange={(e) => updateForm({ insurance: e.target.value })} /></label>
+            <label className="stack"><span className="text-sm font-medium">Collecte</span><Input type="number" min={0} value={form.pickup} onChange={(e) => updateForm({ pickup: e.target.value })} /></label>
+            <label className="stack"><span className="text-sm font-medium">Livraison domicile</span><Input type="number" min={0} value={form.homeDelivery} onChange={(e) => updateForm({ homeDelivery: e.target.value })} /></label>
+            <label className="stack"><span className="text-sm font-medium">Fragile</span><Input type="number" min={0} value={form.fragile} onChange={(e) => updateForm({ fragile: e.target.value })} /></label>
+            <label className="stack"><span className="text-sm font-medium">Prioritaire</span><Input type="number" min={0} value={form.priority} onChange={(e) => updateForm({ priority: e.target.value })} /></label>
           </div>
 
           <div className="stack">
@@ -365,6 +418,7 @@ export function PricingManager() {
                 <th>Modes</th>
                 <th>Unité</th>
                 <th>Prix</th>
+                <th>Minimum / délais</th>
                 <th>Tranches</th>
                 <th>Packages</th>
               </tr>
@@ -373,7 +427,7 @@ export function PricingManager() {
               {loading ? (
                 Array.from({ length: 3 }).map((_, index) => (
                   <tr key={`skeleton-${index}`}>
-                    {Array.from({ length: 6 }).map((_, cellIndex) => (
+                    {Array.from({ length: 7 }).map((_, cellIndex) => (
                       <td key={`skeleton-${cellIndex}`}>
                         <div className="skeleton" style={{ width: `${60 + cellIndex * 3}%` }} />
                       </td>
@@ -382,7 +436,7 @@ export function PricingManager() {
                 ))
               ) : pricing.length === 0 ? (
                 <tr>
-                  <td colSpan={6}>
+                  <td colSpan={7}>
                     <div className="empty-state">Aucun tarif configuré.</div>
                   </td>
                 </tr>
@@ -416,6 +470,7 @@ export function PricingManager() {
                           ? formatCurrency(rule.pricePerUnit)
                           : '—'}
                       </td>
+                      <td>{primaryPrice?.minimumPrice != null ? `${formatCurrency(primaryPrice.minimumPrice, rule.currency)} / ` : ''}{primaryPrice?.minDelayDays ?? '—'}-{primaryPrice?.maxDelayDays ?? '—'} j</td>
                       <td>
                         {primaryPrice?.dimensionRanges?.length
                           ? primaryPrice.dimensionRanges

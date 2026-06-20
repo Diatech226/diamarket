@@ -43,6 +43,13 @@ const ShipmentSchema = new mongoose.Schema({
 
   weight: Number,
   volume: Number,
+  priceAccepted: Number,
+  currency: String,
+  weightActual: Number,
+  weightVolumetric: Number,
+  billableWeight: Number,
+  routeSnapshot: { type: mongoose.Schema.Types.Mixed },
+  pricingSnapshot: { type: mongoose.Schema.Types.Mixed },
   dimensions: {
     length: Number,
     width: Number,

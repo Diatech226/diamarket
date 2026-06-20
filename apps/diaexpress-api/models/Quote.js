@@ -35,7 +35,7 @@ const quoteSchema = new mongoose.Schema({
   destination: { type: String, required: true },
   transportType: {
     type: String,
-    enum: ['air', 'sea', 'road'],
+    enum: ['air', 'sea', 'road', 'express'],
     required: true,
   },
   transportLineId: { type: mongoose.Schema.Types.ObjectId, ref: 'TransportLine' },
@@ -89,6 +89,7 @@ const quoteSchema = new mongoose.Schema({
   matchedPricingId: { type: mongoose.Schema.Types.ObjectId, ref: 'Pricing' },
   pricingAppliedId: { type: mongoose.Schema.Types.ObjectId, ref: 'Pricing' },
   pricingBreakdown: { type: mongoose.Schema.Types.Mixed },
+  pricingSnapshot: { type: mongoose.Schema.Types.Mixed },
 
   // 🔹 Paiement
   paymentMethod: { type: String, enum: ['crypto', 'fiat'], default: null },
@@ -119,6 +120,9 @@ const quoteSchema = new mongoose.Schema({
   height: Number,
   weight: Number,
   volume: Number,
+  weightActual: Number,
+  weightVolumetric: Number,
+  billableWeight: Number,
 
   // 👤 Utilisateur
   userEmail: { type: String },
