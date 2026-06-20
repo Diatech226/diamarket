@@ -22,7 +22,32 @@ const validate = (body: any, partial = false) => {
   if (body.isDefault !== undefined && typeof body.isDefault !== 'boolean') return 'isDefault must be boolean';
   return null;
 };
-async function ensureSeed() { if (await CurrencyRate.countDocuments()) return; await CurrencyRate.insertMany(seed); }
+async function ensureSeed() {
+  await CurrencyRate.bulkWrite(seed.map((currency) => ({
+    updateOne: {
+      filter: { code: currency.code },
+      update: {
+        $setOnInsert: {
+          code: currency.code,
+          name: currency.name,
+          symbol: currency.symbol,
+        },
+        $set: {
+          rateToDefault: currency.rateToDefault,
+          isActive: currency.isActive,
+          isDefault: currency.isDefault,
+          source: 'seed',
+          lastUpdatedAt: new Date(),
+        },
+      },
+      upsert: true,
+    },
+  })), { ordered: false });
+
+  const defaultCurrency = await CurrencyRate.findOne({ code: 'XOF' });
+  if (defaultCurrency) await setSingleDefault(defaultCurrency.id);
+  console.info('[currency-seed] Default currencies ensured.');
+}
 async function setSingleDefault(id: string) { await CurrencyRate.updateMany({ _id: { $ne: id } }, { isDefault: false }); await CurrencyRate.findByIdAndUpdate(id, { isDefault: true, isActive: true, rateToDefault: 1, lastUpdatedAt: new Date() }); }
 export const currenciesController = {
   async list(_req: Request, res: Response) { await ensureSeed(); return res.json({ success: true, data: await CurrencyRate.find().sort({ isDefault: -1, code: 1 }) }); },
