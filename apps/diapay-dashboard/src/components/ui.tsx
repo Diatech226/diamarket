@@ -21,7 +21,10 @@ const statusTone: Record<string, string> = {
 };
 
 export function formatMoney(amount: number, currency = 'XOF') {
-  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency, maximumFractionDigits: currency === 'XOF' ? 0 : 2 }).format(amount);
+  const normalized = currency === 'FCFA' ? 'XOF' : currency;
+  const cryptoCurrencies = new Set(['USDT', 'USDC', 'BTC', 'ETH']);
+  if (cryptoCurrencies.has(normalized)) return `${new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 8 }).format(amount)} ${normalized}`;
+  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: normalized, maximumFractionDigits: normalized === 'XOF' ? 0 : 2 }).format(amount);
 }
 
 export function Card({ children, className = '' }: { children: ReactNode; className?: string }) {

@@ -266,6 +266,8 @@ export class Diapay {
     return this.request<CheckoutSession>(`/checkout/sessions/${id}`, options);
   }
 
+  async getCheckoutSession(id: string, options?: RequestOptions) { return this.retrieveCheckoutSession(id, options); }
+
   async redirectToCheckout(sessionOrId: string | { id?: string; paymentSessionId?: string; checkoutUrl?: string }) {
     const checkoutUrl = typeof sessionOrId === 'string' ? (await this.retrieveCheckoutSession(sessionOrId)).checkoutUrl : sessionOrId.checkoutUrl;
     if (!checkoutUrl) throw new DiapayError('checkoutUrl is required to redirect', 400, 'missing_checkout_url');
@@ -300,3 +302,32 @@ export class Diapay {
 
 export const DiapaySDK = Diapay;
 export default Diapay;
+
+export function createCheckoutSession(client: Diapay, payload: CheckoutSessionCreateParams, options?: RequestOptions) {
+  return client.createCheckoutSession(payload, options);
+}
+
+export function getCheckoutSession(client: Diapay, id: string, options?: RequestOptions) {
+  return client.retrieveCheckoutSession(id, options);
+}
+
+export function getPayment(client: Diapay, id: string, options?: RequestOptions) {
+  return client.getPayment(id, options);
+}
+
+export function refundPayment(client: Diapay, id: string, payload: Omit<RefundCreateParams, 'paymentId'> = {}, options?: RequestOptions) {
+  return client.refundPayment(id, payload, options);
+}
+
+export function verifyWebhookSignature(rawBody: string, signatureHeader: string, secret: string, toleranceSeconds = 300) {
+  if (!signatureHeader.includes(',')) return Diapay.verifyWebhookSignature(rawBody, signatureHeader, secret);
+  const parts = Object.fromEntries(signatureHeader.split(',').map((part) => {
+    const [key, value] = part.split('=');
+    return [key, value];
+  }));
+  const timestamp = Number(parts.t);
+  const signature = parts.v1;
+  if (!timestamp || !signature || Math.abs(Date.now() / 1000 - timestamp) > toleranceSeconds) return false;
+  const signedPayload = `${timestamp}.${rawBody}`;
+  return Diapay.verifyWebhookSignature(signedPayload, signature, secret);
+}
