@@ -19,5 +19,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/', '/dashboard/:path*', '/payments/:path*', '/transactions/:path*', '/api-keys/:path*', '/webhooks/:path*', '/customers/:path*', '/refunds/:path*', '/payouts/:path*', '/developers/:path*', '/settings/:path*'],
+  matcher: ['/', '/dashboard/:path*', '/payments/:path*', '/transactions/:path*', '/api-keys/:path*', '/webhooks/:path*', '/customers/:path*', '/refunds/:path*', '/payouts/:path*', '/developers/:path*', '/apps/:path*', '/sandbox/:path*', '/logs/:path*', '/docs/:path*', '/revenue/:path*', '/settings/:path*'],
 };
