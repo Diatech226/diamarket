@@ -28,14 +28,14 @@ export default function UsersPage() {
 
   useEffect(() => { void loadUsers(); }, [loadUsers]);
 
-  const loadDetail = async (id: string) => {
+  const loadDetail = useCallback(async (id: string) => {
     setAction(`detail:${id}`);
     try { const response = await cmsService.getUser(id); setSelected(response.data); }
     catch (error) { setNotice({ type: 'error', text: (error as Error).message }); }
     finally { setAction(''); }
-  };
+  }, []);
 
-  const runAction = async (label: string, confirmation: string, callback: () => Promise<unknown>) => {
+  const runAction = useCallback(async (label: string, confirmation: string, callback: () => Promise<unknown>) => {
     if (!window.confirm(confirmation)) return;
     setAction(label); setNotice(null);
     try {
@@ -45,7 +45,7 @@ export default function UsersPage() {
       await loadUsers();
     } catch (error) { setNotice({ type: 'error', text: (error as Error).message }); }
     finally { setAction(''); }
-  };
+  }, [loadUsers, selected?.user._id]);
 
   const rows = useMemo(() => users.map((user) => ({
     id: user._id,
@@ -62,7 +62,7 @@ export default function UsersPage() {
         <select disabled={!!action} value={user.role} onChange={(event) => runAction(`role:${user._id}`, `Changer le rôle en ${event.target.value} ?`, () => cmsService.updateUserRole(user._id, event.target.value as UserRole))} className="rounded-lg border px-2 py-1 text-xs disabled:opacity-50">{ROLES.map((role) => <option key={role} value={role}>{role}</option>)}</select>
       </div>,
     ],
-  })), [users, action, selected?.user._id]);
+  })), [users, action, loadDetail, runAction]);
 
   return <div className="space-y-6"><PageHeader title="Utilisateurs & rôles" subtitle="Recherche, statuts, rôles, commandes et vendeur lié" />
     {notice && <p className={`rounded-xl p-3 text-sm ${notice.type === 'error' ? 'bg-red-500/10 text-red-700' : 'bg-emerald-500/10 text-emerald-700'}`}>{notice.text}</p>}

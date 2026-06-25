@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { PageHeader } from "@/components/ui/page-header";
 import { DataTable } from "@/components/ui/data-table";
 import { cmsService } from "@/services/cms-service";
@@ -29,15 +29,15 @@ export default function VendorsPage() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-  const loadVendors = async (next = filters) => {
+  const loadVendors = useCallback(async (next = filters) => {
     setLoading(true); setError("");
     try { const response = await cmsService.getVendors(next); setVendors(response.data); setMeta(response.meta); }
     catch (event) { setError(event instanceof Error ? event.message : "Chargement vendeurs impossible"); }
     finally { setLoading(false); }
-  };
-  const loadRequests = async () => { try { setRequests(await cmsService.getVendorRequests({ status: requestStatus })); } catch (event) { setError(event instanceof Error ? event.message : "Chargement demandes impossible"); } };
-  useEffect(() => { void loadVendors(); }, [filters.page, filters.limit, filters.status, filters.sortBy, filters.sortDir]);
-  useEffect(() => { void loadRequests(); }, [requestStatus]);
+  }, [filters]);
+  const loadRequests = useCallback(async () => { try { setRequests(await cmsService.getVendorRequests({ status: requestStatus })); } catch (event) { setError(event instanceof Error ? event.message : "Chargement demandes impossible"); } }, [requestStatus]);
+  useEffect(() => { void loadVendors(); }, [loadVendors]);
+  useEffect(() => { void loadRequests(); }, [loadRequests]);
 
   const openVendor = async (id: string) => {
     setActionLoading(`detail-${id}`); setError("");

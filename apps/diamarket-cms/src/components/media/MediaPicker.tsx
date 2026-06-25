@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { resolveMediaUrl } from "@/lib/api";
 import { cmsService } from "@/services/cms-service";
 import type { MediaAsset, MediaCategory } from "@/types/cms";
@@ -16,8 +16,8 @@ export function MediaPicker({ value, multiple = false, category = "other", onCha
   const selected = useMemo(() => (Array.isArray(value) ? value : value ? [value] : []), [value]);
   const selectedIds = new Set(selected.map((item) => item._id));
 
-  const load = async () => { setLoading(true); setError(""); try { const response = await cmsService.getMedia({ page: 1, limit: 24, search, category }); setItems(response.data); } catch (err) { setError((err as Error).message); } finally { setLoading(false); } };
-  useEffect(() => { if (open) void load(); }, [open, category]);
+  const load = useCallback(async () => { setLoading(true); setError(""); try { const response = await cmsService.getMedia({ page: 1, limit: 24, search, category }); setItems(response.data); } catch (err) { setError((err as Error).message); } finally { setLoading(false); } }, [category, search]);
+  useEffect(() => { if (open) void load(); }, [open, load]);
 
   const upload = async (file: File | null) => {
     if (!file) return;
