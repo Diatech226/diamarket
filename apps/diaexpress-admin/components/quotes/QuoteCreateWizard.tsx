@@ -445,8 +445,8 @@ export function QuoteCreateWizard({ onQuoteCreated }: QuoteCreateWizardProps) {
             </div>
             <div className="form-control">
               <label>Statut cible</label>
-              <QuoteStatusBadge status="pending" />
-              <p className="muted">Le devis sera créé en statut pending puis validable/convertible.</p>
+              <QuoteStatusBadge status="submitted" />
+              <p className="muted">Le devis sera créé en statut submitted puis validable/convertible.</p>
             </div>
           </div>
           <div className="grid grid--two">

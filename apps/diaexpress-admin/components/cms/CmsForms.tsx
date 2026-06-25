@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { apiClient } from '@/lib/api/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,8 +31,8 @@ export function SettingsForm({ type = 'site-settings' }: { type?: 'site-settings
 
 export function CmsCrud({ resource }: { resource: 'services' | 'popular-routes' | 'faq' | 'testimonials' | 'case-studies' | 'newsletter/subscribers' | 'newsletter/campaigns' | 'marketing/ctas' }) {
   const [items, setItems] = useState<Item[]>([]); const [form, setForm] = useState<Item>({ isActive: true, displayOrder: 0 }); const [status, setStatus] = useState('');
-  const load = async () => { setStatus('Chargement...'); try { setItems(await apiClient(`/api/admin/${resource}`) as Item[]); setStatus(''); } catch(e:any) { setStatus(e.message); } };
-  useEffect(() => { load(); }, [resource]);
+  const load = useCallback(async () => { setStatus('Chargement...'); try { setItems(await apiClient(`/api/admin/${resource}`) as Item[]); setStatus(''); } catch(e:any) { setStatus(e.message); } }, [resource]);
+  useEffect(() => { void load(); }, [load]);
   const save = async () => { try { await apiClient(form._id ? `/api/admin/${resource}/${form._id}` : `/api/admin/${resource}`, { method: form._id ? 'PUT' : 'POST', json: form }); setForm({ isActive: true, displayOrder: 0 }); await load(); } catch(e:any) { setStatus(e.message); } };
   const remove = async (id:string) => { if (!confirm('Supprimer cet élément ?')) return; await apiClient(`/api/admin/${resource}/${id}`, { method:'DELETE' }); await load(); };
   const toggle = async (it:Item) => { await apiClient(`/api/admin/${resource}/${it._id}`, { method:'PUT', json:{ isActive: !it.isActive } }); await load(); };

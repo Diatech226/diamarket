@@ -5,8 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import type { Expedition, TransportLine } from '@/src/types/logistics';
-
-const EXPEDITION_STATUS: Expedition['status'][] = ['pending', 'scheduled', 'in_transit', 'delivered', 'cancelled'];
+import { EXPEDITION_STATUS_OPTIONS, normalizeExpeditionStatus } from '@/src/constants/logistics-status';
 
 type ExpeditionFormProps = {
   transportLines: TransportLine[];
@@ -26,7 +25,7 @@ export function ExpeditionForm({ transportLines, initialData, onSubmit, onCancel
   const [plannedArrivalDate, setPlannedArrivalDate] = useState(
     initialData?.plannedArrivalDate ? initialData.plannedArrivalDate.slice(0, 10) : ''
   );
-  const [status, setStatus] = useState<Expedition['status']>(initialData?.status || 'pending');
+  const [status, setStatus] = useState<Expedition['status']>(normalizeExpeditionStatus(initialData?.status));
   const [voyageCode, setVoyageCode] = useState(initialData?.voyageCode || '');
   const [notes, setNotes] = useState(initialData?.notes || '');
   const [error, setError] = useState<string | null>(null);
@@ -85,7 +84,7 @@ export function ExpeditionForm({ transportLines, initialData, onSubmit, onCancel
         <label className="stack">
           <span className="text-sm font-medium">Statut</span>
           <Select value={status} onChange={(e) => setStatus(e.target.value as Expedition['status'])}>
-            {EXPEDITION_STATUS.map((value) => (
+            {EXPEDITION_STATUS_OPTIONS.map((value) => (
               <option key={value} value={value}>
                 {value}
               </option>

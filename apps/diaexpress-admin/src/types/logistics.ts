@@ -148,7 +148,6 @@ export interface PricingRule {
   pricingSnapshot?: Record<string, unknown>;
   routeSnapshot?: Record<string, unknown>;
   priceAccepted?: number;
-  currency?: string;
   weight?: number;
   volume?: number;
   weightActual?: number;
@@ -283,7 +282,6 @@ export interface TransportLine {
   pricingSnapshot?: Record<string, unknown>;
   routeSnapshot?: Record<string, unknown>;
   priceAccepted?: number;
-  currency?: string;
   weight?: number;
   volume?: number;
   weightActual?: number;

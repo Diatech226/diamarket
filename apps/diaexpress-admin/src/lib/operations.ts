@@ -1,19 +1,18 @@
 import type { MarketPoint, Quote, Shipment, ShipmentStatus } from '@/src/types/logistics';
 
 export const SHIPMENT_STATUSES: ShipmentStatus[] = [
-  'draft',
   'created',
   'awaiting_pickup',
-  'awaiting_pickup',
   'picked_up',
-  'in_transit',
   'at_origin_hub',
+  'in_transit',
+  'at_destination_hub',
   'out_for_delivery',
   'delivered',
   'delivery_failed',
-  'delayed',
   'returned',
   'cancelled',
+  'delayed',
 ];
 
 export const PREPARED_HUBS = [

@@ -3,6 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
+import { QUOTE_STATUS_OPTIONS, STATUS_LABELS } from '@/src/constants/logistics-status';
 
 export type QuoteFiltersProps = {
   status: string;
@@ -29,17 +30,10 @@ export type QuoteFiltersProps = {
   loading?: boolean;
 };
 
-const STATUS_OPTIONS = [
-  { value: 'submitted', label: 'Demande envoyée' },
-  { value: 'under_review', label: 'En cours d’étude' },
-  { value: 'info_requested', label: 'Informations demandées' },
-  { value: 'priced', label: 'Prix proposé' },
-  { value: 'approved', label: 'Devis approuvé' },
-  { value: 'rejected', label: 'Devis refusé' },
-  { value: 'expired', label: 'Devis expiré' },
-  { value: 'converted_to_shipment', label: 'Expédition créée' },
-  { value: 'cancelled', label: 'Devis annulé' },
-];
+const STATUS_OPTIONS = QUOTE_STATUS_OPTIONS.filter((value) => value !== 'draft').map((value) => ({
+  value,
+  label: STATUS_LABELS[value],
+}));
 
 const PRIORITY_OPTIONS = [
   { value: '', label: 'Toutes priorités' },

@@ -15,11 +15,11 @@ export function ShipmentSummaryCard({ shipment }: { shipment: Shipment }) {
         <div><strong>Route</strong><p>{String(origin)} → {String(destination)}</p></div>
         <div><strong>Transport</strong><p>{String(transport)}</p></div>
         <div><strong>Poids facturé</strong><p>{shipment.billableWeight ?? shipment.weight ?? '—'} kg</p></div>
-        <div><strong>Volume</strong><p>{shipment.volume ?? read(shipment.packageSnapshot, 'volume') ?? '—'} m³</p></div>
+        <div><strong>Volume</strong><p>{String(shipment.volume ?? read(shipment.packageSnapshot, 'volume') ?? '—')} m³</p></div>
         <div><strong>Valeur</strong><p>{String(read(shipment.packageSnapshot, 'declaredValue') ?? '—')}</p></div>
         <div><strong>Prix validé</strong><p>{formatCurrency(shipment.priceAccepted, shipment.currency)}</p></div>
         <div><strong>Services</strong><p>{Array.isArray(services) ? services.join(', ') || '—' : '—'}</p></div>
-        <div><strong>Source</strong><p>{shipment.source || shipment.meta?.source || 'manual'}</p></div>
+        <div><strong>Source</strong><p>{String(shipment.source || shipment.meta?.source || 'manual')}</p></div>
       </div>
     </div>
   );

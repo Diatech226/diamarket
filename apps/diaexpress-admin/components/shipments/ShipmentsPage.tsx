@@ -18,21 +18,7 @@ import { resolveStatusClass, resolveStatusLabel, shipmentStatusConfig } from '@/
 import { formatDate } from '@/src/lib/format';
 import { getShipmentSource } from '@/src/lib/operations';
 import type { Embarkment, Shipment } from '@/src/types/logistics';
-
-const STATUS_OPTIONS: Shipment['status'][] = [
-  'created',
-  'awaiting_pickup',
-  'picked_up',
-  'at_origin_hub',
-  'in_transit',
-  'at_destination_hub',
-  'out_for_delivery',
-  'delivered',
-  'delivery_failed',
-  'returned',
-  'cancelled',
-  'delayed',
-];
+import { SHIPMENT_STATUS_OPTIONS } from '@/src/constants/logistics-status';
 
 export function ShipmentsPage() {
   const [page, setPage] = useState(1);
@@ -189,7 +175,7 @@ export function ShipmentsPage() {
           <Input type="date" value={dateTo} onChange={(event) => setDateTo(event.target.value)} />
           <Select value={status} onChange={(event) => { setStatus(event.target.value); setPage(1); }}>
             <option value="">Tous les statuts</option>
-            {STATUS_OPTIONS.map((value) => (
+            {SHIPMENT_STATUS_OPTIONS.map((value) => (
               <option key={value} value={value}>{resolveStatusLabel(value, shipmentStatusConfig)}</option>
             ))}
           </Select>
@@ -262,7 +248,7 @@ export function ShipmentsPage() {
                     <td>{shipment.origin || shipment.meta?.quote?.origin || '—'} → {shipment.destination || shipment.meta?.quote?.destination || '—'}</td>
                     <td><Badge className={resolveStatusClass(shipment.status, shipmentStatusConfig)}>{resolveStatusLabel(shipment.status, shipmentStatusConfig)}</Badge></td>
                     <td><div className="cell-stack"><strong>{shipment.meta?.customerName || shipment.meta?.customerEmail || '—'}</strong><span className="muted">{shipment.carrier || shipment.provider || shipment.meta?.quote?.transportType || '—'}</span></div></td>
-                    <td className="mono">{shipment.quoteId || shipment.meta?.quoteId || '—'}</td>
+                    <td className="mono">{typeof shipment.quoteId === 'string' ? shipment.quoteId : shipment.quoteId?._id || String(shipment.meta?.quoteId || '—')}</td>
                     <td>{getShipmentSource(shipment)}</td>
                     <td>{formatDate(shipment.updatedAt)}</td>
                     <td>
