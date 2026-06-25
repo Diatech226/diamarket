@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { formatDate, toTitle } from '@/src/lib/format';
 import { resolveStatusClass, resolveStatusLabel, shipmentStatusConfig } from '@/lib/status';
 import type { Embarkment, Shipment } from '@/src/types/logistics';
+import { SHIPMENT_STATUS_OPTIONS } from '@/src/constants/logistics-status';
 
 export type ShipmentStatusUpdate = {
   status?: Shipment['status'];
@@ -26,21 +27,6 @@ type ShipmentDetailsDrawerProps = {
   onAssignEmbarkment: (embarkmentId: string) => void;
 };
 
-const STATUS_OPTIONS: Shipment['status'][] = [
-  'created',
-  'awaiting_pickup',
-  'picked_up',
-  'at_origin_hub',
-  'in_transit',
-  'at_destination_hub',
-  'out_for_delivery',
-  'delivered',
-  'delivery_failed',
-  'returned',
-  'cancelled',
-  'delayed',
-];
-
 const QUICK_ACTIONS: Array<{ label: string; status: Shipment['status']; eventType: string }> = [
   { label: 'Planifier', status: 'awaiting_pickup', eventType: 'shipment_scheduled' },
   { label: 'Dispatcher', status: 'in_transit', eventType: 'shipment_dispatched' },
@@ -58,14 +44,14 @@ export function ShipmentDetailsDrawer({
   onSaveStatus,
   onAssignEmbarkment,
 }: ShipmentDetailsDrawerProps) {
-  const [status, setStatus] = useState<Shipment['status']>('draft');
+  const [status, setStatus] = useState<Shipment['status']>('created');
   const [location, setLocation] = useState('');
   const [note, setNote] = useState('');
   const [embarkmentId, setEmbarkmentId] = useState('');
 
   useEffect(() => {
     if (!open || !shipment) return;
-    setStatus(shipment.status || 'draft');
+    setStatus(shipment.status || 'created');
     setLocation(shipment.currentLocation || '');
     setNote('');
     setEmbarkmentId(shipment.embarkmentId || '');
@@ -112,7 +98,7 @@ export function ShipmentDetailsDrawer({
             </div>
             <div>
               <strong>Quote source</strong>
-              <p className="mono">{shipment.quoteId || '—'}</p>
+              <p className="mono">{typeof shipment.quoteId === 'string' ? shipment.quoteId : shipment.quoteId?._id || '—'}</p>
             </div>
             <div>
               <strong>Dernière position</strong>
@@ -149,7 +135,7 @@ export function ShipmentDetailsDrawer({
               <label className="stack">
                 <span className="text-sm font-medium">Nouveau statut</span>
                 <Select value={status} onChange={(event) => setStatus(event.target.value as Shipment['status'])}>
-                  {STATUS_OPTIONS.map((value) => (
+                  {SHIPMENT_STATUS_OPTIONS.map((value) => (
                     <option key={value} value={value}>
                       {resolveStatusLabel(value, shipmentStatusConfig)}
                     </option>

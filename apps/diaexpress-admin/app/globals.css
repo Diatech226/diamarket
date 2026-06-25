@@ -1157,7 +1157,7 @@ p {
 .shipment-timeline__dot--in_transit { background: #3F8F6A; }
 .shipment-timeline__dot--delivered { background: #2E8B57; }
 .shipment-timeline__dot--delayed { background: #D2A43A; }
-.shipment-timeline__dot--created, .shipment-timeline__dot--scheduled, .shipment-timeline__dot--pending_dispatch, .shipment-timeline__dot--at_hub, .shipment-timeline__dot--out_for_delivery { background: #7B8A79; }
+.shipment-timeline__dot--created, .shipment-timeline__dot--awaiting_pickup, .shipment-timeline__dot--at_origin_hub, .shipment-timeline__dot--at_destination_hub, .shipment-timeline__dot--out_for_delivery { background: #7B8A79; }
 .shipment-timeline__content p { color: var(--text-muted); font-size: 12px; }
 
 .cms-editor-grid { display:grid; grid-template-columns: 1fr 1.2fr; gap:16px; }

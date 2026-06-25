@@ -19,8 +19,7 @@ import {
 import type { Expedition, TransportLine } from '@/src/types/logistics';
 import type { PaginatedResult } from '@/src/types/pagination';
 import { expeditionStatusConfig, resolveStatusClass, resolveStatusLabel } from '@/lib/status';
-
-const STATUS_OPTIONS: Expedition['status'][] = ['pending', 'scheduled', 'in_transit', 'delivered', 'cancelled'];
+import { EXPEDITION_STATUS_OPTIONS } from '@/src/constants/logistics-status';
 
 function formatDate(value?: string) {
   return value ? new Date(value).toLocaleDateString() : '—';
@@ -136,7 +135,7 @@ export function ExpeditionsTable() {
         <form className="grid grid-cols-5 gap-2 mb-4" onSubmit={handleSubmitFilters}>
           <Select name="status" defaultValue={filters.status ?? ''}>
             <option value="">Tous les statuts</option>
-            {STATUS_OPTIONS.map((value) => (
+            {EXPEDITION_STATUS_OPTIONS.map((value) => (
               <option key={value} value={value}>
                 {value}
               </option>

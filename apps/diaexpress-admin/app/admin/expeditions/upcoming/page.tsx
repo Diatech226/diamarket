@@ -9,7 +9,7 @@ export default function UpcomingShipmentsPage() {
         description="Shipments programmés ou en transit côté clients."
       />
       <FilteredShipmentsTable
-        statuses={['scheduled', 'in_transit']}
+        statuses={['awaiting_pickup', 'in_transit']}
         title="Expéditions à venir"
         description="Suivi des expéditions en cours de routing."
       />

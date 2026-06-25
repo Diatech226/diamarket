@@ -8,6 +8,7 @@ import {
   shipmentStatusConfig,
 } from '@/lib/status';
 import { formatCurrency, formatDate, toTitle } from '@/src/lib/format';
+import { QUOTE_STATUS_OPTIONS, SHIPMENT_STATUS_OPTIONS, STATUS_LABELS } from '@/src/constants/logistics-status';
 import type { LogisticsAddress, LogisticsUser, PackageType, PricingRule, Quote, Shipment } from '@/src/types/logistics';
 import type { ApiKey, DiaPayAdminUser, NotificationJob, Payment } from '@/src/types/diapay';
 import type { PaginatedParams, PaginatedResult } from '@/src/types/pagination';
@@ -86,15 +87,7 @@ export const resourceConfigs: Record<ResourceName, ResourceConfig<any>> = {
       }
     ],
     fetcher: fetchQuotes,
-    statusOptions: [
-      { value: 'submitted', label: 'Demande envoyée' },
-      { value: 'under_review', label: 'En cours d’étude' },
-      { value: 'priced', label: 'Prix proposé' },
-      { value: 'approved', label: 'Devis approuvé' },
-      { value: 'rejected', label: 'Devis refusé' },
-      { value: 'converted_to_shipment', label: 'Expédition créée' },
-      { value: 'cancelled', label: 'Devis annulé' }
-    ],
+    statusOptions: QUOTE_STATUS_OPTIONS.filter((value) => value !== 'draft').map((value) => ({ value, label: STATUS_LABELS[value] })),
     getRowId: (quote: Quote) => quote._id
   },
   shipments: {
@@ -124,16 +117,7 @@ export const resourceConfigs: Record<ResourceName, ResourceConfig<any>> = {
       }
     ],
     fetcher: fetchShipments,
-    statusOptions: [
-      { value: 'created', label: 'Expédition créée' },
-      { value: 'awaiting_pickup', label: 'En attente de collecte' },
-      { value: 'picked_up', label: 'Colis collecté' },
-      { value: 'in_transit', label: 'En transit' },
-      { value: 'out_for_delivery', label: 'En livraison' },
-      { value: 'delivered', label: 'Livré' },
-      { value: 'delivery_failed', label: 'Livraison échouée' },
-      { value: 'cancelled', label: 'Expédition annulée' }
-    ],
+    statusOptions: SHIPMENT_STATUS_OPTIONS.map((value) => ({ value, label: STATUS_LABELS[value] })),
     getRowId: (shipment: Shipment) => shipment._id
   },
   pricing: {
