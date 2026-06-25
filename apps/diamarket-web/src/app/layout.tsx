@@ -2,11 +2,11 @@ import './globals.css';
 import { ReactNode } from 'react';
 import { ClientHeader } from '@/components/header';
 import { StoreProvider } from '@/context/store';
-import { getPublicSettings } from '@/lib/api';
+import { getPublicSettings, type PublicSettings } from '@/lib/api';
 import type { Metadata } from 'next';
 
 export async function generateMetadata(): Promise<Metadata> {
-  const settings = await getPublicSettings().catch(() => ({}));
+  const settings = await getPublicSettings().catch((): PublicSettings => ({}));
   const seo = settings.seo ?? {};
   return {
     title: seo.title || `${settings.marketplaceName || 'Diamarket'} | Marketplace premium africaine`,
@@ -18,7 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
-  const settings = await getPublicSettings().catch(() => ({}));
+  const settings = await getPublicSettings().catch((): PublicSettings => ({}));
   const siteName = settings.marketplaceName || 'Diamarket';
   return (
     <html lang="fr">
