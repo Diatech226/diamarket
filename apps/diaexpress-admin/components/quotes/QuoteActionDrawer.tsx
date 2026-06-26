@@ -53,7 +53,7 @@ export function QuoteActionDrawer({
       : action === 'edit'
       ? 'Ajuster le prix'
       : action === 'request_info'
-      ? "Demander plus d'informations"
+      ? 'Demander plus d’informations'
       : 'Convertir en shipment';
 
   const handleSubmit = (event: React.FormEvent) => {
@@ -121,7 +121,7 @@ export function QuoteActionDrawer({
                   <textarea
                     className="textarea"
                     rows={4}
-                    placeholder={action === 'request_info' ? "Précisez les informations attendues du client" : "Ajoutez une note sur le devis"}
+                    placeholder={action === 'request_info' ? 'Précisez les informations attendues du client' : 'Ajoutez une note sur le devis'}
                     value={notes}
                     onChange={(event) => setNotes(event.target.value)}
                   />
@@ -144,7 +144,7 @@ export function QuoteActionDrawer({
 
               {action === 'edit' ? (
                 <label className="stack">
-                  <span className="text-sm font-medium">Raison de l'override prix</span>
+                  <span className="text-sm font-medium">Raison de l’override prix</span>
                   <Input
                     placeholder="Remise, client entreprise, prix négocié..."
                     value={reason}
