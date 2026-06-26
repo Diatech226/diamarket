@@ -13,6 +13,7 @@ const { metrics } = require('./src/lib/observability/metrics');
 const metricsMiddleware = require('./middleware/metrics');
 const { validateStartupConfig } = require('./config/startupValidation');
 const { buildRateLimiter } = require('./middleware/rateLimit');
+const { swaggerSpec, swaggerEnabled } = require('./src/config/swagger');
 
 const app = express();
 let httpServer = null;
@@ -56,6 +57,15 @@ const adminRateLimiter = buildRateLimiter({ windowMs: 60_000, maxRequests: 120, 
 app.use('/api/auth', authRateLimiter);
 app.use('/api/admin', adminRateLimiter);
 app.use('/api/v1/admin', adminRateLimiter);
+
+if (swaggerEnabled) {
+  const swaggerUi = require('swagger-ui-express');
+  app.get('/api/docs.json', (_req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.send(swaggerSpec);
+  });
+  app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+}
 
 app.locals.db = {
   connected: false,
