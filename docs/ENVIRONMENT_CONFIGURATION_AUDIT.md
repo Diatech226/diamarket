@@ -1,12 +1,8 @@
 # Environment configuration audit
 
-This document records the monorepo environment variable audit performed for the application templates under `apps/*`.
+This audit synchronizes the application-level `.env.example` files with environment variables read by runtime code under `apps/**`. The scan focused on `process.env.*`, `process.env[...]`, optional `process.env?.[...]`, `import.meta.env.*`, dotenv usage, and runtime URL/config helpers.
 
-## Scope and method
-
-Scanned runtime code in `apps/**`, `packages/**`, and `scripts/**` for `process.env`, `import.meta.env`, public prefixes (`NEXT_PUBLIC_`, `VITE_`), `dotenv`, and environment-style constants. The generated `.env.example` files are grouped by application and only include variables that are referenced by each application runtime or its documented runtime snippets.
-
-## Applications covered
+## Applications audited
 
 - `apps/diamarket-api`
 - `apps/diamarket-web`
@@ -19,82 +15,106 @@ Scanned runtime code in `apps/**`, `packages/**`, and `scripts/**` for `process.
 - `apps/diapay-docs`
 - `apps/diapay-sandbox`
 
+No `apps/diapay-sdk-js` directory exists in the current workspace. The shared SDK package present in this monorepo is `packages/diapay-node`, which reads `DIAPAY_SECRET_KEY` and `DIAPAY_BASE_URL` from the consumer process environment.
+
 ## Conventions retained
 
-- Browser-exposed values use `NEXT_PUBLIC_`.
-- Server secrets remain unprefixed and are only present in API/server templates.
-- Public URL variables use service-specific names where the code already does (`NEXT_PUBLIC_DIAEXPRESS_API_BASE_URL`, `NEXT_PUBLIC_DIAPAY_API_URL`) and compatibility aliases are kept only where code still reads them.
-- DiaMarket API keeps canonical server names for payments and shipping (`DIAPAY_*`, `SHIPPING_*`, `DIAEXPRESS_*`) because the backend still reads each of them.
-- DiaExpress keeps legacy Clerk template aliases because the auth bridge explicitly attempts multiple names for backward compatibility.
+- Browser-exposed variables use `NEXT_PUBLIC_` in Next.js applications.
+- Server-only secrets remain unprefixed (`CLERK_SECRET_KEY`, `DIAPAY_SECRET_KEY`, webhook secrets, API keys, database URIs).
+- Canonical local service URLs are aligned around:
+  - Diamarket web: `http://localhost:3000`
+  - Diamarket CMS: `http://localhost:3001`
+  - Diamarket API: `http://localhost:5001`
+  - DiaExpress web: `http://localhost:3010`
+  - DiaExpress admin: `http://localhost:3011`
+  - DiaExpress API: `http://localhost:5010`
+  - DiaPay API: `http://localhost:5100`
+  - DiaPay sandbox/checkout: `http://localhost:5103`
+- Legacy aliases that are still read by code are kept in `.env.example` files rather than removed.
 
 ## Variables by application
 
 ### `apps/diamarket-api`
 
-Groups: application, database, CORS, authentication, admin bootstrap, payments, DiaExpress/shipping, and media storage. Added missing server-side variables used by authentication, Clerk, payment callback URLs, DiaExpress shipping, and media upload configuration.
+Sections cover application, database, CORS, authentication, admin bootstrap, payments, DiaExpress shipping, and local media storage. The example includes all variables read by `src/config/env.ts`, including `JWT_SECRET`, `AUTH_SESSION_SECRET`, `CLERK_SECRET_KEY`, `DIAPAY_*`, `DIAEXPRESS_*`, and `MEDIA_*`.
 
 ### `apps/diamarket-web`
 
-Groups: application, URLs, and feature flags. Removed unused routing/session public variables that are not read by the current web app code.
+The frontend reads only public configuration: `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_AUTH_API_URL`, `NEXT_PUBLIC_CMS_URL`, and `NEXT_PUBLIC_DEMO_MODE`.
 
 ### `apps/diamarket-cms`
 
-Groups: application and URLs. Removed unused CMS URL/session/path variables and kept the two API URL aliases that are actually read by the CMS API clients.
+The CMS reads `NEXT_PUBLIC_API_URL` and `NEXT_PUBLIC_DIAMARKET_API_URL`.
 
 ### `apps/diaexpress-api`
 
-Groups: application, MongoDB, CORS, Clerk/authentication, admin bootstrap, DiaPay, email, CMA CGM, FedEx, FX, integrations, compliance, and crypto providers. Added missing timeout, template, sandbox fixture, compliance, FX, and crypto provider variables.
+The backend example covers application flags, MongoDB, CORS, Clerk authentication, admin bootstrap, DiaPay, email, CMA CGM, FedEx, FX, integration keys, compliance, and crypto provider configuration.
 
 ### `apps/diaexpress-web`
 
-Groups: application, URLs, Clerk/authentication, local dev admin, DiaPay/features, email, and analytics. Added public template aliases and local dev admin aliases used by auth helpers; removed unused route/session variables.
+The web app uses multiple public and server-side URL fallbacks. The example now includes the missing server-side fallback variables used by the API URL resolver: `DIAEXPRESS_API_BASE_URL`, `DIAEXPRESS_ADMIN_API_BASE_URL`, `LOGISTICS_API_BASE_URL`, `DIAEXPRESS_BACKEND_URL`, `DIAEXPRESS_PUBLIC_URL`, `DIAEXPRESS_PUBLIC_HOST`, `DIAEXPRESS_PUBLIC_PORT`, `SITE_URL`, `NEXTAUTH_URL`, and `VERCEL_URL`.
 
 ### `apps/diaexpress-admin`
 
-Groups: application, URLs, Clerk/authentication, DiaPay/features, and development. Removed unused public cookie/session flags and retained only aliases read by API/auth helpers.
+The admin app uses public API URLs, Clerk public config, JWT template aliases, DiaPay feature toggles, and a development bearer token fallback. The example now also includes the server-side Clerk variables `CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY`, which are referenced by admin auth readiness checks.
 
 ### `apps/diapay-api`
 
-Groups: application and URLs. Removed stale database/auth salt variables that are not read by the current in-memory sandbox API implementation.
+The API reads `PORT`, `DIAPAY_API_PUBLIC_URL`, and `DIAPAY_CHECKOUT_URL`.
 
 ### `apps/diapay-dashboard`
 
-Groups: URLs and webhooks. Added the webhook secret used in the developer example page.
+The dashboard reads `NEXT_PUBLIC_DIAPAY_API_URL`. Documentation/demo snippets also reference `DIAPAY_WEBHOOK_SECRET`, so it remains documented in the example.
 
 ### `apps/diapay-docs`
 
-Groups: documentation snippets. Added snippet variables referenced by the generated documentation code examples.
+The docs include snippet/demo values for `DIAPAY_SECRET_KEY` and `DIAPAY_WEBHOOK_SECRET`.
 
 ### `apps/diapay-sandbox`
 
-Groups: URLs and sandbox credentials. Added server-side DiaPay URL and test secret used by the sandbox API routes.
+The sandbox reads public and server-side DiaPay API URLs plus the sandbox merchant secret key: `NEXT_PUBLIC_DIAPAY_API_URL`, `DIAPAY_API_URL`, and `DIAPAY_SECRET_KEY`.
 
-## Variables removed as obsolete
+## Common variables
 
-- `apps/diamarket-web`: `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_DIAMARKET_CMS_URL`, auth path/cookie variables not read by the app.
-- `apps/diamarket-cms`: CMS/site/demo/auth path/cookie variables not read by the app.
-- `apps/diaexpress-admin`: public cookie/auth source/admin role flags not read by the app.
-- `apps/diaexpress-web`: network retry/timeout and route/session variables not read by the app.
-- `apps/diapay-api`: `MONGO_URI`, `JWT_SECRET`, `API_KEY_SALT`, not read by the current code.
+- Application: `NODE_ENV`, `PORT`, `TZ`
+- URLs: `NEXT_PUBLIC_*_URL`, `*_API_BASE_URL`, `*_PUBLIC_URL`
+- Database: `MONGODB_URI`, `MONGODB_LOCAL_URI`, MongoDB timeout/pool tuning variables
+- Authentication: `CLERK_*`, `JWT_SECRET`, `AUTH_SESSION_SECRET`, JWT template aliases
+- Payments: `DIAPAY_*`, `PAYMENT_*`, webhook secrets
+- Logistics/carriers: `DIAEXPRESS_*`, `SHIPPING_*`, `CMACGM_*`, `FEDEX_*`
+- Email: `EMAIL_USER`, `EMAIL_PASS`
+- Analytics: public DiaExpress web analytics keys
 
-## Variables added
+## Added variables
 
-- DiaExpress API: missing MongoDB tuning, Clerk compatibility, sandbox fixtures, FX timeout, AML/travel-rule, Fireblocks, Coinbase Commerce, and DiaPay timeout aliases.
-- DiaExpress web/admin: public Clerk template compatibility variables and admin/dev API URL aliases that are still read by helpers.
-- DiaPay dashboard/docs/sandbox: snippet and server-route variables used by runtime pages and routes.
+- `apps/diaexpress-admin/.env.example`
+  - `CLERK_PUBLISHABLE_KEY`
+  - `CLERK_SECRET_KEY`
+- `apps/diaexpress-web/.env.example`
+  - `DIAEXPRESS_API_BASE_URL`
+  - `DIAEXPRESS_ADMIN_API_BASE_URL`
+  - `ADMIN_API_BASE_URL`
+  - `LOGISTICS_API_BASE_URL`
+  - `DIAEXPRESS_BACKEND_URL`
+  - `API_HOST`
+  - `API_PORT`
+  - `DIAEXPRESS_API_PORT`
+  - `SITE_URL`
+  - `APP_URL`
+  - `NEXTAUTH_URL`
+  - `VERCEL_URL`
+  - `DIAEXPRESS_PUBLIC_URL`
+  - `DIAEXPRESS_PUBLIC_HOST`
+  - `DIAEXPRESS_PUBLIC_PORT`
 
-## Duplicate and naming audit
+## Removed variables
 
-The codebase still contains compatibility aliases for some URLs and Clerk templates. These were not removed from `.env.example` while code still reads them, to avoid breaking existing authentication and API fallback behavior. Recommended future cleanup:
+No variables were removed. Existing aliases that are still read by code were retained to avoid breaking local or deployed environments.
 
-1. Pick one canonical public API URL per frontend.
-2. Remove fallback aliases from code.
-3. Update `.env.example` again after aliases are no longer referenced.
+## Findings and recommendations
 
-## Security recommendations
-
-- Never put real `CLERK_SECRET_KEY`, `DIAPAY_SECRET_KEY`, `DIAPAY_API_KEY`, carrier credentials, or crypto provider secrets in frontend applications.
-- Treat every `NEXT_PUBLIC_*` value as visible to browser users.
-- Do not set `NEXT_PUBLIC_ADMIN_BEARER_TOKEN` in production; it is a development-only fallback.
-- Keep `AUTH_ALLOW_HEADER_BRIDGE=false` outside controlled development/test environments.
-- Rotate all credentials if a real value was ever committed to an `.env.example` file.
+- Variables used but absent: resolved for `diaexpress-admin` and `diaexpress-web` by adding the missing runtime keys listed above.
+- Variables present but unused: no removals were made because the remaining examples either match runtime reads or intentionally document local snippets/demo integrations.
+- Duplicates/aliases: several apps still read legacy aliases (`API_BASE_URL`, `NEXT_PUBLIC_API_BASE_URL`, product-specific URL variables). They should be normalized in code in a separate refactor; this audit keeps all still-used aliases.
+- Sensitive client exposure: `NEXT_PUBLIC_ADMIN_BEARER_TOKEN` and DiaExpress sandbox/dev admin tokens are public by design for local fallback flows but must never contain production secrets. Prefer Clerk tokens in production and leave public fallback tokens empty.
+- Secrets: never prefix database URIs, private API keys, webhook secrets, or Clerk secret keys with `NEXT_PUBLIC_`.
