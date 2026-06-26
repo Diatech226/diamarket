@@ -1,4 +1,6 @@
 "use client";
+
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -7,9 +9,28 @@ import { cmsService } from "@/services/cms-service";
 import { resolveMediaUrl } from "@/lib/api";
 import type { SlideItem, SlidePayload } from "@/types/cms";
 
-const empty: SlidePayload = { title: "", subtitle: "", description: "", imageDesktop: "", imageMobile: "", ctaLabel: "", ctaLink: "/catalogue", badge: "", backgroundColor: "#0f172a", position: 0, isActive: true, startDate: "", endDate: "" };
+const empty: SlidePayload = {
+  title: "",
+  subtitle: "",
+  description: "",
+  imageDesktop: "",
+  imageMobile: "",
+  ctaLabel: "",
+  ctaLink: "/catalogue",
+  badge: "",
+  backgroundColor: "#0f172a",
+  position: 0,
+  isActive: true,
+  startDate: "",
+  endDate: "",
+};
+
 const idOf = (slide: SlideItem) => String(slide._id ?? slide.id);
-const isVisibleNow = (slide: SlidePayload) => slide.isActive !== false && (!slide.startDate || new Date(slide.startDate) <= new Date()) && (!slide.endDate || new Date(slide.endDate) >= new Date());
+
+const isVisibleNow = (slide: SlidePayload) =>
+  slide.isActive !== false &&
+  (!slide.startDate || new Date(slide.startDate) <= new Date()) &&
+  (!slide.endDate || new Date(slide.endDate) >= new Date());
 
 export default function SlidesPage() {
   const [items, setItems] = useState<SlideItem[]>([]);
@@ -20,22 +41,278 @@ export default function SlidesPage() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
 
-  const load = async () => { setLoading(true); setError(""); try { setItems((await cmsService.getSlides()).sort((a, b) => (a.position ?? 0) - (b.position ?? 0))); } catch (e) { setError((e as Error).message); } finally { setLoading(false); } };
-  useEffect(() => { void load(); }, []);
+  const load = async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const slides = await cmsService.getSlides();
+      setItems(slides.sort((a, b) => (a.position ?? 0) - (b.position ?? 0)));
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    void load();
+  }, []);
 
   const validate = () => {
     if (!form.title?.trim()) return "Le titre est obligatoire.";
-    if (!form.imageDesktop?.trim()) return "L'image desktop est obligatoire.";
-    if (form.ctaLink && !form.ctaLink.startsWith("/") && !/^https?:\/\//i.test(form.ctaLink)) return "Le lien CTA doit être relatif ou http(s).";
-    if (form.startDate && form.endDate && new Date(form.startDate) > new Date(form.endDate)) return "La date de début doit précéder la date de fin.";
+    if (!form.imageDesktop?.trim()) return "L’image desktop est obligatoire.";
+    if (form.ctaLink && !form.ctaLink.startsWith("/") && !/^https?:\/\//i.test(form.ctaLink)) {
+      return "Le lien CTA doit être relatif ou http(s).";
+    }
+    if (form.startDate && form.endDate && new Date(form.startDate) > new Date(form.endDate)) {
+      return "La date de début doit précéder la date de fin.";
+    }
     return "";
   };
-  const save = async () => { const validation = validate(); if (validation) { setError(validation); return; } setSaving(true); setError(""); try { const payload = { ...form, imageUrl: form.imageDesktop, ctaUrl: form.ctaLink }; editing ? await cmsService.updateSlide(editing, payload) : await cmsService.createSlide(payload); setForm(empty); setEditing(null); setMessage("Slide sauvegardé."); await load(); } catch (e) { setError((e as Error).message); } finally { setSaving(false); } };
-  const edit = (s: SlideItem) => { setEditing(idOf(s)); setForm({ title: s.title, subtitle: s.subtitle ?? "", description: s.description ?? "", imageDesktop: s.imageDesktop ?? s.imageUrl ?? "", imageMobile: s.imageMobile ?? "", ctaLabel: s.ctaLabel ?? "", ctaLink: s.ctaLink ?? s.ctaUrl ?? s.cta ?? "", badge: s.badge ?? "", backgroundColor: s.backgroundColor ?? "#0f172a", position: s.position ?? 0, isActive: s.isActive !== false, startDate: s.startDate ? s.startDate.slice(0, 10) : "", endDate: s.endDate ? s.endDate.slice(0, 10) : "" }); };
-  const remove = async (s: SlideItem) => { if (!confirm(`Supprimer ${s.title} ?`)) return; setSaving(true); try { await cmsService.deleteSlide(idOf(s)); setMessage("Slide supprimé."); await load(); } catch (e) { setError((e as Error).message); } finally { setSaving(false); } };
-  const duplicate = (s: SlideItem) => { edit(s); setEditing(null); setForm((current) => ({ ...current, title: `${current.title} (copie)`, position: items.length })); };
-  const move = async (index: number, direction: -1 | 1) => { const next = [...items]; const target = index + direction; if (target < 0 || target >= next.length) return; [next[index], next[target]] = [next[target], next[index]]; setItems(next.map((slide, position) => ({ ...slide, position }))); await Promise.all(next.map((slide, position) => cmsService.updateSlide(idOf(slide), { position }))); await load(); };
+
+  const save = async () => {
+    const validation = validate();
+
+    if (validation) {
+      setError(validation);
+      return;
+    }
+
+    setSaving(true);
+    setError("");
+
+    try {
+      const payload = {
+        ...form,
+        imageUrl: form.imageDesktop,
+        ctaUrl: form.ctaLink,
+      };
+
+      if (editing) {
+        await cmsService.updateSlide(editing, payload);
+      } else {
+        await cmsService.createSlide(payload);
+      }
+
+      setForm(empty);
+      setEditing(null);
+      setMessage("Slide sauvegardé.");
+      await load();
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const edit = (s: SlideItem) => {
+    setEditing(idOf(s));
+    setForm({
+      title: s.title,
+      subtitle: s.subtitle ?? "",
+      description: s.description ?? "",
+      imageDesktop: s.imageDesktop ?? s.imageUrl ?? "",
+      imageMobile: s.imageMobile ?? "",
+      ctaLabel: s.ctaLabel ?? "",
+      ctaLink: s.ctaLink ?? s.ctaUrl ?? s.cta ?? "",
+      badge: s.badge ?? "",
+      backgroundColor: s.backgroundColor ?? "#0f172a",
+      position: s.position ?? 0,
+      isActive: s.isActive !== false,
+      startDate: s.startDate ? s.startDate.slice(0, 10) : "",
+      endDate: s.endDate ? s.endDate.slice(0, 10) : "",
+    });
+  };
+
+  const remove = async (s: SlideItem) => {
+    if (!confirm(`Supprimer ${s.title} ?`)) return;
+
+    setSaving(true);
+
+    try {
+      await cmsService.deleteSlide(idOf(s));
+      setMessage("Slide supprimé.");
+      await load();
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const duplicate = (s: SlideItem) => {
+    edit(s);
+    setEditing(null);
+    setForm((current) => ({
+      ...current,
+      title: `${current.title} (copie)`,
+      position: items.length,
+    }));
+  };
+
+  const move = async (index: number, direction: -1 | 1) => {
+    const next = [...items];
+    const target = index + direction;
+
+    if (target < 0 || target >= next.length) return;
+
+    [next[index], next[target]] = [next[target], next[index]];
+
+    setItems(next.map((slide, position) => ({ ...slide, position })));
+
+    await Promise.all(next.map((slide, position) => cmsService.updateSlide(idOf(slide), { position })));
+
+    await load();
+  };
+
   const activeCount = useMemo(() => items.filter(isVisibleNow).length, [items]);
 
-  return <div className="space-y-6"><PageHeader title="Slides Homepage" subtitle="Administration complète des campagnes hero, images desktop/mobile, CTA, activation et ordre d'affichage" />{error && <p className="rounded-xl bg-red-500/10 p-3 text-red-700">{error}</p>}{message && <p className="rounded-xl bg-blue-500/10 p-3 text-blue-800 dark:text-blue-200">{message}</p>}<section className="grid gap-4 rounded-2xl border p-4 dark:border-zinc-800 lg:grid-cols-[1.2fr_.8fr]"><div className="space-y-3"><h3 className="font-semibold">{editing ? "Édition slide" : "Création slide"}</h3><div className="grid gap-3 md:grid-cols-2"><input className="rounded-xl border p-2" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} placeholder="Titre *" /><input className="rounded-xl border p-2" value={form.subtitle} onChange={e => setForm({ ...form, subtitle: e.target.value })} placeholder="Sous-titre" /><textarea className="rounded-xl border p-2 md:col-span-2" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="Description" /><input className="rounded-xl border p-2" value={form.ctaLabel} onChange={e => setForm({ ...form, ctaLabel: e.target.value })} placeholder="Label CTA" /><input className="rounded-xl border p-2" value={form.ctaLink} onChange={e => setForm({ ...form, ctaLink: e.target.value })} placeholder="Lien CTA" /><input className="rounded-xl border p-2" value={form.badge} onChange={e => setForm({ ...form, badge: e.target.value })} placeholder="Badge" /><input className="rounded-xl border p-2" value={form.backgroundColor} onChange={e => setForm({ ...form, backgroundColor: e.target.value })} placeholder="#0f172a" /><input className="rounded-xl border p-2" type="number" value={form.position ?? 0} onChange={e => setForm({ ...form, position: Number(e.target.value) })} placeholder="Position" /><label className="flex items-center gap-2 rounded-xl border p-2"><input type="checkbox" checked={form.isActive !== false} onChange={e => setForm({ ...form, isActive: e.target.checked })} /> Actif</label><label className="text-sm">Début<input className="mt-1 w-full rounded-xl border p-2" type="date" value={form.startDate ?? ""} onChange={e => setForm({ ...form, startDate: e.target.value })} /></label><label className="text-sm">Fin<input className="mt-1 w-full rounded-xl border p-2" type="date" value={form.endDate ?? ""} onChange={e => setForm({ ...form, endDate: e.target.value })} /></label></div><div className="grid gap-3 md:grid-cols-2"><div><input className="mb-2 w-full rounded-xl border p-2" value={form.imageDesktop ?? ""} onChange={e => setForm({ ...form, imageDesktop: e.target.value })} placeholder="Image desktop *" /><MediaPicker category="slide" onChange={(media) => !Array.isArray(media) && setForm({ ...form, imageDesktop: media.url })} /></div><div><input className="mb-2 w-full rounded-xl border p-2" value={form.imageMobile ?? ""} onChange={e => setForm({ ...form, imageMobile: e.target.value })} placeholder="Image mobile" /><MediaPicker category="slide" onChange={(media) => !Array.isArray(media) && setForm({ ...form, imageMobile: media.url })} /></div></div><div className="flex flex-wrap gap-2"><button disabled={saving} onClick={save} className="rounded-xl bg-olive-700 px-4 py-2 text-white disabled:opacity-60">{saving ? "Enregistrement…" : editing ? "Mettre à jour" : "Créer"}</button>{editing && <button onClick={() => { setEditing(null); setForm(empty); }} className="rounded-xl border px-4 py-2">Annuler</button>}</div></div><div className="space-y-3"><h3 className="font-semibold">Preview desktop/mobile</h3><div className="rounded-2xl p-4 text-white" style={{ background: form.backgroundColor || "#0f172a" }}><span className="rounded-full bg-white/20 px-2 py-1 text-xs">{form.badge || "Badge"}</span><h2 className="mt-4 text-2xl font-bold">{form.title || "Titre du slide"}</h2><p className="mt-2 text-sm opacity-90">{form.subtitle || "Sous-titre"}</p><img src={resolveMediaUrl(form.imageDesktop || "/placeholder.svg")} alt="Preview desktop" className="mt-4 h-40 w-full rounded-xl object-cover" /><button className="mt-4 rounded-full bg-amber-400 px-4 py-2 text-sm text-slate-950">{form.ctaLabel || "CTA"}</button></div><div className="mx-auto max-w-56 rounded-2xl border p-2"><img src={resolveMediaUrl(form.imageMobile || form.imageDesktop || "/placeholder.svg")} alt="Preview mobile" className="h-52 w-full rounded-xl object-cover" /></div></div></section><section className="rounded-2xl border p-4 dark:border-zinc-800"><div className="mb-3 flex items-center justify-between"><h3 className="font-semibold">Ordre d'affichage</h3><span className="text-sm text-zinc-500">{activeCount} visible(s) actuellement</span></div>{loading ? <p>Chargement des slides…</p> : items.length ? <div className="space-y-3">{items.map((s, index) => <article key={idOf(s)} className="grid gap-3 rounded-xl border p-3 md:grid-cols-[120px_1fr_auto]"><img src={resolveMediaUrl(s.imageDesktop || s.imageUrl || "/placeholder.svg")} alt={s.title} className="h-20 w-full rounded-lg object-cover" /><div><div className="flex flex-wrap gap-2"><strong>#{s.position ?? index + 1} {s.title}</strong><StatusBadge status={isVisibleNow(s) ? "active" : s.isActive === false ? "inactive" : "scheduled"} /></div><p className="text-sm text-zinc-500">{s.subtitle || "—"}</p><p className="text-xs text-zinc-500">{s.startDate ? new Date(s.startDate).toLocaleDateString("fr-FR") : "sans début"} → {s.endDate ? new Date(s.endDate).toLocaleDateString("fr-FR") : "sans fin"}</p></div><div className="flex flex-wrap gap-2"><button className="rounded border px-2 py-1" onClick={() => move(index, -1)}>Monter</button><button className="rounded border px-2 py-1" onClick={() => move(index, 1)}>Descendre</button><button className="rounded border px-2 py-1" onClick={() => cmsService.updateSlide(idOf(s), { isActive: s.isActive === false }).then(load)}>{s.isActive === false ? "Activer" : "Désactiver"}</button><button className="rounded border px-2 py-1" onClick={() => duplicate(s)}>Dupliquer</button><button className="rounded border px-2 py-1" onClick={() => edit(s)}>Modifier</button><button className="rounded border px-2 py-1 text-red-700" onClick={() => remove(s)}>Supprimer</button></div></article>)}</div> : <p className="rounded-xl border p-6 text-center text-zinc-500">Aucun slide. Créez votre première campagne homepage.</p>}</section></div>;
+  return (
+    <div className="space-y-6">
+      <PageHeader
+        title="Slides Homepage"
+        subtitle="Administration complète des campagnes hero, images desktop/mobile, CTA, activation et ordre d’affichage"
+      />
+
+      {error && <p className="rounded-xl bg-red-500/10 p-3 text-red-700">{error}</p>}
+      {message && <p className="rounded-xl bg-blue-500/10 p-3 text-blue-800 dark:text-blue-200">{message}</p>}
+
+      <section className="grid gap-4 rounded-2xl border p-4 dark:border-zinc-800 lg:grid-cols-[1.2fr_.8fr]">
+        <div className="space-y-3">
+          <h3 className="font-semibold">{editing ? "Édition slide" : "Création slide"}</h3>
+
+          <div className="grid gap-3 md:grid-cols-2">
+            <input className="rounded-xl border p-2" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Titre *" />
+            <input className="rounded-xl border p-2" value={form.subtitle} onChange={(e) => setForm({ ...form, subtitle: e.target.value })} placeholder="Sous-titre" />
+            <textarea className="rounded-xl border p-2 md:col-span-2" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Description" />
+            <input className="rounded-xl border p-2" value={form.ctaLabel} onChange={(e) => setForm({ ...form, ctaLabel: e.target.value })} placeholder="Label CTA" />
+            <input className="rounded-xl border p-2" value={form.ctaLink} onChange={(e) => setForm({ ...form, ctaLink: e.target.value })} placeholder="Lien CTA" />
+            <input className="rounded-xl border p-2" value={form.badge} onChange={(e) => setForm({ ...form, badge: e.target.value })} placeholder="Badge" />
+            <input className="rounded-xl border p-2" value={form.backgroundColor} onChange={(e) => setForm({ ...form, backgroundColor: e.target.value })} placeholder="#0f172a" />
+            <input className="rounded-xl border p-2" type="number" value={form.position ?? 0} onChange={(e) => setForm({ ...form, position: Number(e.target.value) })} placeholder="Position" />
+
+            <label className="flex items-center gap-2 rounded-xl border p-2">
+              <input type="checkbox" checked={form.isActive !== false} onChange={(e) => setForm({ ...form, isActive: e.target.checked })} />
+              Actif
+            </label>
+
+            <label className="text-sm">
+              Début
+              <input className="mt-1 w-full rounded-xl border p-2" type="date" value={form.startDate ?? ""} onChange={(e) => setForm({ ...form, startDate: e.target.value })} />
+            </label>
+
+            <label className="text-sm">
+              Fin
+              <input className="mt-1 w-full rounded-xl border p-2" type="date" value={form.endDate ?? ""} onChange={(e) => setForm({ ...form, endDate: e.target.value })} />
+            </label>
+          </div>
+
+          <div className="grid gap-3 md:grid-cols-2">
+            <div>
+              <input className="mb-2 w-full rounded-xl border p-2" value={form.imageDesktop ?? ""} onChange={(e) => setForm({ ...form, imageDesktop: e.target.value })} placeholder="Image desktop *" />
+              <MediaPicker category="slide" onChange={(media) => !Array.isArray(media) && setForm({ ...form, imageDesktop: media.url })} />
+            </div>
+
+            <div>
+              <input className="mb-2 w-full rounded-xl border p-2" value={form.imageMobile ?? ""} onChange={(e) => setForm({ ...form, imageMobile: e.target.value })} placeholder="Image mobile" />
+              <MediaPicker category="slide" onChange={(media) => !Array.isArray(media) && setForm({ ...form, imageMobile: media.url })} />
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <button disabled={saving} onClick={save} className="rounded-xl bg-olive-700 px-4 py-2 text-white disabled:opacity-60">
+              {saving ? "Enregistrement…" : editing ? "Mettre à jour" : "Créer"}
+            </button>
+
+            {editing && (
+              <button onClick={() => { setEditing(null); setForm(empty); }} className="rounded-xl border px-4 py-2">
+                Annuler
+              </button>
+            )}
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          <h3 className="font-semibold">Preview desktop/mobile</h3>
+
+          <div className="rounded-2xl p-4 text-white" style={{ background: form.backgroundColor || "#0f172a" }}>
+            <span className="rounded-full bg-white/20 px-2 py-1 text-xs">{form.badge || "Badge"}</span>
+            <h2 className="mt-4 text-2xl font-bold">{form.title || "Titre du slide"}</h2>
+            <p className="mt-2 text-sm opacity-90">{form.subtitle || "Sous-titre"}</p>
+
+            <Image
+              src={resolveMediaUrl(form.imageDesktop || "/placeholder.svg")}
+              alt="Preview desktop"
+              width={900}
+              height={360}
+              className="mt-4 h-40 w-full rounded-xl object-cover"
+            />
+
+            <button className="mt-4 rounded-full bg-amber-400 px-4 py-2 text-sm text-slate-950">{form.ctaLabel || "CTA"}</button>
+          </div>
+
+          <div className="mx-auto max-w-56 rounded-2xl border p-2">
+            <Image
+              src={resolveMediaUrl(form.imageMobile || form.imageDesktop || "/placeholder.svg")}
+              alt="Preview mobile"
+              width={320}
+              height={480}
+              className="h-52 w-full rounded-xl object-cover"
+            />
+          </div>
+        </div>
+      </section>
+
+      <section className="rounded-2xl border p-4 dark:border-zinc-800">
+        <div className="mb-3 flex items-center justify-between">
+          <h3 className="font-semibold">Ordre d’affichage</h3>
+          <span className="text-sm text-zinc-500">{activeCount} visible(s) actuellement</span>
+        </div>
+
+        {loading ? (
+          <p>Chargement des slides…</p>
+        ) : items.length ? (
+          <div className="space-y-3">
+            {items.map((s, index) => (
+              <article key={idOf(s)} className="grid gap-3 rounded-xl border p-3 md:grid-cols-[120px_1fr_auto]">
+                <Image
+                  src={resolveMediaUrl(s.imageDesktop || s.imageUrl || "/placeholder.svg")}
+                  alt={s.title}
+                  width={240}
+                  height={160}
+                  className="h-20 w-full rounded-lg object-cover"
+                />
+
+                <div>
+                  <div className="flex flex-wrap gap-2">
+                    <strong>#{s.position ?? index + 1} {s.title}</strong>
+                    <StatusBadge status={isVisibleNow(s) ? "active" : s.isActive === false ? "inactive" : "scheduled"} />
+                  </div>
+
+                  <p className="text-sm text-zinc-500">{s.subtitle || "—"}</p>
+                  <p className="text-xs text-zinc-500">
+                    {s.startDate ? new Date(s.startDate).toLocaleDateString("fr-FR") : "sans début"} → {s.endDate ? new Date(s.endDate).toLocaleDateString("fr-FR") : "sans fin"}
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  <button className="rounded border px-2 py-1" onClick={() => move(index, -1)}>Monter</button>
+                  <button className="rounded border px-2 py-1" onClick={() => move(index, 1)}>Descendre</button>
+                  <button className="rounded border px-2 py-1" onClick={() => cmsService.updateSlide(idOf(s), { isActive: s.isActive === false }).then(load)}>
+                    {s.isActive === false ? "Activer" : "Désactiver"}
+                  </button>
+                  <button className="rounded border px-2 py-1" onClick={() => duplicate(s)}>Dupliquer</button>
+                  <button className="rounded border px-2 py-1" onClick={() => edit(s)}>Modifier</button>
+                  <button className="rounded border px-2 py-1 text-red-700" onClick={() => remove(s)}>Supprimer</button>
+                </div>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <p className="rounded-xl border p-6 text-center text-zinc-500">Aucun slide. Créez votre première campagne homepage.</p>
+        )}
+      </section>
+    </div>
+  );
 }
