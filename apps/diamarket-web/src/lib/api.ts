@@ -30,3 +30,6 @@ export type PublicSettings = {
   marketplaceName?: string; logo?: string; favicon?: string; defaultCurrency?: string; supportContact?: string; supportEmail?: string; supportPhone?: string; companyAddress?: string; maintenanceMode?: boolean; maintenanceMessage?: string; maintenanceImage?: string; socialLinks?: Record<string, string>; seo?: { title?: string; description?: string; keywords?: string; openGraphImage?: string }; checkout?: Record<string, unknown>; shipping?: Record<string, unknown>; vendors?: Record<string, unknown>; homepage?: Record<string, unknown>;
 };
 export async function getPublicSettings(): Promise<PublicSettings> { return demoFallback(request<any>('/settings').then(r => r.data ?? {}), {}); }
+export async function getPublicStorefront(domain: string) {
+  return request<any>(`/public/storefront/${encodeURIComponent(domain)}`).then((r) => r.data ?? r);
+}

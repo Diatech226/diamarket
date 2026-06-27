@@ -1,0 +1,37 @@
+import { api } from "@/services/api";
+import type { ApiResponse, EmailTemplate, MediaAsset, Payout, Promotion, PublicStorefront, StorefrontConfig, StorefrontHomePage, User } from "@/types/white-label";
+import type { CategoryItem, ProductItem, VendorAdminItem } from "@/types/cms";
+const qs = (q?: Record<string, unknown>) => { const p = new URLSearchParams(); Object.entries(q ?? {}).forEach(([k,v]) => v != null && String(v) !== "" && p.set(k, String(v))); return p.toString() ? `?${p}` : ""; };
+export const cmsApi = {
+  login: (payload: { email: string; password: string }) => api.post<ApiResponse<{ token: string; user: User }>>("/auth/login", payload),
+  refresh: () => api.post<ApiResponse<{ token: string }>>("/auth/refresh", {}),
+  users: () => api.get<ApiResponse<User[]>>("/users"),
+  createUser: (payload: Partial<User> & { password?: string }) => api.post<ApiResponse<User>>("/users", payload),
+  userAuditLogs: (id: string) => api.get<ApiResponse<unknown[]>>(`/users/${id}/audit-logs`),
+  products: (query?: Record<string, unknown>) => api.get<ApiResponse<ProductItem[]>>(`/products${qs(query)}`),
+  createProduct: (payload: Partial<ProductItem>) => api.post<ApiResponse<ProductItem>>("/products", payload),
+  updateProduct: (id: string, payload: Partial<ProductItem>) => api.patch<ApiResponse<ProductItem>>(`/products/${id}`, payload),
+  deleteProduct: (id: string) => api.delete<ApiResponse<null>>(`/products/${id}`),
+  categories: () => api.get<ApiResponse<CategoryItem[]>>("/categories"),
+  createCategory: (payload: Partial<CategoryItem>) => api.post<ApiResponse<CategoryItem>>("/categories", payload),
+  exportProducts: () => api.get<ApiResponse<{ url?: string; format: "csv" }>>("/products/export"),
+  vendors: () => api.get<ApiResponse<VendorAdminItem[]>>("/vendors"),
+  vendorPayouts: (id: string) => api.get<ApiResponse<Payout[]>>(`/vendors/${id}/payouts`),
+  createVendorPayout: (id: string, payload: Partial<Payout>) => api.post<ApiResponse<Payout>>(`/vendors/${id}/payouts`, payload),
+  updateVendorBankDetails: (id: string, payload: unknown) => api.patch<ApiResponse<unknown>>(`/vendors/${id}/bank-details`, payload),
+  vendorMessaging: (id: string) => api.get<ApiResponse<unknown[]>>(`/vendors/${id}/messaging`),
+  storefrontConfig: (vendorId: string) => api.get<ApiResponse<StorefrontConfig>>(`/storefront/${vendorId}/config`),
+  updateStorefrontConfig: (vendorId: string, payload: Partial<StorefrontConfig>) => api.put<ApiResponse<StorefrontConfig>>(`/storefront/${vendorId}/config`, payload),
+  storefrontHome: (vendorId: string) => api.get<ApiResponse<StorefrontHomePage>>(`/storefront/${vendorId}/pages/home`),
+  updateStorefrontHome: (vendorId: string, payload: Partial<StorefrontHomePage>) => api.put<ApiResponse<StorefrontHomePage>>(`/storefront/${vendorId}/pages/home`, payload),
+  connectDomain: (vendorId: string, payload: { domain: string }) => api.post<ApiResponse<unknown>>(`/storefront/${vendorId}/domain`, payload),
+  promotions: () => api.get<ApiResponse<Promotion[]>>("/promotions"),
+  createPromotion: (payload: Partial<Promotion>) => api.post<ApiResponse<Promotion>>("/promotions", payload),
+  campaignAnalytics: (id: string) => api.get<ApiResponse<unknown>>(`/analytics/campaigns/${id}`),
+  emailTemplates: () => api.get<ApiResponse<EmailTemplate[]>>("/email-templates"),
+  updateEmailTemplate: (id: string, payload: Partial<EmailTemplate>) => api.put<ApiResponse<EmailTemplate>>(`/email-templates/${id}`, payload),
+  media: () => api.get<ApiResponse<MediaAsset[]>>("/media"),
+  uploadMedia: (payload: unknown) => api.post<ApiResponse<MediaAsset>>("/media/upload", payload),
+  deleteMedia: (id: string) => api.delete<ApiResponse<null>>(`/media/${id}`),
+  publicStorefront: (domain: string) => api.get<ApiResponse<PublicStorefront>>(`/public/storefront/${domain}`),
+};

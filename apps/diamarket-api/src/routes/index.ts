@@ -22,6 +22,7 @@ import { currenciesController } from '../controllers/currencies.controller';
 import { teamController } from '../controllers/team.controller';
 import { User, Vendor, Setting } from '../models';
 import { AuthContext } from '../middlewares/requireAuth';
+import { whiteLabelController } from '../controllers/white-label.controller';
 
 const listUsers = async (_req: Request, res: Response) => res.json({ success: true, data: await User.find().select('-passwordHash').sort({ createdAt: -1 }) });
 const getCurrentUser = async (req: Request, res: Response) => {
@@ -141,7 +142,30 @@ apiRouter.get('/vendors', listVendors);
 apiRouter.get('/settings', publicSettings);
 apiRouter.get('/currencies', currenciesController.publicList);
 apiRouter.get('/products', productsController.list);
+apiRouter.get('/products/export', requireAuth, requireRole('admin', 'vendor'), whiteLabelController.productExport);
 apiRouter.get('/products/:id', productsController.getByIdOrSlug);
+
+apiRouter.get('/users/:id/audit-logs', requireAuth, requireAdmin, adminController.auditLogs);
+apiRouter.post('/users', requireAuth, requireAdmin, (_req: Request, res: Response) => res.status(501).json({ success: false, message: 'User creation endpoint is declared for CMS integration; persistence policy remains to implement.' }));
+apiRouter.patch('/products/:id', requireAuth, requireRole('admin', 'vendor'), requirePermission('products:update'), validateRequest(validateProductUpdate), productsController.update);
+apiRouter.get('/vendors/:id/payouts', requireAuth, requireRole('admin', 'vendor'), whiteLabelController.vendorPayouts);
+apiRouter.post('/vendors/:id/payouts', requireAuth, requireAdmin, whiteLabelController.createVendorPayout);
+apiRouter.patch('/vendors/:id/bank-details', requireAuth, requireRole('admin', 'vendor'), whiteLabelController.updateBankDetails);
+apiRouter.get('/vendors/:id/messaging', requireAuth, requireRole('admin', 'vendor'), whiteLabelController.vendorMessaging);
+apiRouter.get('/storefront/:vendor_id/config', requireAuth, requireRole('admin', 'vendor'), whiteLabelController.getConfig);
+apiRouter.put('/storefront/:vendor_id/config', requireAuth, requireRole('admin', 'vendor'), whiteLabelController.putConfig);
+apiRouter.get('/storefront/:vendor_id/pages/home', requireAuth, requireRole('admin', 'vendor'), whiteLabelController.getHome);
+apiRouter.put('/storefront/:vendor_id/pages/home', requireAuth, requireRole('admin', 'vendor'), whiteLabelController.putHome);
+apiRouter.post('/storefront/:vendor_id/domain', requireAuth, requireRole('admin', 'vendor'), whiteLabelController.postDomain);
+apiRouter.get('/promotions', requireAuth, requireAdmin, whiteLabelController.promotions);
+apiRouter.post('/promotions', requireAuth, requireAdmin, whiteLabelController.createPromotion);
+apiRouter.get('/analytics/campaigns/:id', requireAuth, requireAdmin, whiteLabelController.campaignAnalytics);
+apiRouter.get('/email-templates', requireAuth, requireAdmin, whiteLabelController.emailTemplates);
+apiRouter.put('/email-templates/:id', requireAuth, requireAdmin, whiteLabelController.updateEmailTemplate);
+apiRouter.get('/public/storefront/:domain', whiteLabelController.publicStorefront);
+apiRouter.post('/public/orders', requireAuth, validateRequest(validateOrder), ordersController.create);
+apiRouter.post('/public/returns/claim', (_req: Request, res: Response) => res.status(501).json({ success: false, message: 'Returns claim intake is documented but not yet implemented.' }));
+
 apiRouter.post('/products', requireAuth, requireRole('admin', 'vendor'), requirePermission('products:create'), validateRequest(validateProduct), productsController.create);
 apiRouter.put('/products/:id', requireAuth, requireRole('admin', 'vendor'), requirePermission('products:update'), validateRequest(validateProductUpdate), productsController.update);
 apiRouter.delete('/products/:id', requireAuth, requireRole('admin', 'vendor'), requirePermission('products:delete'), productsController.remove);
