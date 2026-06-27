@@ -1,0 +1,1 @@
+export const shadows = { card:'0 1px 3px rgba(32,36,18,.10), 0 1px 2px rgba(32,36,18,.06)', dropdown:'0 12px 32px rgba(32,36,18,.16)', modal:'0 24px 64px rgba(32,36,18,.24)', tooltip:'0 8px 24px rgba(32,36,18,.18)', hover:'0 10px 24px rgba(32,36,18,.14)', floating:'0 18px 48px rgba(32,36,18,.20)' } as const;
