@@ -1,0 +1,2 @@
+import { PageHeader } from "@/components/ui/page-header";
+export default function AuditLogDetail({ params }: { params: { id: string } }){ return <div className="space-y-6"><PageHeader title="Détail audit log" subtitle={`Événement ${params.id}`}/><section className="admin-card"><p>Le détail complet est disponible depuis le drawer de la liste et l’endpoint GET /audit-logs/:id.</p></section></div>; }

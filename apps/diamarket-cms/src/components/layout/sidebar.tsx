@@ -4,11 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const groups = [
-  { title: "Pilotage", links: [{ href: "/dashboard", label: "Dashboard" }, { href: "/orders", label: "Commandes" }, { href: "/audit-logs", label: "Audit logs" }] },
+  { title: "Pilotage", links: [{ href: "/dashboard", label: "Dashboard" }, { href: "/analytics", label: "Analytics" }, { href: "/orders", label: "Commandes" }, { href: "/audit-logs", label: "Audit logs" }, { href: "/system", label: "System" }] },
   { title: "Catalogue", links: [{ href: "/products", label: "Produits" }, { href: "/categories", label: "Catégories" }, { href: "/media", label: "Médiathèque" }, { href: "/slides", label: "Slides" }, { href: "/team", label: "Équipe" }] },
   { title: "Marchands", links: [{ href: "/vendors", label: "Vendeurs" }, { href: "/storefront", label: "White-Label" }, { href: "/users", label: "Utilisateurs" }] },
   { title: "Marketing", links: [{ href: "/promotions", label: "Promotions" }, { href: "/email-templates", label: "Emails" }] },
-  { title: "Configuration", links: [{ href: "/settings", label: "Settings" }, { href: "/currencies", label: "Devises & commissions" }, { href: "/shipping", label: "Shipping" }, { href: "/focal-points", label: "Points focaux", disabled: true }] },
+  { title: "Configuration", links: [{ href: "/settings", label: "Settings" }, { href: "/roles", label: "Rôles" }, { href: "/permissions", label: "Permissions" }, { href: "/currencies", label: "Devises & commissions" }, { href: "/shipping", label: "Shipping" }, { href: "/focal-points", label: "Points focaux", disabled: true }] },
 ];
 
 export function Sidebar() {

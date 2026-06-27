@@ -1,0 +1,3 @@
+import { PageHeader } from "@/components/ui/page-header";
+import { UserRoleEditor } from "@/components/cms/admin-control-center";
+export default function UserDetail({ params }: { params: { id: string } }){ return <div className="space-y-6"><PageHeader title="Utilisateur" subtitle={`Profil, activité, reset mot de passe et révocation session: ${params.id}`}/><UserRoleEditor roles={["super_admin","admin","manager","support","finance","vendor_manager","viewer"]}/><section className="admin-card grid gap-3 md:grid-cols-2"><button className="admin-btn admin-btn-secondary">Reset mot de passe</button><button className="admin-btn admin-btn-secondary">Révoquer les sessions</button></section></div>; }
