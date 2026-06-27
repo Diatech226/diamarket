@@ -24,6 +24,7 @@ export const whiteLabelController = {
   vendorPayouts: (req: Request, res: Response) => ok(res, [{ _id: `payout_${req.params.id}_sample`, vendor: req.params.id, amount: 0, currency: 'FCFA', status: 'pending' }]),
   createVendorPayout: (req: Request, res: Response) => ok(res, { _id: `payout_${Date.now()}`, vendor: req.params.id, ...req.body, status: req.body?.status ?? 'pending' }),
   updateBankDetails: (req: Request, res: Response) => ok(res, { vendor: req.params.id, bankDetails: req.body, updatedAt: new Date().toISOString() }),
-  vendorMessaging: (req: Request, res: Response) => ok(res, [{ _id: `thread_${req.params.id}`, subject: 'Support vendeur', messages: [] }]),
+  vendorMessaging: (req: Request, res: Response) => ok(res, [{ _id: `thread_${req.params.id}`, subject: 'Support vendeur', unreadCount: 0, messages: [] }]),
+  createVendorMessage: (req: Request, res: Response) => ok(res, { _id: `msg_${Date.now()}`, vendor: req.params.id, body: req.body?.body ?? '', attachments: req.body?.attachments ?? [], status: 'queued', websocket: 'planned', createdAt: new Date().toISOString() }),
   productExport: (_req: Request, res: Response) => ok(res, { format: 'csv', status: 'not_persisted', message: 'Export endpoint foundation; streaming export remains to implement.' }),
 };

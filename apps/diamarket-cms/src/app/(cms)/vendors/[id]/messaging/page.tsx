@@ -1,2 +1,2 @@
-import { CmsFoundationPage } from "../../../cms-page";
-export default function Page(){return <CmsFoundationPage title="Messagerie vendeur" subtitle="Historique des conversations et support vendeur." endpoint="/vendors/:id/messaging" focus={["Messages","SLA support","Pièces jointes"]} />;}
+import VendorHubPage from "../VendorHubPage";
+export default function Page({ params }: { params: { id: string } }) { return <VendorHubPage id={params.id} section="messaging" />; }
