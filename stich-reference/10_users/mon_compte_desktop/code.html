@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+
+<html class="light" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mon Compte | ESTELLE</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-surface-variant": "#45464d",
+                    "on-primary": "#ffffff",
+                    "secondary": "#775a19",
+                    "on-tertiary-container": "#818486",
+                    "on-background": "#0b1c30",
+                    "primary-fixed": "#dae2fd",
+                    "on-tertiary-fixed-variant": "#444749",
+                    "secondary-fixed-dim": "#e9c176",
+                    "inverse-on-surface": "#eaf1ff",
+                    "on-error": "#ffffff",
+                    "outline-variant": "#c6c6cd",
+                    "error-container": "#ffdad6",
+                    "primary-container": "#131b2e",
+                    "on-primary-container": "#7c839b",
+                    "surface": "#f8f9ff",
+                    "on-tertiary-fixed": "#191c1e",
+                    "on-error-container": "#93000a",
+                    "surface-container-low": "#eff4ff",
+                    "on-secondary": "#ffffff",
+                    "tertiary-fixed-dim": "#c4c7c9",
+                    "surface-dim": "#cbdbf5",
+                    "on-secondary-container": "#785a1a",
+                    "error": "#ba1a1a",
+                    "tertiary": "#000000",
+                    "surface-container-highest": "#d3e4fe",
+                    "primary-fixed-dim": "#bec6e0",
+                    "secondary-fixed": "#ffdea5",
+                    "on-primary-fixed": "#131b2e",
+                    "tertiary-container": "#191c1e",
+                    "primary": "#000000",
+                    "tertiary-fixed": "#e0e3e5",
+                    "on-surface": "#0b1c30",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary-fixed": "#261900",
+                    "on-primary-fixed-variant": "#3f465c",
+                    "secondary-container": "#fed488",
+                    "surface-bright": "#f8f9ff",
+                    "on-secondary-fixed-variant": "#5d4201",
+                    "outline": "#76777d",
+                    "surface-container-high": "#dce9ff",
+                    "surface-container": "#e5eeff",
+                    "background": "#f8f9ff",
+                    "surface-container-lowest": "#ffffff",
+                    "inverse-primary": "#bec6e0",
+                    "inverse-surface": "#213145",
+                    "surface-variant": "#d3e4fe",
+                    "surface-tint": "#565e74"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-sm": "8px",
+                    "stack-lg": "32px",
+                    "stack-md": "16px",
+                    "section-gap": "64px",
+                    "gutter": "16px",
+                    "container-margin": "24px"
+            },
+            "fontFamily": {
+                    "headline-md": ["Playfair Display"],
+                    "display-lg": ["Playfair Display"],
+                    "body-lg": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "label-md": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-lg": ["Playfair Display"]
+            },
+            "fontSize": {
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.03em", "fontWeight": "500"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body {
+            background-color: #f8f9ff;
+            color: #0b1c30;
+            overflow-x: hidden;
+        }
+        .luxury-card {
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            border: 1px solid #E2E8F0;
+        }
+        .luxury-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(11, 28, 48, 0.05);
+            border-color: #775a19;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #0b1c30;
+        }
+    </style>
+</head>
+<body class="font-body-md text-body-md selection:bg-secondary selection:text-white">
+<!-- TopNavBar -->
+<header class="bg-surface-container-lowest sticky top-0 z-50 border-b border-outline-variant">
+<div class="flex justify-between items-center px-container-margin py-stack-md w-full max-w-[1440px] mx-auto">
+<nav class="flex gap-stack-lg items-center">
+<a class="font-label-md text-label-md uppercase tracking-widest text-on-surface-variant hover:text-secondary transition-colors duration-300 cursor-pointer active:opacity-70" href="#">Collections</a>
+<a class="font-label-md text-label-md uppercase tracking-widest text-on-surface-variant hover:text-secondary transition-colors duration-300 cursor-pointer active:opacity-70" href="#">High Jewelry</a>
+<a class="font-label-md text-label-md uppercase tracking-widest text-on-surface-variant hover:text-secondary transition-colors duration-300 cursor-pointer active:opacity-70" href="#">Maison</a>
+</nav>
+<div class="font-display-lg text-display-lg tracking-tighter text-primary">ESTELLE</div>
+<div class="flex gap-stack-md items-center">
+<button class="p-2 cursor-pointer transition-all duration-200 hover:text-secondary">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+</button>
+<button class="p-2 cursor-pointer transition-all duration-200 hover:text-secondary">
+<span class="material-symbols-outlined" data-icon="favorite">favorite</span>
+</button>
+<button class="p-2 cursor-pointer transition-all duration-200 text-secondary border-b border-secondary pb-1">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+</button>
+</div>
+</div>
+</header>
+<main class="max-w-[1440px] mx-auto flex min-h-screen">
+<!-- SideNavBar -->
+<aside class="h-[calc(100vh-80px)] w-64 sticky top-20 bg-surface-container-low flex flex-col gap-stack-md py-stack-lg border-r border-outline-variant">
+<div class="px-6 mb-stack-lg">
+<h2 class="font-headline-md text-headline-md text-primary">My Account</h2>
+<p class="text-on-surface-variant text-label-sm uppercase tracking-wider mt-1">Welcome back to Estelle</p>
+</div>
+<nav class="flex flex-col gap-2">
+<a class="flex items-center gap-4 py-3 text-primary font-bold border-l-2 border-secondary pl-4 cursor-pointer transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-4 py-3 text-on-surface-variant pl-4 cursor-pointer hover:bg-surface-container-high transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="shopping_bag">shopping_bag</span>
+<span class="font-body-md text-body-md">Orders</span>
+</a>
+<a class="flex items-center gap-4 py-3 text-on-surface-variant pl-4 cursor-pointer hover:bg-surface-container-high transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-body-md text-body-md">Profile</span>
+</a>
+<a class="flex items-center gap-4 py-3 text-on-surface-variant pl-4 cursor-pointer hover:bg-surface-container-high transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="favorite">favorite</span>
+<span class="font-body-md text-body-md">Wishlist</span>
+</a>
+<a class="flex items-center gap-4 py-3 text-on-surface-variant pl-4 cursor-pointer hover:bg-surface-container-high transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="support_agent">support_agent</span>
+<span class="font-body-md text-body-md">Concierge</span>
+</a>
+</nav>
+<div class="mt-auto px-6 pb-6">
+<button class="w-full py-4 border border-outline text-label-md uppercase tracking-widest hover:bg-primary hover:text-white transition-all duration-300">
+                    Sign Out
+                </button>
+</div>
+</aside>
+<!-- Right Content Area -->
+<section class="flex-1 px-12 py-12 bg-background overflow-y-auto custom-scrollbar">
+<!-- Welcome Section -->
+<div class="mb-section-gap flex flex-col md:flex-row justify-between items-end gap-stack-lg border-b border-outline-variant pb-stack-lg">
+<div>
+<h1 class="font-display-lg text-display-lg text-primary mb-2">Bonjour, Isabella</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Your personal sanctuary of French luxury and exquisite craftsmanship.</p>
+</div>
+<div class="flex items-center gap-stack-md bg-white p-4 luxury-card">
+<div class="w-16 h-16 rounded-full overflow-hidden bg-surface-container-highest">
+<img class="w-full h-full object-cover" data-alt="A professional studio portrait of a sophisticated woman with elegant styling, soft cinematic lighting, minimalist background, high-end luxury editorial photography style for a premium brand profile." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAmOQ3liqsdtmwc_C2tnOw17TWz0wo9WbJPd4BmA30LI6J0igodZrU_OWW42K2uRJIUb0jyJxYKpYSJBg9pnWJjCjUN6dXNcTisuENQ21nFabNonqMUI1nhtEaILt2tsT1-4VK_fteYk22Q0I_YuUwGDPspBZdULhwVYKnIdugqlL3-MpzUD5tERJWdpKfUOwTxHqSTtYjHhEN1gJqcGnJPNRGnLkZXHQxP8Q8KpJuTShUGi8gAPqNjTR_W-FkLYw3-wciw-fsQqWWS"/>
+</div>
+<div>
+<p class="font-label-md text-label-md text-primary">Isabella Fontaine</p>
+<span class="text-secondary font-label-sm uppercase tracking-widest flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
+                            Platinum Member
+                        </span>
+</div>
+</div>
+</div>
+<!-- Bento Grid - Points & Status -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-section-gap">
+<div class="md:col-span-2 bg-primary-container text-white p-8 luxury-card flex justify-between items-center relative overflow-hidden group">
+<div class="relative z-10">
+<p class="font-label-sm uppercase tracking-widest text-on-primary-container mb-2">Loyalty Points Balance</p>
+<h3 class="text-[42px] font-bold tracking-tight">12,450 <span class="text-secondary-fixed text-body-md font-normal">pts</span></h3>
+<p class="text-on-primary-container mt-4 text-label-md">Next Tier: Diamond (2,550 pts remaining)</p>
+</div>
+<div class="relative z-10 hidden lg:block">
+<button class="bg-secondary text-white px-8 py-4 font-label-md uppercase tracking-widest hover:bg-secondary-fixed-variant transition-colors">
+                            Redeem Rewards
+                        </button>
+</div>
+<div class="absolute right-[-20px] bottom-[-20px] opacity-10 rotate-12 transition-transform duration-700 group-hover:scale-110">
+<span class="material-symbols-outlined text-[180px]">workspace_premium</span>
+</div>
+</div>
+<div class="bg-white p-8 luxury-card flex flex-col justify-between">
+<div>
+<p class="font-label-sm uppercase tracking-widest text-on-surface-variant mb-2">Current Tier</p>
+<h3 class="font-headline-md text-headline-md text-secondary">Platinum</h3>
+</div>
+<ul class="text-label-sm space-y-2 text-on-surface-variant">
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-secondary text-[16px]">check</span> Complimentary Shipping</li>
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-secondary text-[16px]">check</span> Early Collection Access</li>
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-secondary text-[16px]">check</span> Private Viewings</li>
+</ul>
+</div>
+</div>
+<!-- Recent Orders -->
+<div class="mb-section-gap">
+<div class="flex justify-between items-end mb-stack-lg">
+<h2 class="font-headline-lg text-headline-lg text-primary">Recent Orders</h2>
+<a class="text-label-md uppercase tracking-widest text-secondary hover:underline transition-all" href="#">View All Orders</a>
+</div>
+<div class="space-y-4">
+<!-- Order Item 1 -->
+<div class="bg-white p-6 luxury-card flex flex-col md:flex-row items-center gap-8">
+<div class="w-32 h-32 bg-surface-container overflow-hidden shrink-0">
+<img class="w-full h-full object-cover" data-alt="A macro close-up of a luxurious gold diamond ring on a soft velvet pedestal. Meticulous detail, high-end jewelry photography, soft natural studio lighting, minimalist grey background, elegant and sophisticated mood." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNGI9hxh_z71zZa9tjy-7ohW2mfdkX9NRGz6x8Kwpr1HoSo98tvtG9yDkmW0aZ55iVjUM2g5tLQ5yWF0k5x8flDW5MXAkyI-PKAbSfW8Kh1TFg4EHOZcZjsY-L-nSltnj3SzPw-RiKj11DRmMdElAByBzXkPq0nYwIKESqkc0inWxcWBIQFtvRozLuc0s2tHeNPTCIPU6hYFvli_F6qOp1x4NvK2stgYlRk863KBsZQY-KtsiO4Uh04kQBsT3SXyKujbgSb44BO6xo"/>
+</div>
+<div class="flex-1">
+<p class="text-label-sm text-on-surface-variant mb-1">Order #ES-49201 • Oct 12, 2023</p>
+<h4 class="font-headline-md text-headline-md mb-2">L'Éclat Diamond Solitaire</h4>
+<div class="flex items-center gap-4">
+<span class="bg-surface-container-high px-3 py-1 rounded-full text-label-sm uppercase text-primary">In Transit</span>
+<p class="text-body-md font-bold text-primary">€8,400.00</p>
+</div>
+</div>
+<button class="px-8 py-3 border border-primary text-label-md uppercase tracking-widest hover:bg-primary hover:text-white transition-all">Track Order</button>
+</div>
+<!-- Order Item 2 -->
+<div class="bg-white p-6 luxury-card flex flex-col md:flex-row items-center gap-8">
+<div class="w-32 h-32 bg-surface-container overflow-hidden shrink-0">
+<img class="w-full h-full object-cover" data-alt="Exquisite gold hoop earrings with intricate floral patterns and small emeralds, photographed against a neutral background. Sharp focus, professional lighting, luxury lifestyle photography style, minimalist aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBD0HluqhL3ImG8DEmiWcATqVEUEBv4OjP7m6sjcRF7fIlZ2zduWnS3f7EU3CyDKotvSEHRsAajRk27OxaVfPOqVJImBPChBSZ5-WZLGATc6FR9cNz7CgLVeYWnslZOxY2vZpODZmPkDN0Xvp3s88h9Bdp0hopVBtJHZUg1wmWLIGnAEpzi0b7fbIhGqBUzqlKG1WM8CHxbiRJQQfh-TX1mO3ABCW5M2qzGltRYvp-hI_jOK1rNXUxKLGKhaSt-M1PFIEYqI-TmEAo3"/>
+</div>
+<div class="flex-1">
+<p class="text-label-sm text-on-surface-variant mb-1">Order #ES-48763 • Sept 05, 2023</p>
+<h4 class="font-headline-md text-headline-md mb-2">Heritage Gold Hoops</h4>
+<div class="flex items-center gap-4">
+<span class="bg-surface-container-highest px-3 py-1 rounded-full text-label-sm uppercase text-on-surface-variant">Delivered</span>
+<p class="text-body-md font-bold text-primary">€3,250.00</p>
+</div>
+</div>
+<button class="px-8 py-3 border border-primary text-label-md uppercase tracking-widest hover:bg-primary hover:text-white transition-all">Order Details</button>
+</div>
+</div>
+</div>
+<!-- Quick Access Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-section-gap">
+<div class="bg-white p-8 luxury-card cursor-pointer group">
+<span class="material-symbols-outlined text-secondary mb-4 group-hover:scale-110 transition-transform">location_on</span>
+<h3 class="font-headline-md text-headline-md mb-2">Shipping Addresses</h3>
+<p class="text-on-surface-variant text-body-md mb-6">Manage your primary and secondary delivery locations.</p>
+<p class="text-label-md font-bold uppercase tracking-widest text-primary border-b border-primary w-fit">Manage</p>
+</div>
+<div class="bg-white p-8 luxury-card cursor-pointer group">
+<span class="material-symbols-outlined text-secondary mb-4 group-hover:scale-110 transition-transform">credit_card</span>
+<h3 class="font-headline-md text-headline-md mb-2">Payment Methods</h3>
+<p class="text-on-surface-variant text-body-md mb-6">Securely store your vault cards for seamless checkout.</p>
+<p class="text-label-md font-bold uppercase tracking-widest text-primary border-b border-primary w-fit">Manage</p>
+</div>
+<div class="bg-white p-8 luxury-card cursor-pointer group">
+<span class="material-symbols-outlined text-secondary mb-4 group-hover:scale-110 transition-transform">verified_user</span>
+<h3 class="font-headline-md text-headline-md mb-2">Account Security</h3>
+<p class="text-on-surface-variant text-body-md mb-6">Update password, enable 2FA and manage sessions.</p>
+<p class="text-label-md font-bold uppercase tracking-widest text-primary border-b border-primary w-fit">Secure</p>
+</div>
+</div>
+<!-- Wishlist Preview & Concierge -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-stack-lg items-stretch">
+<!-- Wishlist -->
+<div class="bg-surface-container-low p-8 border border-outline-variant flex flex-col">
+<div class="flex justify-between items-end mb-8">
+<h2 class="font-headline-lg text-headline-lg text-primary">My Wishlist</h2>
+<a class="text-label-md uppercase tracking-widest text-secondary" href="#">View All</a>
+</div>
+<div class="grid grid-cols-2 gap-4 flex-1">
+<div class="relative group cursor-pointer bg-white p-2">
+<div class="aspect-[4/5] bg-surface-container overflow-hidden mb-2">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A delicate silver necklace with a sapphire pendant, placed on a white marble surface. Bright high-key lighting, minimalist editorial product photography, sophisticated and elegant vibe." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCV89_D75v0fDJT-HR6KIE8kCoGM-X4cREH3sWmAMjG2NYAt6PSCzMGH7idiW0yVzro3qtKyvxTvJBCsSOF3Gn-Z0mZz0pr9uIxXQz4sbG9aBb2K-54E1MDE10te8bwhdKJjRfxt-49jhzER5EW6c3JJXsgi5TISTE_ht5nx8d1DoxXEzHZ44_o6VWQOtOIGBHz5z4xn8RDLSIUaIspPSvkoUJOywQnuCor9MqGcvmD0THrQU1d5XHtuXQL0RDEkyYwjDu4mS5iNCa4"/>
+</div>
+<p class="text-label-sm font-bold truncate">Sapphire Pendant</p>
+<p class="text-label-sm text-on-surface-variant">€4,900</p>
+</div>
+<div class="relative group cursor-pointer bg-white p-2">
+<div class="aspect-[4/5] bg-surface-container overflow-hidden mb-2">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Luxury platinum cufflinks with black onyx inlay, presented in a wooden gift box. Elegant close-up shot, soft warm lighting, minimalist aesthetic, high-end men's jewelry photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCAvDsGeceTD73HigII_AjqAl27qt7b0YZoJl2xoHa7OkJ9okJDnTyCJai8oUWkUyavS1_wkerybVuSjl2Oae67iSzaWR9_FZKOIZYRhb25d229vOD4jghm4_wmGdyo8aw48Yrp4B1dHtVUG_cZlToGkEW07JdZqHJ8VVSqm7kAo4Pb92MvWdNrnRFV2dOTfXjBVLy1XjKVuxopPHyR7szzovDTQkOVvz3U8GOnLEbiBTlZRC404P_HQIlZbdRqkyb0AmkxK07YdVH0"/>
+</div>
+<p class="text-label-sm font-bold truncate">Onyx Cufflinks</p>
+<p class="text-label-sm text-on-surface-variant">€1,200</p>
+</div>
+</div>
+</div>
+<!-- Concierge -->
+<div class="bg-primary text-white p-12 flex flex-col justify-center items-start relative overflow-hidden">
+<div class="absolute inset-0 opacity-10">
+<img class="w-full h-full object-cover grayscale" data-alt="A blurry, atmospheric shot of an elegant high-end jewelry boutique interior, with glowing display cases and plush carpeting. Deep shadows and highlights create a sense of exclusivity and mystery. Monochrome dark tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC33CDOotLM5Rv95_bEYpLG4M6de1ojS_501x0wdwPvuwgXAj38OkRH8ypt9wmONI_yUkOybnijzMyChPCuJh-j9gUXwofYem9FYNN_nJTl8HOIx7dGx6J0MkG5Q_yN8bgglcLzJKNNdjpxfDWAf_JmyR2s9hayHwdbb1EjlJbfDWVUI03o7X3ZJSyHEZlJsZkg-AQXirUN0wmv1zS1HNLHjEESIblZRvtc9nFDhZoXGrNEKi2jid-MuW7vwVG8hllgoL-ImbvTXAJw"/>
+</div>
+<div class="relative z-10 max-w-sm">
+<span class="text-secondary font-label-sm uppercase tracking-[0.2em] mb-4 block">Dedicated Support</span>
+<h2 class="font-display-lg text-display-lg text-white mb-6 leading-tight">Your Personal Concierge</h2>
+<p class="text-on-primary-container mb-10 font-body-lg">Access priority service for bespoke commissions, size adjustments, and private appointments with our lead jewelers.</p>
+<button class="bg-secondary text-white px-10 py-5 font-label-md uppercase tracking-widest hover:bg-white hover:text-primary transition-all duration-300">
+                            Speak with Concierge
+                        </button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-highest border-t border-outline-variant">
+<div class="flex flex-col items-center gap-stack-md py-section-gap px-container-margin w-full max-w-[1440px] mx-auto">
+<div class="font-headline-md text-headline-md text-primary mb-stack-md">ESTELLE</div>
+<nav class="flex flex-wrap justify-center gap-stack-lg mb-stack-md">
+<a class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant hover:text-secondary transition-colors" href="#">Customer Care</a>
+<a class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant hover:text-secondary transition-colors" href="#">Shipping &amp; Returns</a>
+<a class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant hover:text-secondary transition-colors" href="#">Legal Notice</a>
+<a class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant hover:text-secondary transition-colors" href="#">Privacy Policy</a>
+<a class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant hover:text-secondary transition-colors" href="#">Contact Us</a>
+</nav>
+<p class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant opacity-60">© 2024 ESTELLE. All Rights Reserved.</p>
+</div>
+</footer>
+<script>
+        // Micro-interactions and subtle effects
+        document.querySelectorAll('.luxury-card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                // Subtle shine effect or interaction could go here
+                // For now just standard hover handles through CSS
+            });
+        });
+    </script>
+</body></html>

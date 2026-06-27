@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+
+<html class="light" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Paramètres Généraux - Diamarket Admin</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom scrollbar for professional look */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container": "#e5eeff",
+                    "secondary-fixed": "#d8e2ff",
+                    "inverse-surface": "#213145",
+                    "success": "#10b981",
+                    "on-primary-fixed-variant": "#3c475a",
+                    "on-primary-fixed": "#111c2d",
+                    "surface-dim": "#cbdbf5",
+                    "on-tertiary-fixed-variant": "#564427",
+                    "primary-fixed": "#d8e3fb",
+                    "tertiary": "#1e1200",
+                    "on-secondary-fixed": "#001a42",
+                    "surface-container-low": "#eff4ff",
+                    "on-secondary-container": "#fefcff",
+                    "on-error-container": "#93000a",
+                    "on-surface-variant": "#45474c",
+                    "surface-tint": "#545f73",
+                    "primary-container": "#1e293b",
+                    "secondary": "#0058be",
+                    "on-tertiary-container": "#a38c6a",
+                    "on-secondary": "#ffffff",
+                    "tertiary-container": "#35260c",
+                    "background": "#f8f9ff",
+                    "surface-variant": "#d3e4fe",
+                    "surface-container-highest": "#d3e4fe",
+                    "secondary-container": "#2170e4",
+                    "secondary-fixed-dim": "#adc6ff",
+                    "on-tertiary-fixed": "#271902",
+                    "outline-variant": "#c5c6cd",
+                    "on-surface": "#0b1c30",
+                    "on-primary-container": "#8590a6",
+                    "tertiary-fixed-dim": "#ddc39d",
+                    "inverse-primary": "#bcc7de",
+                    "surface": "#f8f9ff",
+                    "on-tertiary": "#ffffff",
+                    "inverse-on-surface": "#eaf1ff",
+                    "outline": "#75777d",
+                    "primary": "#091426",
+                    "border-light": "#e2e8f0",
+                    "surface-subtle": "#f8fafc",
+                    "on-primary": "#ffffff",
+                    "surface-bright": "#f8f9ff",
+                    "surface-container-high": "#dce9ff",
+                    "error": "#ef4444",
+                    "on-secondary-fixed-variant": "#004395",
+                    "on-error": "#ffffff",
+                    "warning": "#f59e0b",
+                    "on-background": "#0b1c30",
+                    "tertiary-fixed": "#fadfb8",
+                    "primary-fixed-dim": "#bcc7de",
+                    "surface-container-lowest": "#ffffff",
+                    "error-container": "#ffdad6"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "xl": "32px",
+                    "sidebar-width": "260px",
+                    "md": "16px",
+                    "gutter": "20px",
+                    "margin-mobile": "16px",
+                    "base": "4px",
+                    "sm": "8px",
+                    "xs": "4px",
+                    "lg": "24px"
+            },
+            "fontFamily": {
+                    "code-sm": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "label-md": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-sm": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "display-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "code-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+</head>
+<body class="bg-background text-on-background min-h-screen overflow-x-hidden">
+<!-- SideNavBar Anchor -->
+<aside class="w-sidebar-width h-screen fixed left-0 top-0 bg-primary dark:bg-primary-container border-r border-border-light dark:border-outline-variant flex flex-col py-lg z-50">
+<div class="px-lg mb-xl">
+<h1 class="font-headline-md text-headline-md font-bold text-on-primary">Diamarket</h1>
+<p class="font-body-md text-body-md text-on-primary-container opacity-70">Admin Console</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-lg py-3 text-on-primary-container opacity-70 hover:opacity-100 hover:bg-surface-variant/10 transition-all cursor-pointer" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-lg py-3 text-on-primary-container opacity-70 hover:opacity-100 hover:bg-surface-variant/10 transition-all cursor-pointer" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-body-md text-body-md">Products</span>
+</a>
+<a class="flex items-center gap-3 px-lg py-3 text-on-primary-container opacity-70 hover:opacity-100 hover:bg-surface-variant/10 transition-all cursor-pointer" href="#">
+<span class="material-symbols-outlined">shopping_cart</span>
+<span class="font-body-md text-body-md">Orders</span>
+</a>
+<a class="flex items-center gap-3 px-lg py-3 text-on-primary-container opacity-70 hover:opacity-100 hover:bg-surface-variant/10 transition-all cursor-pointer" href="#">
+<span class="material-symbols-outlined">storefront</span>
+<span class="font-body-md text-body-md">Vendors</span>
+</a>
+<a class="flex items-center gap-3 px-lg py-3 text-on-primary-container opacity-70 hover:opacity-100 hover:bg-surface-variant/10 transition-all cursor-pointer" href="#">
+<span class="material-symbols-outlined">chat</span>
+<span class="font-body-md text-body-md">Messaging</span>
+</a>
+<a class="flex items-center gap-3 px-lg py-3 text-on-primary-container opacity-70 hover:opacity-100 hover:bg-surface-variant/10 transition-all cursor-pointer" href="#">
+<span class="material-symbols-outlined">campaign</span>
+<span class="font-body-md text-body-md">Promotions</span>
+</a>
+<!-- Contextual Active Settings -->
+<a class="flex items-center gap-3 px-lg py-3 bg-secondary-container text-on-secondary-container border-l-4 border-secondary transition-all cursor-pointer" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</a>
+</nav>
+<div class="px-lg mt-auto">
+<div class="flex items-center gap-3 p-3 rounded-lg hover:bg-surface-variant/10 cursor-pointer">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="Close up professional portrait of a tech executive in a clean corporate office environment. The person is wearing a navy blazer and has a confident, welcoming expression. The lighting is bright and even, typical of high-end corporate photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhB0as5uiD12cO2cnk5mhtBpjLTlhNBVXfp6PMhDJ6KRcNhWPDTybQ8wDgQTdggMQsDBAya5AKC5T-sPOY45VpgUO2Ox0iYwSpIagwYoGmj7eIYTP2CmRcM8Lge8FN4_NKpBhwOb3Gr1ex5fqya0QdgjRSpkbIot7dE2_I-rrkeAltQo3XtlOWNbJ0HETY1PAcBTPIKr_JFk6gYL-If5Ltgx1fsdAEl2NwDeoi-URPEMbSl0qEO1x5ek4M8WwVlj_iSiMlH46MgwHQ"/>
+<div class="flex-1 overflow-hidden">
+<p class="text-on-primary font-label-md truncate">Admin User</p>
+<p class="text-on-primary-container opacity-60 text-label-sm truncate">Super Admin</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- TopNavBar Anchor -->
+<header class="fixed top-0 right-0 left-[260px] h-16 bg-surface dark:bg-surface-dim border-b border-border-light dark:border-outline-variant shadow-sm z-40 px-lg flex justify-between items-center">
+<div class="flex items-center flex-1 max-w-xl">
+<div class="relative w-full group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full bg-surface-container-low border-none rounded-full py-2 pl-10 pr-4 text-body-md focus:ring-2 focus:ring-secondary transition-all outline-none" placeholder="Rechercher des paramètres..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+<div class="h-8 w-[1px] bg-outline-variant mx-2"></div>
+<button class="flex items-center gap-2 px-4 py-2 bg-secondary text-on-secondary rounded-lg font-label-md hover:bg-secondary/90 transition-all shadow-sm">
+<span>Enregistrer</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-[260px] pt-16 pb-24 p-xl max-w-[1400px]">
+<!-- Header Section -->
+<div class="mb-lg flex justify-between items-end">
+<div>
+<h2 class="font-display-lg text-display-lg text-on-surface">Paramètres Généraux</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Gérez l'identité, la localisation et la visibilité de votre boutique Diamarket.</p>
+</div>
+<div class="flex gap-3">
+<button class="px-4 py-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg border border-outline-variant font-label-md transition-all">
+                    Annuler
+                </button>
+<button class="px-6 py-2 bg-secondary text-on-secondary rounded-lg font-label-md hover:shadow-lg transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">save</span>
+                    Enregistrer les modifications
+                </button>
+</div>
+</div>
+<!-- Settings Grid -->
+<div class="grid grid-cols-12 gap-xl">
+<!-- Left Column: Primary Config -->
+<div class="col-span-12 lg:col-span-8 space-y-xl">
+<!-- Section 1: Shop Identity -->
+<section class="bg-white border border-border-light rounded-xl overflow-hidden shadow-sm">
+<div class="p-lg border-b border-border-light bg-surface-subtle flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary">store</span>
+<h3 class="font-headline-sm text-headline-sm">Identité de la Boutique</h3>
+</div>
+<div class="p-lg space-y-lg">
+<!-- Horizontal Input Row -->
+<div class="grid grid-cols-1 md:grid-cols-3 items-start gap-md">
+<label class="font-label-md text-on-surface pt-2">Nom de la boutique</label>
+<div class="md:col-span-2">
+<input class="w-full rounded-lg border-outline-variant focus:border-secondary focus:ring-1 focus:ring-secondary text-body-md px-4 py-2.5 transition-all" type="text" value="Diamarket"/>
+<p class="text-body-sm text-on-surface-variant mt-2">Le nom public de votre place de marché.</p>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 items-start gap-md border-t border-border-light pt-lg">
+<label class="font-label-md text-on-surface pt-2">Slogan</label>
+<div class="md:col-span-2">
+<input class="w-full rounded-lg border-outline-variant focus:border-secondary focus:ring-1 focus:ring-secondary text-body-md px-4 py-2.5 transition-all" type="text" value="L'excellence à portée de clic"/>
+<p class="text-body-sm text-on-surface-variant mt-2">Apparaît sous le logo sur certains thèmes.</p>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 items-start gap-md border-t border-border-light pt-lg">
+<label class="font-label-md text-on-surface pt-2">Logo de la boutique</label>
+<div class="md:col-span-2 flex items-center gap-lg">
+<div class="w-24 h-24 bg-surface-container-low rounded-xl border-2 border-dashed border-outline-variant flex items-center justify-center overflow-hidden relative group cursor-pointer">
+<div class="absolute inset-0 bg-primary/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10">
+<span class="material-symbols-outlined text-on-primary">edit</span>
+</div>
+<img class="w-full h-full object-contain p-4" data-alt="A clean, minimalist vector logo for a high-end luxury brand named Diamarket. The logo features a stylized diamond shape integrated with a subtle 'D' letterform. The color scheme is deep charcoal and a vibrant corporate blue. The style is modern, professional, and scalable, presented on a light gray background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLmeN5hlOChCoKe8APyGyGvPv8At2q3Rtc0KlSb87QWkSNotZW_Ht6Gm2FjcNcpLN_DwNx87SDqYGTsjTSE664r-Dh6cOwkL1mZfC1SH4VAKeYdjn5gn8a6VxCbnf29sdzp8reByb6W9ktJMnSGLylEX5jGgjdm37JSQrNJpwUvyp7HxlrN8EzDqQK7OaVVHyqBHo8lDpWUBRM_m7CO1kaaW8U8PuAMRjnsRzwcHMuwjsQH_d89sYdnLSczl6FAviCgv_IvnQB0wch"/>
+</div>
+<div class="space-y-2">
+<button class="px-4 py-2 bg-surface-container-high text-on-surface font-label-md rounded-lg hover:bg-surface-variant/30 transition-all border border-outline-variant">
+                                        Remplacer le logo
+                                    </button>
+<p class="text-body-sm text-on-surface-variant">PNG ou SVG, min 512x512px. Max 2MB.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 2: Contact Information -->
+<section class="bg-white border border-border-light rounded-xl overflow-hidden shadow-sm">
+<div class="p-lg border-b border-border-light bg-surface-subtle flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary">contact_support</span>
+<h3 class="font-headline-sm text-headline-sm">Coordonnées</h3>
+</div>
+<div class="p-lg space-y-lg">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-xl">
+<div class="space-y-2">
+<label class="font-label-md text-on-surface">Email de support</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">mail</span>
+<input class="w-full rounded-lg border-outline-variant pl-10 pr-4 py-2.5 text-body-md focus:ring-secondary focus:border-secondary" type="email" value="support@diamarket.com"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-label-md text-on-surface">Téléphone</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">call</span>
+<input class="w-full rounded-lg border-outline-variant pl-10 pr-4 py-2.5 text-body-md focus:ring-secondary focus:border-secondary" type="tel" value="+33 1 23 45 67 89"/>
+</div>
+</div>
+</div>
+<div class="space-y-2 border-t border-border-light pt-lg">
+<label class="font-label-md text-on-surface">Adresse physique</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-4 text-on-surface-variant text-[20px]">location_on</span>
+<textarea class="w-full rounded-lg border-outline-variant pl-10 pr-4 py-2.5 text-body-md focus:ring-secondary focus:border-secondary" rows="3">8 Avenue des Champs-Élysées, 75008 Paris, France</textarea>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: Secondary Config & Status -->
+<div class="col-span-12 lg:col-span-4 space-y-xl">
+<!-- Section 3: Maintenance & Visibility -->
+<section class="bg-white border border-border-light rounded-xl overflow-hidden shadow-sm">
+<div class="p-lg border-b border-border-light bg-surface-subtle flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary">visibility</span>
+<h3 class="font-headline-sm text-headline-sm">Maintenance &amp; Visibilité</h3>
+</div>
+<div class="p-lg space-y-lg">
+<!-- Maintenance Toggle -->
+<div class="flex items-center justify-between p-4 bg-surface-container-low rounded-xl border border-surface-variant/30">
+<div class="flex-1">
+<p class="font-label-md text-on-surface">Mode Maintenance</p>
+<p class="text-body-sm text-on-surface-variant">Rendre le site inaccessible aux clients.</p>
+</div>
+<button class="w-12 h-6 bg-outline-variant rounded-full p-0.5 transition-colors duration-300 relative focus:outline-none" onclick="this.classList.toggle('bg-secondary'); this.querySelector('div').classList.toggle('translate-x-6')">
+<div class="w-5 h-5 bg-white rounded-full shadow-sm transition-transform duration-300 transform"></div>
+</button>
+</div>
+<!-- SEO Checkbox -->
+<label class="flex items-start gap-3 p-4 hover:bg-surface-subtle rounded-xl transition-colors cursor-pointer group">
+<div class="relative flex items-center pt-1">
+<input checked="" class="w-5 h-5 rounded border-outline-variant text-secondary focus:ring-secondary transition-all" type="checkbox"/>
+</div>
+<div>
+<p class="font-label-md text-on-surface">Indexation SEO</p>
+<p class="text-body-sm text-on-surface-variant">Autoriser les moteurs de recherche à indexer la boutique.</p>
+</div>
+</label>
+</div>
+</section>
+<!-- Section 4: Localization -->
+<section class="bg-white border border-border-light rounded-xl overflow-hidden shadow-sm">
+<div class="p-lg border-b border-border-light bg-surface-subtle flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary">language</span>
+<h3 class="font-headline-sm text-headline-sm">Localisation</h3>
+</div>
+<div class="p-lg space-y-lg">
+<div class="space-y-2">
+<label class="font-label-md text-on-surface">Fuseau horaire</label>
+<select class="w-full rounded-lg border-outline-variant text-body-md focus:ring-secondary focus:border-secondary py-2.5">
+<option>(UTC+01:00) Paris, Berlin, Rome</option>
+<option>(UTC+00:00) London, Lisbon</option>
+<option>(UTC-05:00) New York, Toronto</option>
+</select>
+</div>
+<div class="space-y-2">
+<label class="font-label-md text-on-surface">Langue par défaut</label>
+<select class="w-full rounded-lg border-outline-variant text-body-md focus:ring-secondary focus:border-secondary py-2.5">
+<option>Français (FR)</option>
+<option>English (EN)</option>
+<option>Deutsch (DE)</option>
+</select>
+</div>
+</div>
+</section>
+<!-- Quick Help Card -->
+<div class="bg-secondary p-lg rounded-xl text-on-secondary shadow-lg relative overflow-hidden">
+<div class="relative z-10">
+<span class="material-symbols-outlined text-on-secondary-container mb-3 text-[32px]">lightbulb</span>
+<h4 class="font-headline-sm text-headline-sm mb-2">Besoin d'aide ?</h4>
+<p class="text-body-md opacity-90 mb-4">La configuration correcte de ces paramètres assure une meilleure indexation et une expérience utilisateur optimale.</p>
+<a class="inline-flex items-center gap-1 font-label-md hover:underline" href="#">
+                            Consulter le guide de démarrage
+                            <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</a>
+</div>
+<!-- Decorative Background Element -->
+<div class="absolute -right-8 -bottom-8 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer Mobile (Suppressed for Desktop, but added for safety/responsive logic) -->
+<footer class="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-surface border-t border-border-light z-50 flex justify-around items-center">
+<!-- Not rendered due to SideNavBar mandate but kept for structure -->
+</footer>
+<script>
+        // Micro-interaction for input highlight
+        const inputs = document.querySelectorAll('input, select, textarea');
+        inputs.forEach(input => {
+            input.addEventListener('focus', () => {
+                input.parentElement.closest('section')?.classList.add('border-secondary/30');
+            });
+            input.addEventListener('blur', () => {
+                input.parentElement.closest('section')?.classList.remove('border-secondary/30');
+            });
+        });
+
+        // Simple save feedback simulation
+        const saveBtns = document.querySelectorAll('button:contains("Enregistrer")');
+        // Since :contains isn't standard JS, we'll just target the specific primary button
+        const mainSaveBtn = document.querySelector('button.bg-secondary');
+        mainSaveBtn?.addEventListener('click', () => {
+            const originalText = mainSaveBtn.innerHTML;
+            mainSaveBtn.innerHTML = `<span class="material-symbols-outlined animate-spin text-[18px]">sync</span> Enregistrement...`;
+            mainSaveBtn.disabled = true;
+            
+            setTimeout(() => {
+                mainSaveBtn.innerHTML = `<span class="material-symbols-outlined text-[18px]">check_circle</span> Modifié !`;
+                mainSaveBtn.classList.remove('bg-secondary');
+                mainSaveBtn.classList.add('bg-success');
+                
+                setTimeout(() => {
+                    mainSaveBtn.innerHTML = originalText;
+                    mainSaveBtn.classList.remove('bg-success');
+                    mainSaveBtn.classList.add('bg-secondary');
+                    mainSaveBtn.disabled = false;
+                }, 2000);
+            }, 1500);
+        });
+    </script>
+</body></html>

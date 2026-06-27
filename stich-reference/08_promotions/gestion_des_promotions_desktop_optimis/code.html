@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+
+<html class="light" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Diamarket Admin - Gestion des Promotions</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "outline": "#75777d",
+                    "secondary-container": "#2170e4",
+                    "secondary-fixed": "#d8e2ff",
+                    "tertiary-fixed": "#fadfb8",
+                    "surface-variant": "#d3e4fe",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container": "#e5eeff",
+                    "surface-container-high": "#dce9ff",
+                    "border-light": "#e2e8f0",
+                    "on-tertiary-fixed-variant": "#564427",
+                    "inverse-on-surface": "#eaf1ff",
+                    "secondary-fixed-dim": "#adc6ff",
+                    "surface-subtle": "#f8fafc",
+                    "primary-fixed": "#d8e3fb",
+                    "warning": "#f59e0b",
+                    "on-surface-variant": "#45474c",
+                    "on-tertiary-container": "#a38c6a",
+                    "surface-container-highest": "#d3e4fe",
+                    "primary-fixed-dim": "#bcc7de",
+                    "error": "#ef4444",
+                    "on-secondary-container": "#fefcff",
+                    "on-error-container": "#93000a",
+                    "surface-container-low": "#eff4ff",
+                    "primary-container": "#1e293b",
+                    "surface-bright": "#f8f9ff",
+                    "on-secondary-fixed-variant": "#004395",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary-fixed": "#001a42",
+                    "on-primary-fixed-variant": "#3c475a",
+                    "on-primary-fixed": "#111c2d",
+                    "on-surface": "#0b1c30",
+                    "tertiary-container": "#35260c",
+                    "primary": "#091426",
+                    "surface-tint": "#545f73",
+                    "inverse-primary": "#bcc7de",
+                    "inverse-surface": "#213145",
+                    "background": "#f8f9ff",
+                    "on-error": "#ffffff",
+                    "outline-variant": "#c5c6cd",
+                    "on-primary": "#ffffff",
+                    "success": "#10b981",
+                    "on-background": "#0b1c30",
+                    "secondary": "#0058be",
+                    "tertiary": "#1e1200",
+                    "tertiary-fixed-dim": "#ddc39d",
+                    "surface-dim": "#cbdbf5",
+                    "on-tertiary-fixed": "#271902",
+                    "surface": "#f8f9ff",
+                    "on-secondary": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "on-primary-container": "#8590a6"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "lg": "24px",
+                    "gutter": "20px",
+                    "xs": "4px",
+                    "md": "16px",
+                    "sm": "8px",
+                    "margin-mobile": "16px",
+                    "xl": "32px",
+                    "sidebar-width": "260px",
+                    "base": "4px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "label-md": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "code-sm": ["Inter"],
+                    "headline-sm": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-md": ["Inter"]
+            },
+            "fontSize": {
+                    "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                    "code-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .sidebar-active {
+            background-color: #2170e4;
+            color: #fefcff;
+            border-left-width: 4px;
+            border-color: #0058be;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background overflow-x-hidden">
+<!-- SideNavBar Shell -->
+<aside class="w-sidebar-width h-full fixed left-0 top-0 bg-primary flex flex-col py-md z-50">
+<div class="px-md mb-xl">
+<h1 class="font-headline-sm text-headline-sm font-bold text-on-primary">Diamarket Admin</h1>
+<p class="text-on-primary-container text-xs opacity-70">Management Console</p>
+</div>
+<nav class="flex-1 space-y-xs">
+<a class="flex items-center gap-sm px-md py-sm text-on-primary-container opacity-80 hover:opacity-100 hover:bg-primary-container transition-colors duration-200 cursor-pointer" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm text-on-primary-container opacity-80 hover:opacity-100 hover:bg-primary-container transition-colors duration-200 cursor-pointer" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="font-body-md text-body-md">Products</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm text-on-primary-container opacity-80 hover:opacity-100 hover:bg-primary-container transition-colors duration-200 cursor-pointer" href="#">
+<span class="material-symbols-outlined" data-icon="shopping_cart">shopping_cart</span>
+<span class="font-body-md text-body-md">Orders</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm text-on-primary-container opacity-80 hover:opacity-100 hover:bg-primary-container transition-colors duration-200 cursor-pointer" href="#">
+<span class="material-symbols-outlined" data-icon="storefront">storefront</span>
+<span class="font-body-md text-body-md">Vendors</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm text-on-primary-container opacity-80 hover:opacity-100 hover:bg-primary-container transition-colors duration-200 cursor-pointer" href="#">
+<span class="material-symbols-outlined" data-icon="chat">chat</span>
+<span class="font-body-md text-body-md">Messaging</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm bg-secondary-container text-on-secondary-container border-l-4 border-secondary transition-colors duration-200 cursor-pointer" href="#">
+<span class="material-symbols-outlined" data-icon="campaign" style="font-variation-settings: 'FILL' 1;">campaign</span>
+<span class="font-body-md text-body-md">Promotions</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm text-on-primary-container opacity-80 hover:opacity-100 hover:bg-primary-container transition-colors duration-200 cursor-pointer" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</a>
+</nav>
+<div class="px-md mt-auto pt-md border-t border-primary-container">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-secondary-fixed flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Professional headshot of a female administrator with a confident smile, wearing a professional navy suit, set against a blurred modern office background with soft daylighting. Corporate professional photography style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAxHs0A1vD3Xew9Vi18tjCtLzmK3CQu6BT9hCqPQJoXxToWbjuD9OMPxNps9IF0meD-TGB3CEREPVYyZdWtmzuDHEC8VPXchjRZVTefIBjmMOVKIk4zZiLyxkKB5NpT4FwNFELdWASvioOcGJaqcLJ88xXeOevYqq3NtC5DZWIRnB6DmwvxuxvVg216LaqyE0sE4iG9x6YFLUVqK2_sT4x97tDl5Qruf5RloWxL9quJXWi8Y5pUCEgcP33-V9ZQS52dz84Xm80sraaX"/>
+</div>
+<div class="flex flex-col">
+<span class="text-on-primary text-xs font-bold">Admin User</span>
+<span class="text-on-primary-container text-[10px]">Super Admin</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-sidebar-width min-h-screen flex flex-col">
+<!-- TopNavBar Shell -->
+<header class="h-16 fixed top-0 right-0 left-[260px] w-[calc(100%-260px)] bg-surface border-b border-border-light flex justify-between items-center px-lg z-40">
+<div class="flex items-center gap-md flex-1">
+<div class="relative w-full max-w-md group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm" data-icon="search">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-lg font-body-md text-body-md focus:ring-2 focus:ring-secondary" placeholder="Rechercher une promotion..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+<button class="flex items-center gap-sm bg-secondary text-on-secondary px-md py-sm rounded-lg font-label-md hover:brightness-110 transition-all active:scale-95 shadow-sm">
+<span class="material-symbols-outlined text-sm" data-icon="add">add</span>
+                    New Promotion
+                </button>
+</div>
+</header>
+<!-- Page Canvas -->
+<div class="mt-16 p-lg space-y-lg">
+<!-- Dashboard KPIs -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-md">
+<!-- KPI 1 -->
+<div class="bg-surface-container-lowest border border-border-light p-md rounded-xl flex items-center justify-between">
+<div class="space-y-xs">
+<p class="text-on-surface-variant font-label-sm uppercase tracking-wider">Active Campaigns</p>
+<h3 class="font-display-lg text-display-lg text-on-surface">12</h3>
+<div class="flex items-center gap-xs text-success font-label-sm">
+<span class="material-symbols-outlined text-[14px]" data-icon="trending_up">trending_up</span>
+<span>+4% vs last month</span>
+</div>
+</div>
+<div class="w-12 h-12 bg-secondary-fixed rounded-full flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined" data-icon="campaign" style="font-variation-settings: 'FILL' 1;">campaign</span>
+</div>
+</div>
+<!-- KPI 2 -->
+<div class="bg-surface-container-lowest border border-border-light p-md rounded-xl flex items-center justify-between">
+<div class="space-y-xs">
+<p class="text-on-surface-variant font-label-sm uppercase tracking-wider">Total Codes Used</p>
+<h3 class="font-display-lg text-display-lg text-on-surface">2,840</h3>
+<div class="flex items-center gap-xs text-on-surface-variant font-label-sm">
+<span class="material-symbols-outlined text-[14px]" data-icon="sync">sync</span>
+<span>Updated just now</span>
+</div>
+</div>
+<div class="w-12 h-12 bg-tertiary-fixed rounded-full flex items-center justify-center text-on-tertiary-fixed-variant">
+<span class="material-symbols-outlined" data-icon="confirmation_number" style="font-variation-settings: 'FILL' 1;">confirmation_number</span>
+</div>
+</div>
+<!-- KPI 3 -->
+<div class="bg-surface-container-lowest border border-border-light p-md rounded-xl flex items-center justify-between">
+<div class="space-y-xs">
+<p class="text-on-surface-variant font-label-sm uppercase tracking-wider">Revenue Generated</p>
+<h3 class="font-display-lg text-display-lg text-on-surface">€42.3k</h3>
+<div class="flex items-center gap-xs text-success font-label-sm">
+<span class="material-symbols-outlined text-[14px]" data-icon="trending_up">trending_up</span>
+<span>+12.5% vs period</span>
+</div>
+</div>
+<div class="w-12 h-12 bg-surface-container rounded-full flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="payments" style="font-variation-settings: 'FILL' 1;">payments</span>
+</div>
+</div>
+<!-- KPI 4 -->
+<div class="bg-surface-container-lowest border border-border-light p-md rounded-xl flex items-center justify-between">
+<div class="space-y-xs">
+<p class="text-on-surface-variant font-label-sm uppercase tracking-wider">Conversion Rate</p>
+<h3 class="font-display-lg text-display-lg text-on-surface">3.8%</h3>
+<div class="flex items-center gap-xs text-error font-label-sm">
+<span class="material-symbols-outlined text-[14px]" data-icon="trending_down">trending_down</span>
+<span>-1.2% drop</span>
+</div>
+</div>
+<div class="w-12 h-12 bg-error-container rounded-full flex items-center justify-center text-on-error-container">
+<span class="material-symbols-outlined" data-icon="ads_click" style="font-variation-settings: 'FILL' 1;">ads_click</span>
+</div>
+</div>
+</div>
+<!-- List Controls -->
+<div class="flex items-center justify-between bg-surface-container-lowest p-md rounded-xl border border-border-light">
+<div class="flex items-center gap-md">
+<div class="flex items-center gap-sm bg-surface-container-low px-sm py-xs rounded border border-outline-variant">
+<span class="font-label-sm text-on-surface-variant">Filter by:</span>
+<select class="bg-transparent border-none font-label-md text-on-surface py-0 focus:ring-0 cursor-pointer">
+<option>All Status</option>
+<option>Active</option>
+<option>Planned</option>
+<option>Expired</option>
+</select>
+</div>
+<div class="flex items-center gap-sm bg-surface-container-low px-sm py-xs rounded border border-outline-variant">
+<span class="font-label-sm text-on-surface-variant">Type:</span>
+<select class="bg-transparent border-none font-label-md text-on-surface py-0 focus:ring-0 cursor-pointer">
+<option>Percentage</option>
+<option>Fixed Amount</option>
+<option>Free Shipping</option>
+</select>
+</div>
+</div>
+<div class="flex items-center gap-sm">
+<button class="p-sm text-on-surface-variant hover:bg-surface-container-low rounded transition-colors border border-border-light">
+<span class="material-symbols-outlined" data-icon="grid_view">grid_view</span>
+</button>
+<button class="p-sm text-secondary bg-surface-container-high rounded transition-colors border border-secondary/20">
+<span class="material-symbols-outlined" data-icon="list">list</span>
+</button>
+</div>
+</div>
+<!-- Promotion Table -->
+<div class="bg-surface-container-lowest rounded-xl border border-border-light overflow-hidden shadow-sm">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-subtle">
+<tr>
+<th class="px-md py-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Promotion Name</th>
+<th class="px-md py-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Status</th>
+<th class="px-md py-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Date Range</th>
+<th class="px-md py-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Usage Progress</th>
+<th class="px-md py-sm font-label-sm text-on-surface-variant uppercase tracking-wider text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-light">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-subtle transition-colors group">
+<td class="px-md py-md">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 bg-secondary-fixed rounded-lg flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined" data-icon="percent">percent</span>
+</div>
+<div>
+<div class="font-label-md text-on-surface">Soldes d'Été 2024</div>
+<div class="font-body-sm text-on-surface-variant">Code: SUMMER24 - 20% OFF</div>
+</div>
+</div>
+</td>
+<td class="px-md py-md">
+<span class="inline-flex items-center px-sm py-[2px] rounded-full bg-success/10 text-success font-label-sm border border-success/20">
+<span class="w-1.5 h-1.5 rounded-full bg-success mr-2"></span> Active
+                                </span>
+</td>
+<td class="px-md py-md font-body-md text-on-surface">
+                                01 Juin - 31 Août 2024
+                            </td>
+<td class="px-md py-md w-1/4">
+<div class="space-y-xs">
+<div class="flex justify-between font-label-sm text-on-surface-variant">
+<span>345 used</span>
+<span>69%</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-secondary" style="width: 69%"></div>
+</div>
+</div>
+</td>
+<td class="px-md py-md text-right">
+<div class="flex items-center justify-end gap-xs opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-sm hover:bg-surface-container-high rounded-full text-on-surface-variant hover:text-secondary" title="Edit">
+<span class="material-symbols-outlined text-[20px]" data-icon="edit">edit</span>
+</button>
+<button class="p-sm hover:bg-surface-container-high rounded-full text-on-surface-variant hover:text-warning" title="Pause">
+<span class="material-symbols-outlined text-[20px]" data-icon="pause_circle">pause_circle</span>
+</button>
+<button class="p-sm hover:bg-surface-container-high rounded-full text-on-surface-variant hover:text-error" title="Delete">
+<span class="material-symbols-outlined text-[20px]" data-icon="delete">delete</span>
+</button>
+<button class="p-sm hover:bg-surface-container-high rounded-full text-on-surface-variant hover:text-primary" title="Details">
+<span class="material-symbols-outlined text-[20px]" data-icon="open_in_new">open_in_new</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-subtle transition-colors group">
+<td class="px-md py-md">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 bg-tertiary-fixed rounded-lg flex items-center justify-center text-on-tertiary-fixed-variant">
+<span class="material-symbols-outlined" data-icon="inventory">inventory</span>
+</div>
+<div>
+<div class="font-label-md text-on-surface">Lancement Nouvelle Collection</div>
+<div class="font-body-sm text-on-surface-variant">Code: NEW24 - €10 fixed</div>
+</div>
+</div>
+</td>
+<td class="px-md py-md">
+<span class="inline-flex items-center px-sm py-[2px] rounded-full bg-secondary/10 text-secondary font-label-sm border border-secondary/20">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary mr-2"></span> Planned
+                                </span>
+</td>
+<td class="px-md py-md font-body-md text-on-surface">
+                                15 Sep - 30 Sep 2024
+                            </td>
+<td class="px-md py-md w-1/4">
+<div class="space-y-xs">
+<div class="flex justify-between font-label-sm text-on-surface-variant">
+<span>0 used</span>
+<span>0%</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-secondary" style="width: 0%"></div>
+</div>
+</div>
+</td>
+<td class="px-md py-md text-right">
+<div class="flex items-center justify-end gap-xs opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-sm hover:bg-surface-container-high rounded-full text-on-surface-variant hover:text-secondary" title="Edit">
+<span class="material-symbols-outlined text-[20px]" data-icon="edit">edit</span>
+</button>
+<button class="p-sm hover:bg-surface-container-high rounded-full text-on-surface-variant hover:text-error" title="Delete">
+<span class="material-symbols-outlined text-[20px]" data-icon="delete">delete</span>
+</button>
+<button class="p-sm hover:bg-surface-container-high rounded-full text-on-surface-variant" title="Details">
+<span class="material-symbols-outlined text-[20px]" data-icon="open_in_new">open_in_new</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-subtle transition-colors group">
+<td class="px-md py-md">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 bg-surface-container rounded-lg flex items-center justify-center text-outline">
+<span class="material-symbols-outlined" data-icon="local_shipping">local_shipping</span>
+</div>
+<div>
+<div class="font-label-md text-on-surface">Offre Livraison Offerte</div>
+<div class="font-body-sm text-on-surface-variant">Code: FREEGO - No shipping fee</div>
+</div>
+</div>
+</td>
+<td class="px-md py-md">
+<span class="inline-flex items-center px-sm py-[2px] rounded-full bg-on-surface-variant/10 text-on-surface-variant font-label-sm border border-outline-variant">
+<span class="w-1.5 h-1.5 rounded-full bg-on-surface-variant mr-2"></span> Expired
+                                </span>
+</td>
+<td class="px-md py-md font-body-md text-on-surface opacity-60">
+                                01 Mai - 31 Mai 2024
+                            </td>
+<td class="px-md py-md w-1/4">
+<div class="space-y-xs opacity-60">
+<div class="flex justify-between font-label-sm text-on-surface-variant">
+<span>500 used</span>
+<span>100%</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-on-surface-variant" style="width: 100%"></div>
+</div>
+</div>
+</td>
+<td class="px-md py-md text-right">
+<div class="flex items-center justify-end gap-xs opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-sm hover:bg-surface-container-high rounded-full text-on-surface-variant hover:text-secondary" title="Reactivate">
+<span class="material-symbols-outlined text-[20px]" data-icon="restart_alt">restart_alt</span>
+</button>
+<button class="p-sm hover:bg-surface-container-high rounded-full text-on-surface-variant hover:text-error" title="Delete">
+<span class="material-symbols-outlined text-[20px]" data-icon="delete">delete</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="px-md py-sm bg-surface-subtle flex items-center justify-between border-t border-border-light">
+<span class="font-body-sm text-on-surface-variant">Showing 1 to 3 of 42 promotions</span>
+<div class="flex items-center gap-xs">
+<button class="p-xs text-on-surface-variant hover:bg-surface-container rounded-full disabled:opacity-30" disabled="">
+<span class="material-symbols-outlined" data-icon="chevron_left">chevron_left</span>
+</button>
+<button class="w-8 h-8 rounded bg-secondary text-on-secondary font-label-sm">1</button>
+<button class="w-8 h-8 rounded hover:bg-surface-container font-label-sm text-on-surface-variant">2</button>
+<button class="w-8 h-8 rounded hover:bg-surface-container font-label-sm text-on-surface-variant">3</button>
+<button class="p-xs text-on-surface-variant hover:bg-surface-container rounded-full">
+<span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Bottom Insights Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-lg">
+<div class="lg:col-span-2 bg-surface-container-lowest border border-border-light p-md rounded-xl space-y-md">
+<div class="flex items-center justify-between">
+<h4 class="font-label-md text-on-surface">Top Performing Campaigns</h4>
+<button class="text-secondary font-label-sm hover:underline">View Analytics</button>
+</div>
+<div class="space-y-sm">
+<div class="flex items-center justify-between p-sm hover:bg-surface-subtle rounded-lg">
+<div class="flex items-center gap-sm">
+<div class="w-2 h-8 bg-success rounded-full"></div>
+<div>
+<p class="font-label-sm text-on-surface">Summer Sale 2024</p>
+<p class="text-[10px] text-on-surface-variant">Active • 342 conversions</p>
+</div>
+</div>
+<span class="font-label-md text-on-surface">€12,450.00</span>
+</div>
+<div class="flex items-center justify-between p-sm hover:bg-surface-subtle rounded-lg">
+<div class="flex items-center gap-sm">
+<div class="w-2 h-8 bg-secondary rounded-full"></div>
+<div>
+<p class="font-label-sm text-on-surface">New User Welcome</p>
+<p class="text-[10px] text-on-surface-variant">Always On • 1,200 conversions</p>
+</div>
+</div>
+<span class="font-label-md text-on-surface">€8,120.50</span>
+</div>
+<div class="flex items-center justify-between p-sm hover:bg-surface-subtle rounded-lg">
+<div class="flex items-center gap-sm">
+<div class="w-2 h-8 bg-tertiary-fixed-dim rounded-full"></div>
+<div>
+<p class="font-label-sm text-on-surface">VIP Early Access</p>
+<p class="text-[10px] text-on-surface-variant">Expired • 89 conversions</p>
+</div>
+</div>
+<span class="font-label-md text-on-surface">€5,200.00</span>
+</div>
+</div>
+</div>
+<div class="bg-primary-container text-on-primary-container p-md rounded-xl space-y-md relative overflow-hidden">
+<div class="relative z-10 space-y-sm">
+<h4 class="font-label-md text-on-primary">Promotion Health Score</h4>
+<div class="flex items-center justify-center py-sm">
+<div class="w-32 h-32 rounded-full border-[10px] border-surface-variant/20 flex flex-col items-center justify-center relative">
+<div class="absolute inset-0 rounded-full border-[10px] border-secondary border-t-transparent border-r-transparent rotate-45"></div>
+<span class="font-display-lg text-display-lg text-on-primary">82</span>
+<span class="font-label-sm opacity-60">Excellent</span>
+</div>
+</div>
+<p class="font-body-sm text-center opacity-80">Your promotions are 15% more effective than the industry average this month.</p>
+<button class="w-full bg-on-primary text-primary py-sm rounded font-label-md active:scale-95 transition-all">Optimize Strategy</button>
+</div>
+<!-- Subtle background decoration -->
+<div class="absolute -bottom-10 -right-10 w-40 h-40 bg-secondary/20 rounded-full blur-3xl"></div>
+</div>
+</div>
+</div>
+</main>
+<script>
+        // Simple search interactivity
+        document.querySelector('input[type="text"]').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+
+        // Tooltip or micro-interaction simulation
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const originalText = btn.innerHTML;
+                if (btn.innerText.includes('New Promotion')) return; // skip main action
+            });
+        });
+    </script>
+</body></html>

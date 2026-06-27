@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+
+<html class="light" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Diamarket Admin - Mes Commandes</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .active-tab-indicator {
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: #0058be;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-low": "#eff4ff",
+                      "success": "#10b981",
+                      "primary-fixed": "#d8e3fb",
+                      "surface-subtle": "#f8fafc",
+                      "primary-container": "#1e293b",
+                      "surface-tint": "#545f73",
+                      "surface-container-high": "#dce9ff",
+                      "surface-container": "#e5eeff",
+                      "on-tertiary-fixed-variant": "#564427",
+                      "outline": "#75777d",
+                      "tertiary": "#1e1200",
+                      "primary-fixed-dim": "#bcc7de",
+                      "on-surface-variant": "#45474c",
+                      "tertiary-fixed-dim": "#ddc39d",
+                      "warning": "#f59e0b",
+                      "on-primary-fixed-variant": "#3c475a",
+                      "on-primary-container": "#8590a6",
+                      "outline-variant": "#c5c6cd",
+                      "secondary": "#0058be",
+                      "on-primary": "#ffffff",
+                      "on-error-container": "#93000a",
+                      "on-surface": "#0b1c30",
+                      "tertiary-fixed": "#fadfb8",
+                      "surface-bright": "#f8f9ff",
+                      "secondary-fixed": "#d8e2ff",
+                      "inverse-on-surface": "#eaf1ff",
+                      "on-secondary-container": "#fefcff",
+                      "error": "#ef4444",
+                      "primary": "#091426",
+                      "surface-container-highest": "#d3e4fe",
+                      "inverse-surface": "#213145",
+                      "background": "#f8f9ff",
+                      "on-background": "#0b1c30",
+                      "surface-container-lowest": "#ffffff",
+                      "on-secondary": "#ffffff",
+                      "border-light": "#e2e8f0",
+                      "tertiary-container": "#35260c",
+                      "on-background": "#0b1c30",
+                      "surface-container-lowest": "#ffffff",
+                      "on-tertiary": "#ffffff",
+                      "secondary-container": "#2170e4",
+                      "on-tertiary-fixed": "#271902",
+                      "error-container": "#ffdad6",
+                      "surface-dim": "#cbdbf5",
+                      "on-error": "#ffffff",
+                      "surface": "#f8f9ff",
+                      "on-secondary-fixed-variant": "#004395",
+                      "secondary-fixed-dim": "#adc6ff",
+                      "on-tertiary-container": "#a38c6a",
+                      "on-primary-fixed": "#111c2d"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "xs": "4px",
+                      "lg": "24px",
+                      "base": "4px",
+                      "sm": "8px",
+                      "sidebar-width": "260px",
+                      "md": "16px",
+                      "margin-mobile": "16px",
+                      "gutter": "20px",
+                      "xl": "32px"
+              },
+              "fontFamily": {
+                      "code-sm": ["Inter"],
+                      "label-md": ["Inter"],
+                      "label-sm": ["Inter"],
+                      "body-sm": ["Inter"],
+                      "headline-sm": ["Inter"],
+                      "body-lg": ["Inter"],
+                      "display-lg": ["Inter"],
+                      "body-md": ["Inter"],
+                      "headline-md": ["Inter"]
+              },
+              "fontSize": {
+                      "code-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                      "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                      "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                      "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                      "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+              }
+            },
+          },
+        }
+      </script>
+</head>
+<body class="bg-background text-on-background font-body-md overflow-hidden h-screen">
+<!-- Side Navigation Bar -->
+<aside class="fixed left-0 top-0 h-full w-sidebar-width bg-primary flex flex-col py-lg z-50">
+<div class="px-lg mb-xl">
+<h1 class="font-headline-md text-headline-md font-bold text-on-primary">Diamarket</h1>
+<p class="text-on-primary-container text-label-sm">Admin Console</p>
+</div>
+<nav class="flex-grow space-y-xs overflow-y-auto">
+<a class="flex items-center px-lg py-md text-on-primary-container hover:bg-primary-container hover:text-on-primary-container transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined mr-md">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center px-lg py-md text-on-primary-container hover:bg-primary-container hover:text-on-primary-container transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined mr-md">inventory_2</span>
+                Products
+            </a>
+<a class="flex items-center px-lg py-md bg-secondary-container text-on-secondary-container border-l-4 border-secondary font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined mr-md">shopping_cart</span>
+                Orders
+            </a>
+<a class="flex items-center px-lg py-md text-on-primary-container hover:bg-primary-container hover:text-on-primary-container transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined mr-md">group</span>
+                Vendors
+            </a>
+<a class="flex items-center px-lg py-md text-on-primary-container hover:bg-primary-container hover:text-on-primary-container transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined mr-md">chat</span>
+                Messaging
+            </a>
+<a class="flex items-center px-lg py-md text-on-primary-container hover:bg-primary-container hover:text-on-primary-container transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined mr-md">campaign</span>
+                Promotions
+            </a>
+<a class="flex items-center px-lg py-md text-on-primary-container hover:bg-primary-container hover:text-on-primary-container transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined mr-md">settings</span>
+                Settings
+            </a>
+</nav>
+<div class="px-lg mt-auto pt-lg border-t border-primary-container">
+<div class="flex items-center space-x-md">
+<img class="w-10 h-10 rounded-full border-2 border-outline-variant" data-alt="A professional headshot of a mature corporate administrator with silvering hair, wearing a navy blue blazer and a crisp white shirt. The background is a blurred, high-end office lobby with soft morning light. The overall mood is authoritative, trustworthy, and calm, reflecting the professional brand identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuABoAOaB7_8ery0HuYX89rXqvFRGin3cCqToqve8Bzqqmg9vWcHHtiJNFWAXyj55dmLTf_xiT_6BN3sf7GCtKz4oYHSIPwNh8A60bXwCFHF10t5EF6u0JG0y4Q4pO3qrhit0nT_bkV6B2dlym3kWyP2fKtUMveA7sV0qxh4AtSVLpGfBUR73oRERa0KV5dQJOlhA3YbgpleAYv9OGYzJxt-XJpkUyo8pbA6UjaVPiOX6BgZOrWOVFg2Y1Y739-G5PlIpwYdfyuOTWmg"/>
+<div class="overflow-hidden">
+<p class="text-on-primary font-label-md truncate">Admin Profile</p>
+<p class="text-on-primary-container text-label-sm truncate">Super Admin</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Top App Bar -->
+<header class="fixed top-0 right-0 w-[calc(100%-260px)] h-16 bg-surface-container-lowest border-b border-border-light flex items-center justify-between px-lg z-40">
+<div class="flex items-center bg-surface-subtle border border-outline-variant rounded-lg px-md py-xs w-96 focus-within:ring-2 focus-within:ring-secondary transition-all">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px] mr-sm">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-md w-full placeholder:text-on-surface-variant" placeholder="Search orders, products, IDs..." type="text"/>
+</div>
+<div class="flex items-center space-x-lg">
+<button class="relative text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute -top-1 -right-1 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">help</span>
+</button>
+<div class="h-8 w-[1px] bg-outline-variant"></div>
+<span class="text-primary font-headline-sm text-headline-sm font-bold">Mes Commandes</span>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-sidebar-width mt-16 p-lg h-[calc(100vh-64px)] overflow-y-auto bg-background">
+<div class="max-w-7xl mx-auto space-y-lg">
+<!-- Filters & Tabs Section -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-md border-b border-border-light pb-base">
+<div class="flex space-x-xl relative">
+<button class="relative pb-md text-secondary font-bold font-label-md transition-all">
+                        All Purchases
+                        <div class="active-tab-indicator"></div>
+</button>
+<button class="pb-md text-on-surface-variant font-label-md hover:text-on-surface transition-colors">
+                        In Delivery
+                    </button>
+<button class="pb-md text-on-surface-variant font-label-md hover:text-on-surface transition-colors">
+                        Completed
+                    </button>
+</div>
+<div class="flex items-center space-x-sm pb-md">
+<span class="text-label-sm text-on-surface-variant uppercase tracking-wider">Sort by:</span>
+<select class="border-none bg-surface-container-low rounded-lg text-label-sm font-label-md focus:ring-secondary py-1 pl-3 pr-8">
+<option>Most Recent</option>
+<option>Oldest First</option>
+<option>Price: High to Low</option>
+<option>Price: Low to High</option>
+</select>
+</div>
+</div>
+<!-- Orders Table Container -->
+<div class="bg-surface-container-lowest border border-border-light rounded-xl overflow-hidden">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-subtle text-label-sm text-on-surface-variant uppercase tracking-wider border-b border-border-light">
+<th class="px-lg py-md font-medium">Product</th>
+<th class="px-lg py-md font-medium">Order ID</th>
+<th class="px-lg py-md font-medium">Date</th>
+<th class="px-lg py-md font-medium">Status</th>
+<th class="px-lg py-md font-medium text-right">Price</th>
+<th class="px-lg py-md font-medium text-center">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-light">
+<!-- Order Row 1 -->
+<tr class="hover:bg-surface-subtle transition-colors group">
+<td class="px-lg py-md">
+<div class="flex items-center space-x-md">
+<div class="w-12 h-12 rounded bg-surface-container flex-shrink-0 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A macro studio photograph of an 'Aura Diamond Pendant', a luxurious platinum necklace with a central pear-shaped diamond surrounded by a halo of smaller pave diamonds. The lighting is crisp, emphasizing the internal fire and brilliance of the diamond against a clean white background. High-end jewelry catalog style, ultra-sharp focus, bright and airy professional aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAADLs-VOut84Le0wqQWS5h0VcZhyOsWQI6ECYf8e5UbyCiDITvNh0EGIgT4g_6w55G7zxXrYNYoGQgBNaE14UMIHYCZQYNGMLsUzis0r26lPdybedj0Jwirr5FmIMOUGlQYwX2VbTYopznMC84LqyUhpQLS6RLoXt2FhSnQC76QzZ491g-yEW0k6kacFmzaMIBR-cBEGnabx55qyfHjWYuqrH3PS-Ew4aRLC3uQ0Oky6eYieSIIprMgFIHJR3riwIXH6HvbKrnQvB3"/>
+</div>
+<span class="font-label-md text-on-surface">Aura Diamond Pendant</span>
+</div>
+</td>
+<td class="px-lg py-md">
+<span class="text-body-sm text-secondary font-medium font-code-sm">#EST-82940</span>
+</td>
+<td class="px-lg py-md text-body-md text-on-surface-variant">Oct 24, 2023</td>
+<td class="px-lg py-md">
+<span class="px-3 py-1 rounded-full bg-surface-container-high text-on-secondary-fixed-variant text-label-sm flex items-center w-fit">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary mr-2"></span>
+                                    In Delivery
+                                </span>
+</td>
+<td class="px-lg py-md text-right font-headline-sm text-headline-sm text-on-surface">$4,250.00</td>
+<td class="px-lg py-md text-center">
+<button class="p-2 hover:bg-primary-fixed rounded-full transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">visibility</span>
+</button>
+</td>
+</tr>
+<!-- Order Row 2 -->
+<tr class="hover:bg-surface-subtle transition-colors group">
+<td class="px-lg py-md">
+<div class="flex items-center space-x-md">
+<div class="w-12 h-12 rounded bg-surface-container flex-shrink-0 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Close-up detail of a 'Celestia Diamond Tennis Bracelet' in 18k yellow gold. The diamonds are round brilliant cuts, held in delicate four-prong settings. The lighting is warm and luxurious, with a subtle golden glow reflecting off the polished metal surfaces. High-density professional CMS style imagery, clean and minimal context." src="https://lh3.googleusercontent.com/aida-public/AB6AXuClz8dTDOjawRNP97Zc8HlrpvseWGkfFUDKQt_hHmR-NYCt2xJyAQ11kx7lmx3bYTerYEDF0ibswuWT4rUgeZJseZv7AmfPHp1IEdNiveEMFwqxXEjH9ye9N79x_WmLBhRoeA8126tnIKXnjbi9CzVGZMZ9krQgot9S-XN0McMczBnaATkYdN1xUNM5jqvIhSWguBi88uhw8-EAEPxpjgazGx6qk1-Pzz1djLBC1tOtlaZh0JVqdWzBhaGQp_Md528W7VcflvzrmOCh"/>
+</div>
+<span class="font-label-md text-on-surface">Celestia Bracelet</span>
+</div>
+</td>
+<td class="px-lg py-md">
+<span class="text-body-sm text-secondary font-medium font-code-sm">#EST-82935</span>
+</td>
+<td class="px-lg py-md text-body-md text-on-surface-variant">Oct 21, 2023</td>
+<td class="px-lg py-md">
+<span class="px-3 py-1 rounded-full bg-success/10 text-success text-label-sm flex items-center w-fit">
+<span class="w-1.5 h-1.5 rounded-full bg-success mr-2"></span>
+                                    Completed
+                                </span>
+</td>
+<td class="px-lg py-md text-right font-headline-sm text-headline-sm text-on-surface">$8,120.00</td>
+<td class="px-lg py-md text-center">
+<button class="p-2 hover:bg-primary-fixed rounded-full transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">visibility</span>
+</button>
+</td>
+</tr>
+<!-- Order Row 3 -->
+<tr class="hover:bg-surface-subtle transition-colors group">
+<td class="px-lg py-md">
+<div class="flex items-center space-x-md">
+<div class="w-12 h-12 rounded bg-surface-container flex-shrink-0 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A stunning pair of 'Emerald Cut Solitaire Studs' in white gold. The image focuses on the clarity and step-cut facets of the diamonds. The presentation is minimalist and high-end, featuring soft shadows and a professional studio lighting setup that suggests reliability and high value. Part of a corporate administrative interface for a jewelry marketplace." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC_Pw6m75u_sxI8BJVJVS5Vu6Z6HvWlqkf_EIl-DXfsWTGLWR1TdvEjtFSC7ejsvoPUnHfR0rlrlVZ3bCubR-uUE_-U-Hpp6qxg8oVtg8agPWz70v607IdI3HP3zgfuVKjD06FUdKvrhYC4Bvnln6bcQFa3WHM6BH7LWNQU4BWka9vn5UCpL729SMR7NJDAjcgySYztphAxYtTVqI5LGlEa-gbnk8zG1ct3_C7PHM6qtqcQwY8eCV_ILTDHd6JqpkhO23sE9pLz58YY"/>
+</div>
+<span class="font-label-md text-on-surface">Emerald Cut Solitaire Studs</span>
+</div>
+</td>
+<td class="px-lg py-md">
+<span class="text-body-sm text-secondary font-medium font-code-sm">#EST-82912</span>
+</td>
+<td class="px-lg py-md text-body-md text-on-surface-variant">Oct 15, 2023</td>
+<td class="px-lg py-md">
+<span class="px-3 py-1 rounded-full bg-success/10 text-success text-label-sm flex items-center w-fit">
+<span class="w-1.5 h-1.5 rounded-full bg-success mr-2"></span>
+                                    Completed
+                                </span>
+</td>
+<td class="px-lg py-md text-right font-headline-sm text-headline-sm text-on-surface">$2,900.00</td>
+<td class="px-lg py-md text-center">
+<button class="p-2 hover:bg-primary-fixed rounded-full transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">visibility</span>
+</button>
+</td>
+</tr>
+<!-- Order Row 4 -->
+<tr class="hover:bg-surface-subtle transition-colors group">
+<td class="px-lg py-md">
+<div class="flex items-center space-x-md">
+<div class="w-12 h-12 rounded bg-surface-container flex-shrink-0 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A high-end 'Marquise Diamond Eternity Band' set in platinum. The ring is shown at an angle to highlight the continuous flow of marquise-shaped diamonds. The background is a soft, cool-toned grey. The overall aesthetic is clean, professional, and sophisticated, designed for a back-office administrative console where precision is key." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8xFK2tCLhLJN5Xh1F0PA6tv596liQlLuMn71BFwGqZFYY1DWTYxmpfIgAEzDQ_xleUq0W3xtLdS56vKy0Q_isY_Aw6nSI6fMba5RpJAiQPhOepnEYIQ_zlGofksOF8NvFGwpCgdr17QjqW3346UMEBIFB6Z4tf5hPhWjuZAqBOeplASubL_9RMrd18g4UvaGAcVunDzN25DLi-TWnddBIra5dW4tju7RPLNhxC_Al4vIXyeisKC4wVgT42kW8ZhSph8zbDXuNx4oO"/>
+</div>
+<span class="font-label-md text-on-surface">Marquise Eternity Band</span>
+</div>
+</td>
+<td class="px-lg py-md">
+<span class="text-body-sm text-secondary font-medium font-code-sm">#EST-82899</span>
+</td>
+<td class="px-lg py-md text-body-md text-on-surface-variant">Oct 12, 2023</td>
+<td class="px-lg py-md">
+<span class="px-3 py-1 rounded-full bg-surface-container-high text-on-secondary-fixed-variant text-label-sm flex items-center w-fit">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary mr-2"></span>
+                                    In Delivery
+                                </span>
+</td>
+<td class="px-lg py-md text-right font-headline-sm text-headline-sm text-on-surface">$5,500.00</td>
+<td class="px-lg py-md text-center">
+<button class="p-2 hover:bg-primary-fixed rounded-full transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">visibility</span>
+</button>
+</td>
+</tr>
+<!-- Order Row 5 -->
+<tr class="hover:bg-surface-subtle transition-colors group">
+<td class="px-lg py-md">
+<div class="flex items-center space-x-md">
+<div class="w-12 h-12 rounded bg-surface-container flex-shrink-0 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Detail shot of an 'Ocean Sapphire and Diamond Ring' with a large deep blue cushion-cut sapphire. The blue of the stone is vivid and deep, contrasting beautifully with the sparkling round diamonds on the band. The style is professional commercial photography for a luxury diamond marketplace, presented with high clarity and balanced tonal values." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1PobUm2FASe0CtMuXmDLDqzH82xh43wmU9Qsn4q-jg0wXCneHX36xuxnqF0E28P4VJQA8kpSpGWtBTxFFZqpHpJCWIrjyGJV_Vll5na-OV1DrNDmgKUmzAFG6BiMIoIuowFts4y5OijkJq6YzIHoIAkwIENhmZYhUB6yOcaBolGpfuI8xeDKRN9pSN4Ws3j_mMkeVn4GhfS4vFxSJ75LQwQkE_h-P14Ov4FCv_oKBJNM_2jSsaTMw8UnxazqcPWFyWW9wXzIe3OJa"/>
+</div>
+<span class="font-label-md text-on-surface">Sapphire &amp; Diamond Ring</span>
+</div>
+</td>
+<td class="px-lg py-md">
+<span class="text-body-sm text-secondary font-medium font-code-sm">#EST-82885</span>
+</td>
+<td class="px-lg py-md text-body-md text-on-surface-variant">Oct 05, 2023</td>
+<td class="px-lg py-md">
+<span class="px-3 py-1 rounded-full bg-success/10 text-success text-label-sm flex items-center w-fit">
+<span class="w-1.5 h-1.5 rounded-full bg-success mr-2"></span>
+                                    Completed
+                                </span>
+</td>
+<td class="px-lg py-md text-right font-headline-sm text-headline-sm text-on-surface">$12,400.00</td>
+<td class="px-lg py-md text-center">
+<button class="p-2 hover:bg-primary-fixed rounded-full transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">visibility</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Load Previous Years Button -->
+<div class="flex justify-center pt-xl pb-xl">
+<button class="flex items-center space-x-md px-xl py-md bg-surface-container-lowest border border-outline-variant text-on-surface hover:bg-surface-container transition-all rounded-lg font-label-md shadow-sm">
+<span class="material-symbols-outlined text-[20px]">history</span>
+<span>Load Previous Years</span>
+</button>
+</div>
+<!-- Analytics Quick Look (Extra value addition for Admin feel) -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-lg pt-lg border-t border-border-light">
+<div class="bg-surface-container-lowest border border-border-light p-lg rounded-xl flex items-center space-x-md">
+<div class="p-md rounded-full bg-secondary-fixed-dim text-secondary flex items-center justify-center">
+<span class="material-symbols-outlined">trending_up</span>
+</div>
+<div>
+<p class="text-label-sm text-on-surface-variant">Total Spend (2023)</p>
+<p class="font-headline-md text-headline-md text-on-surface">$33,170.00</p>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-border-light p-lg rounded-xl flex items-center space-x-md">
+<div class="p-md rounded-full bg-primary-fixed text-primary flex items-center justify-center">
+<span class="material-symbols-outlined">package_2</span>
+</div>
+<div>
+<p class="text-label-sm text-on-surface-variant">Total Orders</p>
+<p class="font-headline-md text-headline-md text-on-surface">12 active</p>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-border-light p-lg rounded-xl flex items-center space-x-md">
+<div class="p-md rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center">
+<span class="material-symbols-outlined">local_shipping</span>
+</div>
+<div>
+<p class="text-label-sm text-on-surface-variant">Pending Shipments</p>
+<p class="font-headline-md text-headline-md text-on-surface">2 items</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- FAB for Quick Order Action -->
+<button class="fixed bottom-lg right-lg w-14 h-14 bg-secondary text-on-secondary rounded-full flex items-center justify-center shadow-xl hover:scale-110 active:scale-95 transition-all z-50">
+<span class="material-symbols-outlined text-[28px]">add_shopping_cart</span>
+</button>
+<script>
+        // Simple Micro-interaction for tabs
+        const tabs = document.querySelectorAll('.flex.space-x-xl button');
+        const indicator = document.querySelector('.active-tab-indicator');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Reset all
+                tabs.forEach(t => {
+                    t.classList.remove('text-secondary', 'font-bold');
+                    t.classList.add('text-on-surface-variant');
+                });
+                // Remove indicator from current parent
+                const oldIndicator = document.querySelector('.active-tab-indicator');
+                if (oldIndicator) oldIndicator.remove();
+
+                // Set new active
+                tab.classList.remove('text-on-surface-variant');
+                tab.classList.add('text-secondary', 'font-bold');
+                
+                const newIndicator = document.createElement('div');
+                newIndicator.className = 'active-tab-indicator';
+                tab.appendChild(newIndicator);
+            });
+        });
+    </script>
+</body></html>

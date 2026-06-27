@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Diamarket Admin - Brand Kit</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "tertiary-fixed-dim": "#ddc39d",
+                "secondary": "#0058be",
+                "on-tertiary-container": "#a38c6a",
+                "tertiary": "#1e1200",
+                "primary": "#091426",
+                "surface-container-high": "#dce9ff",
+                "surface": "#f8f9ff",
+                "on-error": "#ffffff",
+                "primary-fixed": "#d8e3fb",
+                "on-primary-container": "#8590a6",
+                "on-secondary-container": "#fefcff",
+                "tertiary-fixed": "#fadfb8",
+                "primary-fixed-dim": "#bcc7de",
+                "surface-container-lowest": "#ffffff",
+                "warning": "#f59e0b",
+                "on-primary-fixed": "#111c2d",
+                "inverse-surface": "#213145",
+                "on-primary": "#ffffff",
+                "inverse-on-surface": "#eaf1ff",
+                "surface-variant": "#d3e4fe",
+                "on-primary-fixed-variant": "#3c475a",
+                "secondary-fixed": "#d8e2ff",
+                "error": "#ef4444",
+                "surface-container-low": "#eff4ff",
+                "tertiary-container": "#35260c",
+                "on-tertiary": "#ffffff",
+                "on-secondary": "#ffffff",
+                "on-error-container": "#93000a",
+                "on-secondary-fixed-variant": "#004395",
+                "surface-container": "#e5eeff",
+                "surface-bright": "#f8f9ff",
+                "inverse-primary": "#bcc7de",
+                "secondary-fixed-dim": "#adc6ff",
+                "surface-subtle": "#f8fafc",
+                "outline": "#75777d",
+                "surface-container-highest": "#d3e4fe",
+                "on-surface-variant": "#45474c",
+                "success": "#10b981",
+                "surface-dim": "#cbdbf5",
+                "primary-container": "#1e293b",
+                "error-container": "#ffdad6",
+                "on-tertiary-fixed-variant": "#564427",
+                "border-light": "#e2e8f0",
+                "secondary-container": "#2170e4",
+                "on-surface": "#0b1c30",
+                "on-secondary-fixed": "#001a42",
+                "on-tertiary-fixed": "#271902",
+                "background": "#f8f9ff",
+                "surface-tint": "#545f73",
+                "outline-variant": "#c5c6cd",
+                "on-background": "#0b1c30"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+            },
+            "spacing": {
+                "sm": "8px",
+                "base": "4px",
+                "xl": "32px",
+                "margin-mobile": "16px",
+                "lg": "24px",
+                "xs": "4px",
+                "gutter": "20px",
+                "sidebar-width": "260px",
+                "md": "16px"
+            },
+            "fontFamily": {
+                "label-sm": ["Inter"],
+                "label-md": ["Inter"],
+                "body-lg": ["Inter"],
+                "display-lg": ["Inter"],
+                "headline-md": ["Inter"],
+                "body-sm": ["Inter"],
+                "code-sm": ["Inter"],
+                "body-md": ["Inter"],
+                "headline-sm": ["Inter"]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+        .preview-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background selection:bg-secondary-fixed">
+<!-- SideNavBar Shell -->
+<aside class="fixed left-0 top-0 h-screen w-sidebar-width bg-primary dark:bg-primary-container flex flex-col py-lg border-r border-outline-variant dark:border-on-primary-fixed-variant z-50">
+<div class="px-lg mb-xl">
+<h1 class="font-headline-md text-headline-md font-bold text-on-primary dark:text-on-primary-container">Diamarket</h1>
+<p class="text-on-primary-container font-label-sm text-label-sm opacity-80">Admin Console</p>
+</div>
+<nav class="flex-1 space-y-1 px-sm">
+<!-- Dashboard -->
+<a class="flex items-center gap-md px-md py-sm font-label-md text-label-md rounded-lg text-on-primary-container hover:bg-on-primary-fixed-variant/20 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                Dashboard
+            </a>
+<!-- Products -->
+<a class="flex items-center gap-md px-md py-sm font-label-md text-label-md rounded-lg text-on-primary-container hover:bg-on-primary-fixed-variant/20 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+                Products
+            </a>
+<!-- Settings Active -->
+<a class="flex items-center gap-md px-md py-sm font-label-md text-label-md bg-secondary-container text-on-secondary-container border-l-4 border-secondary-fixed rounded-r-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+                Settings
+            </a>
+<!-- Rest of items truncated for clarity in UI but implied by JSON -->
+<a class="flex items-center gap-md px-md py-sm font-label-md text-label-md rounded-lg text-on-primary-container hover:bg-on-primary-fixed-variant/20 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="shopping_cart">shopping_cart</span>
+                Orders
+            </a>
+<a class="flex items-center gap-md px-md py-sm font-label-md text-label-md rounded-lg text-on-primary-container hover:bg-on-primary-fixed-variant/20 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="storefront">storefront</span>
+                Vendors
+            </a>
+</nav>
+<div class="px-lg pt-lg mt-auto border-t border-on-primary-fixed-variant/10">
+<button class="w-full bg-secondary text-on-secondary py-sm px-md rounded-xl font-label-md active:scale-95 transition-transform flex items-center justify-center gap-sm">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+                New Product
+            </button>
+</div>
+</aside>
+<!-- TopAppBar Shell -->
+<header class="fixed top-0 right-0 w-[calc(100%-260px)] h-16 bg-surface dark:bg-inverse-surface border-b border-border-light dark:border-outline-variant flex items-center justify-between px-lg z-40">
+<div class="flex items-center gap-xl">
+<div class="relative group">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-on-surface-variant group-focus-within:text-primary transition-colors" data-icon="search">search</span>
+<input class="bg-surface-container-low border-none rounded-full pl-10 pr-lg py-2 text-body-md focus:ring-2 focus:ring-secondary w-64 transition-all" placeholder="Search Brand Kit..." type="text"/>
+</div>
+<nav class="hidden md:flex gap-lg">
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-all" href="#">Analytics</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-all" href="#">Reports</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-all" href="#">Support</a>
+</nav>
+</div>
+<div class="flex items-center gap-lg">
+<div class="flex gap-md">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-all">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-all">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+</button>
+</div>
+<div class="h-8 w-px bg-border-light"></div>
+<div class="flex items-center gap-sm">
+<img class="w-8 h-8 rounded-full border border-border-light object-cover" data-alt="A professional studio portrait of a high-level administrator for a digital marketplace, dressed in modern business casual attire against a clean, light-colored background that reflects a high-trust, corporate-modern design system. The lighting is soft and even, highlighting a friendly yet authoritative expression suitable for a back-office management environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCOukJnkSmDcNy_ohUgm_XuxqAsCE-XhsEkBh--GbyhOFsDmZRMjanVyTKvxhG3E5vW37451fgmYGJIwzLn2wV_bBROGaFD7GuiAMi_qJPCuP-VhBxvSMs9p7bNMZ_I2xzK2YpWAP87tvRfYSbY6XBzRudevNo0UW7oe-IZgw800TLZ4FDRIx4fCLi2RxHo7jOB1r4TAgecMzpuJwTvMRfUL4ciHvFH06vxwLC23_Agf6qzN_LCNvdsMoVKhKKiLfJRFtNzQ7RqQsYl"/>
+<div class="hidden lg:block">
+<p class="font-label-md text-label-md text-on-surface">Admin User</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Super Administrator</p>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="ml-[260px] pt-16 min-h-screen">
+<div class="p-lg max-w-7xl mx-auto">
+<header class="mb-xl flex items-end justify-between">
+<div>
+<div class="flex items-center gap-sm text-secondary font-label-md text-label-md mb-xs">
+<span class="material-symbols-outlined text-[18px]" data-icon="brush">brush</span>
+                        Store Customization
+                    </div>
+<h2 class="font-display-lg text-display-lg text-on-surface">Brand Kit Configuration</h2>
+<p class="text-body-lg text-on-surface-variant mt-xs">Define your marketplace's visual identity for consistent customer experiences.</p>
+</div>
+<div class="flex gap-md">
+<button class="px-lg py-sm border border-outline text-on-surface font-label-md rounded-lg hover:bg-surface-container transition-all">Discard</button>
+<button class="px-lg py-sm bg-secondary text-on-secondary font-label-md rounded-lg hover:shadow-lg active:scale-95 transition-all">Publish Changes</button>
+</div>
+</header>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-lg items-start">
+<!-- Configuration Columns -->
+<div class="lg:col-span-7 space-y-lg">
+<!-- Logo Assets Card -->
+<section class="bg-surface-container-lowest p-lg rounded-xl border border-border-light shadow-sm">
+<div class="flex items-center gap-sm mb-lg border-b border-border-light pb-sm">
+<span class="material-symbols-outlined text-secondary" data-icon="image">image</span>
+<h3 class="font-headline-sm text-headline-sm">Logo Assets</h3>
+</div>
+<div class="grid grid-cols-2 gap-lg">
+<div class="space-y-sm">
+<label class="font-label-md text-label-md block">Primary Logo</label>
+<div class="border-2 border-dashed border-outline-variant rounded-xl p-xl flex flex-col items-center justify-center bg-surface-subtle group hover:border-secondary transition-colors cursor-pointer">
+<div class="w-12 h-12 rounded-full bg-surface-variant flex items-center justify-center text-secondary mb-sm group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined" data-icon="upload">upload</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">SVG, PNG (Max 5MB)</span>
+</div>
+</div>
+<div class="space-y-sm">
+<label class="font-label-md text-label-md block">Secondary Logo</label>
+<div class="border-2 border-dashed border-outline-variant rounded-xl p-xl flex flex-col items-center justify-center bg-surface-subtle group hover:border-secondary transition-colors cursor-pointer">
+<div class="w-12 h-12 rounded-full bg-surface-variant flex items-center justify-center text-secondary mb-sm group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined" data-icon="upload">upload</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">SVG, PNG (Max 5MB)</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-lg mt-lg">
+<div class="flex items-center gap-lg p-md border border-border-light rounded-xl bg-surface-subtle">
+<div class="w-10 h-10 bg-white border border-border-light rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="public">public</span>
+</div>
+<div>
+<label class="font-label-md text-label-md block">Favicon</label>
+<p class="text-body-sm text-on-surface-variant">32x32px .ico or .png</p>
+</div>
+<button class="ml-auto text-secondary font-label-md">Upload</button>
+</div>
+<div class="flex items-center gap-lg p-md border border-border-light rounded-xl bg-surface-subtle">
+<div class="w-10 h-10 bg-white border border-border-light rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="category">category</span>
+</div>
+<div>
+<label class="font-label-md text-label-md block">Brand Icon</label>
+<p class="text-body-sm text-on-surface-variant">Simplified square logo</p>
+</div>
+<button class="ml-auto text-secondary font-label-md">Upload</button>
+</div>
+</div>
+</section>
+<!-- Color Palette Card -->
+<section class="bg-surface-container-lowest p-lg rounded-xl border border-border-light shadow-sm">
+<div class="flex items-center gap-sm mb-lg border-b border-border-light pb-sm">
+<span class="material-symbols-outlined text-secondary" data-icon="palette">palette</span>
+<h3 class="font-headline-sm text-headline-sm">Color System</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-lg">
+<div class="space-y-sm">
+<label class="font-label-md text-label-md block">Primary Color</label>
+<div class="flex items-center gap-md p-sm border border-border-light rounded-lg">
+<input class="w-10 h-10 rounded border-none cursor-pointer p-0 bg-transparent" id="primaryColorInput" type="color" value="#0058be"/>
+<input class="w-full border-none font-code-sm text-code-sm uppercase focus:ring-0" type="text" value="#0058BE"/>
+</div>
+<p class="text-body-sm text-on-surface-variant">Used for buttons, links, and active states.</p>
+</div>
+<div class="space-y-sm">
+<label class="font-label-md text-label-md block">Accent Color</label>
+<div class="flex items-center gap-md p-sm border border-border-light rounded-lg">
+<input class="w-10 h-10 rounded border-none cursor-pointer p-0 bg-transparent" id="accentColorInput" type="color" value="#f59e0b"/>
+<input class="w-full border-none font-code-sm text-code-sm uppercase focus:ring-0" type="text" value="#F59E0B"/>
+</div>
+<p class="text-body-sm text-on-surface-variant">Used for call-outs and highlights.</p>
+</div>
+<div class="space-y-sm">
+<label class="font-label-md text-label-md block">Surface Color</label>
+<div class="flex items-center gap-md p-sm border border-border-light rounded-lg">
+<input class="w-10 h-10 rounded border-none cursor-pointer p-0 bg-transparent" id="surfaceColorInput" type="color" value="#f8f9ff"/>
+<input class="w-full border-none font-code-sm text-code-sm uppercase focus:ring-0" type="text" value="#F8F9FF"/>
+</div>
+<p class="text-body-sm text-on-surface-variant">Background for sections and containers.</p>
+</div>
+</div>
+</section>
+<!-- Typography Card -->
+<section class="bg-surface-container-lowest p-lg rounded-xl border border-border-light shadow-sm">
+<div class="flex items-center gap-sm mb-lg border-b border-border-light pb-sm">
+<span class="material-symbols-outlined text-secondary" data-icon="text_fields">text_fields</span>
+<h3 class="font-headline-sm text-headline-sm">Typography</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-xl">
+<div class="space-y-sm">
+<label class="font-label-md text-label-md block">Heading Font</label>
+<select class="w-full rounded-lg border-border-light font-body-md text-body-md focus:ring-secondary">
+<option>Inter (Sans-Serif)</option>
+<option>Playfair Display (Serif)</option>
+<option>Montserrat (Geometric)</option>
+<option>Roboto (Neutral)</option>
+</select>
+<div class="mt-md p-md bg-surface-subtle rounded border border-border-light italic text-on-surface-variant text-body-sm">
+                                    The quick brown fox jumps over the lazy dog (Bold, 24px)
+                                </div>
+</div>
+<div class="space-y-sm">
+<label class="font-label-md text-label-md block">Body Font</label>
+<select class="w-full rounded-lg border-border-light font-body-md text-body-md focus:ring-secondary">
+<option>Inter (Default)</option>
+<option>Open Sans</option>
+<option>Source Sans Pro</option>
+<option>Merriweather</option>
+</select>
+<div class="mt-md p-md bg-surface-subtle rounded border border-border-light italic text-on-surface-variant text-body-sm">
+                                    The quick brown fox jumps over the lazy dog (Regular, 14px)
+                                </div>
+</div>
+</div>
+</section>
+</div>
+<!-- Live Preview Column -->
+<div class="lg:col-span-5 sticky top-24">
+<div class="bg-surface-container-low border border-border-light rounded-xl overflow-hidden">
+<div class="bg-surface-container-high px-lg py-sm flex items-center justify-between border-b border-border-light">
+<div class="flex items-center gap-xs">
+<span class="w-3 h-3 rounded-full bg-error/40"></span>
+<span class="w-3 h-3 rounded-full bg-warning/40"></span>
+<span class="w-3 h-3 rounded-full bg-success/40"></span>
+</div>
+<span class="text-label-sm font-label-sm text-on-surface-variant">Marketplace Preview</span>
+<div class="w-8"></div>
+</div>
+<!-- Actual Preview Area -->
+<div class="p-xl bg-white space-y-lg min-h-[600px] transition-colors duration-500" id="previewCanvas">
+<!-- Preview Navbar -->
+<nav class="flex items-center justify-between pb-lg border-b border-border-light">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded bg-primary flex items-center justify-center text-white" id="previewLogoContainer">
+<span class="material-symbols-outlined" data-icon="diamond">diamond</span>
+</div>
+<span class="font-bold text-headline-sm text-primary" id="previewBrandName">Diamarket</span>
+</div>
+<div class="flex gap-md text-body-md font-medium text-on-surface-variant">
+<span class="text-secondary border-b-2 border-secondary" id="previewNavLink">Shop</span>
+<span>Collections</span>
+<span>About</span>
+</div>
+</nav>
+<!-- Hero Section Preview -->
+<div class="rounded-2xl p-xl flex flex-col justify-center gap-md relative overflow-hidden" id="previewHero">
+<div class="absolute inset-0 opacity-10 bg-gradient-to-br from-primary to-secondary"></div>
+<div class="relative z-10">
+<span class="px-md py-1 rounded-full text-label-sm font-label-sm bg-secondary/10 text-secondary border border-secondary/20" id="previewTag">New Collection</span>
+<h4 class="font-display-lg text-display-lg text-primary mt-sm" id="previewHeading">Refined Aesthetics for Modern Sellers</h4>
+<p class="text-body-lg text-on-surface-variant max-w-sm mt-xs">Curate your store's appearance with our advanced branding engine.</p>
+<button class="mt-lg px-xl py-sm bg-secondary text-white rounded-lg font-label-md shadow-md hover:shadow-lg transition-shadow active:scale-95" id="previewButton">Shop Now</button>
+</div>
+</div>
+<!-- Product Card Preview -->
+<div class="grid grid-cols-2 gap-lg mt-xl">
+<div class="preview-card bg-white border border-border-light rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all">
+<div class="aspect-square relative">
+<img class="w-full h-full object-cover" data-alt="A high-quality studio photograph of a premium leather wallet, showcasing minimalist design and exquisite craftsmanship. The lighting is crisp and modern, featuring soft shadows on a clean white surface that complements a high-end SaaS professional aesthetic. The focus is sharp on the texture of the leather, symbolizing quality and attention to detail in a marketplace context." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTdbjTY6dqPMStGcy620b-MVzzDTp29MQRcTCAb-amUExMRwOfzD0yMSUV-FF5sRlSy3EWkKM5HnfOhcRS5m2qeetdKqMX6sxCDr39vClL673JrLe-kGCYDB2JuBivoJLhBk-DH44ZUlt_JoXXpFOHZmy9r3osakHMLHTzcGlVvGmEPi2wkyHI45rgHgMGNNnqbQUJ28cYen1duTKNq_Zis3bb5sSNnUQqyx81Lp59m3abPnESBlHdJnFjAsO9SNPyk1VEN0tdCDDR"/>
+<div class="absolute top-2 right-2 p-2 bg-white/80 backdrop-blur-sm rounded-full shadow-sm">
+<span class="material-symbols-outlined text-secondary text-[20px]" data-icon="favorite">favorite</span>
+</div>
+</div>
+<div class="p-md">
+<h5 class="font-label-md text-label-md text-on-surface">Minimalist Wallet</h5>
+<p class="text-body-sm text-on-surface-variant">Premium Leather</p>
+<div class="mt-md flex items-center justify-between">
+<span class="font-headline-sm text-headline-sm text-secondary" id="previewPrice">$49.00</span>
+<button class="p-2 border border-border-light rounded-lg hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="add_shopping_cart">add_shopping_cart</span>
+</button>
+</div>
+</div>
+</div>
+<div class="preview-card bg-white border border-border-light rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all">
+<div class="aspect-square relative">
+<img class="w-full h-full object-cover" data-alt="A professional product shot of a sleek, wireless desktop mechanical keyboard with a brushed metal finish. The scene is illuminated by soft, cool-toned studio lights, creating a high-tech and professional atmosphere. The composition emphasizes clean lines and premium materials, perfectly aligning with a corporate-modern design language for a sophisticated seller's dashboard." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1Swk0UlIpQFY8kMac09uS7PTVcwohv_7kYaMP4MFSuKluwAXzqEcznaFdOfd3o9ub9Y82cHlmrq6XmgtJXbXVEFf4tq6freBv2o38TzVAX4-4JimG5Fqq3UXXK-RolFxExAzscyxfzhZhM5rvqAmLGrkX1fmlc8qUM0mOeB45s9Q2fDTT3-hY6ee732-bjCVubxktXdqYnEVPScMSU0e-SkJIk0UxXwchODWrBBmMM7fa9kFQzoD3AmWrxfJU3RnkOQHaAgxnnXu7"/>
+<div class="absolute top-2 right-2 p-2 bg-white/80 backdrop-blur-sm rounded-full shadow-sm">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]" data-icon="favorite">favorite</span>
+</div>
+</div>
+<div class="p-md">
+<h5 class="font-label-md text-label-md text-on-surface">Modern Keyboard</h5>
+<p class="text-body-sm text-on-surface-variant">Ergonomic Design</p>
+<div class="mt-md flex items-center justify-between">
+<span class="font-headline-sm text-headline-sm text-secondary" id="previewPrice2">$129.00</span>
+<button class="p-2 border border-border-light rounded-lg hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="add_shopping_cart">add_shopping_cart</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="p-md bg-surface-container-high border-t border-border-light text-center">
+<button class="text-label-sm font-label-sm text-secondary flex items-center gap-xs mx-auto">
+<span class="material-symbols-outlined text-[16px]" data-icon="open_in_new">open_in_new</span>
+                                View Full Page Preview
+                            </button>
+</div>
+</div>
+<!-- Helpful Tips -->
+<div class="mt-lg p-lg bg-tertiary-fixed rounded-xl border border-tertiary-fixed-dim text-on-tertiary-fixed flex gap-md">
+<span class="material-symbols-outlined text-on-tertiary-fixed-variant" data-icon="lightbulb">lightbulb</span>
+<div>
+<p class="font-label-md text-label-md">Pro Tip</p>
+<p class="text-body-sm opacity-80">Use high-contrast combinations for your Primary and Surface colors to ensure accessibility compliance (WCAG 2.1).</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<script>
+        // Simple Micro-interactions for live preview color updates
+        const primaryInput = document.getElementById('primaryColorInput');
+        const accentInput = document.getElementById('accentColorInput');
+        const surfaceInput = document.getElementById('surfaceColorInput');
+
+        const previewButton = document.getElementById('previewButton');
+        const previewPrice = document.getElementById('previewPrice');
+        const previewPrice2 = document.getElementById('previewPrice2');
+        const previewNavLink = document.getElementById('previewNavLink');
+        const previewTag = document.getElementById('previewTag');
+        const previewLogo = document.getElementById('previewLogoContainer');
+        const previewCanvas = document.getElementById('previewCanvas');
+
+        primaryInput.addEventListener('input', (e) => {
+            const color = e.target.value;
+            previewButton.style.backgroundColor = color;
+            previewPrice.style.color = color;
+            previewPrice2.style.color = color;
+            previewNavLink.style.color = color;
+            previewNavLink.style.borderColor = color;
+            previewTag.style.color = color;
+            previewTag.style.borderColor = `${color}33`; // 20% opacity
+            previewTag.style.backgroundColor = `${color}11`; // 10% opacity
+            previewLogo.style.backgroundColor = color;
+        });
+
+        surfaceInput.addEventListener('input', (e) => {
+            previewCanvas.style.backgroundColor = e.target.value;
+        });
+
+        // Initialize state
+        window.onload = () => {
+            // Apply initial colors to preview components if needed
+            primaryInput.dispatchEvent(new Event('input'));
+        };
+    </script>
+</body></html>

@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Domain &amp; SEO Settings | Diamarket Admin</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        /* Custom scrollbar for professional look */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "tertiary-fixed-dim": "#ddc39d",
+                      "secondary": "#0058be",
+                      "on-tertiary-container": "#a38c6a",
+                      "tertiary": "#1e1200",
+                      "primary": "#091426",
+                      "surface-container-high": "#dce9ff",
+                      "surface": "#f8f9ff",
+                      "on-error": "#ffffff",
+                      "primary-fixed": "#d8e3fb",
+                      "on-primary-container": "#8590a6",
+                      "on-secondary-container": "#fefcff",
+                      "tertiary-fixed": "#fadfb8",
+                      "primary-fixed-dim": "#bcc7de",
+                      "surface-container-lowest": "#ffffff",
+                      "warning": "#f59e0b",
+                      "on-primary-fixed": "#111c2d",
+                      "inverse-surface": "#213145",
+                      "on-primary": "#ffffff",
+                      "inverse-on-surface": "#eaf1ff",
+                      "surface-variant": "#d3e4fe",
+                      "on-primary-fixed-variant": "#3c475a",
+                      "secondary-fixed": "#d8e2ff",
+                      "error": "#ef4444",
+                      "surface-container-low": "#eff4ff",
+                      "tertiary-container": "#35260c",
+                      "on-tertiary": "#ffffff",
+                      "on-secondary": "#ffffff",
+                      "on-error-container": "#93000a",
+                      "on-secondary-fixed-variant": "#004395",
+                      "surface-container": "#e5eeff",
+                      "surface-bright": "#f8f9ff",
+                      "inverse-primary": "#bcc7de",
+                      "secondary-fixed-dim": "#adc6ff",
+                      "surface-subtle": "#f8fafc",
+                      "outline": "#75777d",
+                      "surface-container-highest": "#d3e4fe",
+                      "on-surface-variant": "#45474c",
+                      "success": "#10b981",
+                      "surface-dim": "#cbdbf5",
+                      "primary-container": "#1e293b",
+                      "error-container": "#ffdad6",
+                      "on-tertiary-fixed-variant": "#564427",
+                      "border-light": "#e2e8f0",
+                      "secondary-container": "#2170e4",
+                      "on-surface": "#0b1c30",
+                      "on-secondary-fixed": "#001a42",
+                      "on-tertiary-fixed": "#271902",
+                      "background": "#f8f9ff",
+                      "surface-tint": "#545f73",
+                      "outline-variant": "#c5c6cd",
+                      "on-background": "#0b1c30"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "sm": "8px",
+                      "base": "4px",
+                      "xl": "32px",
+                      "margin-mobile": "16px",
+                      "lg": "24px",
+                      "xs": "4px",
+                      "gutter": "20px",
+                      "sidebar-width": "260px",
+                      "md": "16px"
+              },
+              "fontFamily": {
+                      "label-sm": ["Inter"],
+                      "label-md": ["Inter"],
+                      "body-lg": ["Inter"],
+                      "display-lg": ["Inter"],
+                      "headline-md": ["Inter"],
+                      "body-sm": ["Inter"],
+                      "code-sm": ["Inter"],
+                      "body-md": ["Inter"],
+                      "headline-sm": ["Inter"]
+              },
+              "fontSize": {
+                      "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                      "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                      "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                      "code-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}]
+              }
+            },
+          },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background">
+<!-- Side Navigation Shell -->
+<aside class="fixed left-0 top-0 h-screen w-sidebar-width bg-primary dark:bg-primary-container border-r border-outline-variant dark:border-on-primary-fixed-variant flex flex-col h-full py-lg z-50">
+<div class="px-lg mb-xl">
+<h1 class="font-headline-md text-headline-md font-bold text-on-primary dark:text-on-primary-container leading-none">Diamarket</h1>
+<p class="text-on-primary-container text-xs opacity-70 mt-1 uppercase tracking-widest font-bold">Admin Console</p>
+</div>
+<nav class="flex-1 space-y-1 px-sm">
+<!-- Navigation Items Mapping -->
+<a class="flex items-center gap-sm px-md py-sm rounded-lg transition-colors duration-200 text-on-primary-container hover:bg-on-primary-fixed-variant/20 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm rounded-lg transition-colors duration-200 text-on-primary-container hover:bg-on-primary-fixed-variant/20 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span>Products</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm rounded-lg transition-colors duration-200 text-on-primary-container hover:bg-on-primary-fixed-variant/20 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="shopping_cart">shopping_cart</span>
+<span>Orders</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm rounded-lg transition-colors duration-200 text-on-primary-container hover:bg-on-primary-fixed-variant/20 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="storefront">storefront</span>
+<span>Vendors</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm rounded-lg transition-colors duration-200 text-on-primary-container hover:bg-on-primary-fixed-variant/20 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="campaign">campaign</span>
+<span>Promotions</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm rounded-lg transition-colors duration-200 text-on-primary-container hover:bg-on-primary-fixed-variant/20 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="perm_media">perm_media</span>
+<span>Media Library</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm rounded-lg transition-colors duration-200 text-on-primary-container hover:bg-on-primary-fixed-variant/20 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+<span>Audit Logs</span>
+</a>
+<!-- Active State: Settings -->
+<a class="flex items-center gap-sm px-md py-sm rounded-lg bg-secondary-container text-on-secondary-container border-l-4 border-secondary-fixed font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span>Settings</span>
+</a>
+</nav>
+<div class="px-lg pt-lg">
+<button class="w-full bg-secondary text-on-secondary py-sm rounded-xl font-label-md flex items-center justify-center gap-2 hover:bg-secondary/90 transition-all active:scale-95">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add</span>
+                New Product
+            </button>
+</div>
+</aside>
+<!-- Top App Bar -->
+<header class="fixed top-0 right-0 w-[calc(100%-260px)] h-16 bg-surface dark:bg-inverse-surface border-b border-border-light dark:border-outline-variant flex items-center justify-between px-lg z-40">
+<div class="flex items-center gap-xl flex-1">
+<div class="relative max-w-md w-full">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline" data-icon="search">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-full text-body-md focus-within:ring-2 focus-within:ring-secondary transition-all" placeholder="Search configurations..." type="text"/>
+</div>
+<nav class="hidden lg:flex items-center gap-lg">
+<a class="text-on-surface-variant hover:text-primary font-body-md" href="#">Analytics</a>
+<a class="text-on-surface-variant hover:text-primary font-body-md" href="#">Reports</a>
+<a class="text-on-surface-variant hover:text-primary font-body-md" href="#">Support</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<button class="p-2 hover:bg-surface-container-low rounded-full relative group">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="notifications">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border-2 border-surface"></span>
+</button>
+<button class="p-2 hover:bg-surface-container-low rounded-full">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="help_outline">help_outline</span>
+</button>
+<div class="h-8 w-[1px] bg-outline-variant mx-2"></div>
+<div class="flex items-center gap-sm">
+<div class="text-right hidden sm:block">
+<p class="font-label-md text-on-surface leading-tight">Admin User</p>
+<p class="text-[10px] text-on-surface-variant uppercase font-bold tracking-tight">Super Administrator</p>
+</div>
+<img class="w-10 h-10 rounded-full border-2 border-secondary-fixed object-cover" data-alt="A professional portrait of a tech-savvy marketplace administrator in a minimalist office setting. The person has a friendly but authoritative expression, with soft cinematic lighting illuminating a clean-cut corporate appearance. The background is a slightly blurred modern office with glass partitions and subtle blue and white tech accents, perfectly matching a professional light-mode dashboard aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAFJBtDLgajENWvwBaX_P90A0CHwqXTPe-03WH9j8B5ILwdYVvtnnfDCQhW7P18a5AyypRPqpQ26rdZvENXsIoNyC6N4L0qgKrm74lI9Z5oxDUb4NCQ81v5XWqwr_K6xlH0r-gtNF2lO2yxuomzlzcP56I0QlEa2cQzjYfFHz7LKy09EsD4RZBXcShlu54BdStHWZipA1JISZyCcFfxirbAzAnAljVH0W4C36U0erjm0tZylvoRRPjaehLESrJ8Z3y1dfk0zLVN6BEf"/>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-[260px] pt-16 min-h-screen p-lg">
+<div class="max-w-6xl mx-auto">
+<!-- Page Header -->
+<div class="mb-xl flex items-end justify-between">
+<div>
+<h2 class="font-display-lg text-display-lg text-on-surface">Domain &amp; SEO Settings</h2>
+<p class="text-on-surface-variant font-body-lg">Manage your boutique's identity, custom connectivity, and search engine visibility.</p>
+</div>
+<div class="flex gap-sm">
+<button class="px-lg py-sm rounded-lg border border-outline text-on-surface font-label-md hover:bg-surface-container transition-colors">Discard Changes</button>
+<button class="px-lg py-sm rounded-lg bg-secondary text-on-secondary font-label-md shadow-lg shadow-secondary/20 hover:opacity-90 transition-all">Publish Settings</button>
+</div>
+</div>
+<!-- Bento Layout Grid -->
+<div class="grid grid-cols-12 gap-lg">
+<!-- Left Column: Domain Management -->
+<div class="col-span-12 lg:col-span-7 space-y-lg">
+<!-- Domain Health Status Card -->
+<div class="bg-surface-container-lowest border border-border-light rounded-xl p-lg flex items-center justify-between overflow-hidden relative">
+<div class="flex items-center gap-lg z-10">
+<div class="w-16 h-16 rounded-full bg-success/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-success text-[32px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Domain Health: Healthy</h3>
+<p class="text-body-md text-on-surface-variant">Your custom domain is correctly configured and pointing to Diamarket servers.</p>
+</div>
+</div>
+<div class="text-right z-10">
+<span class="inline-flex items-center gap-1 bg-success/20 text-success text-label-sm px-3 py-1 rounded-full font-bold">
+                                SSL ACTIVE
+                            </span>
+<p class="text-xs text-on-surface-variant mt-2">Last check: 2 mins ago</p>
+</div>
+<!-- Subtle background pattern -->
+<div class="absolute right-0 top-0 opacity-5 pointer-events-none">
+<span class="material-symbols-outlined text-[160px]" data-icon="language">language</span>
+</div>
+</div>
+<!-- Custom Domain Config Card -->
+<div class="bg-surface-container-lowest border border-border-light rounded-xl p-lg">
+<div class="flex items-center gap-2 mb-lg">
+<span class="material-symbols-outlined text-secondary" data-icon="dns">dns</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Custom Domain</h3>
+</div>
+<div class="space-y-md">
+<div>
+<label class="block font-label-md text-on-surface mb-2">Connect your domain</label>
+<div class="flex gap-2">
+<div class="relative flex-1">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant font-body-md">https://</span>
+<input class="w-full pl-[68px] pr-4 py-3 rounded-lg border border-border-light bg-surface focus:ring-2 focus:ring-secondary transition-all font-code-sm text-code-sm" type="text" value="boutique.diamarket.io"/>
+</div>
+<button class="bg-surface-container-high px-lg rounded-lg font-label-md text-secondary hover:bg-secondary/10 transition-colors">Change</button>
+</div>
+</div>
+<div class="bg-surface-container-low rounded-lg p-md border border-dashed border-outline-variant">
+<p class="font-label-sm text-on-surface-variant uppercase mb-sm">Required DNS Settings (CNAME)</p>
+<div class="grid grid-cols-3 gap-md font-code-sm text-code-sm">
+<div class="bg-surface-container-lowest p-sm rounded border border-border-light">
+<span class="text-on-surface-variant text-[10px] block font-bold">TYPE</span>
+                                        CNAME
+                                    </div>
+<div class="bg-surface-container-lowest p-sm rounded border border-border-light">
+<span class="text-on-surface-variant text-[10px] block font-bold">HOST</span>
+                                        www
+                                    </div>
+<div class="bg-surface-container-lowest p-sm rounded border border-border-light flex justify-between items-center">
+<div>
+<span class="text-on-surface-variant text-[10px] block font-bold">VALUE</span>
+                                            nodes.diamarket.net
+                                        </div>
+<button class="text-secondary hover:text-primary"><span class="material-symbols-outlined text-sm" data-icon="content_copy">content_copy</span></button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- SEO Section Header -->
+<div class="pt-lg">
+<h3 class="font-headline-md text-headline-md text-on-surface">Global SEO Metadata</h3>
+<p class="text-on-surface-variant font-body-md">Optimize how your store appears in Google and social media feeds.</p>
+</div>
+<!-- SEO Input Card -->
+<div class="bg-surface-container-lowest border border-border-light rounded-xl p-lg space-y-lg">
+<div>
+<div class="flex justify-between items-center mb-2">
+<label class="font-label-md text-on-surface">Meta Title</label>
+<span class="text-xs text-on-surface-variant">42 / 60 characters</span>
+</div>
+<input class="w-full px-4 py-3 rounded-lg border border-border-light bg-surface focus:ring-2 focus:ring-secondary transition-all font-body-md" type="text" value="Luxura Boutique | Artisanal Luxury Goods &amp; Crafts"/>
+</div>
+<div>
+<div class="flex justify-between items-center mb-2">
+<label class="font-label-md text-on-surface">Meta Description</label>
+<span class="text-xs text-on-surface-variant">152 / 160 characters</span>
+</div>
+<textarea class="w-full px-4 py-3 rounded-lg border border-border-light bg-surface focus:ring-2 focus:ring-secondary transition-all font-body-md resize-none" rows="3">Discover curated artisanal luxury goods. Luxura Boutique offers limited edition handmade crafts from master vendors globally. Free shipping on all boutique orders.</textarea>
+</div>
+</div>
+</div>
+<!-- Right Column: SEO Preview & Social -->
+<div class="col-span-12 lg:col-span-5 space-y-lg">
+<!-- Search Preview -->
+<div class="bg-surface-container-lowest border border-border-light rounded-xl p-lg overflow-hidden">
+<div class="flex items-center gap-2 mb-lg">
+<span class="material-symbols-outlined text-secondary" data-icon="search">search</span>
+<h3 class="font-label-md text-on-surface uppercase tracking-wider">Search Engine Preview</h3>
+</div>
+<div class="bg-white p-lg rounded-lg border border-border-light shadow-sm max-w-md mx-auto">
+<div class="flex items-center gap-2 mb-1">
+<div class="w-4 h-4 rounded-full bg-slate-100 flex items-center justify-center">
+<span class="material-symbols-outlined text-[10px]" data-icon="language">language</span>
+</div>
+<span class="text-xs text-[#202124]">https://boutique.diamarket.io</span>
+</div>
+<h4 class="text-[#1a0dab] text-xl font-normal hover:underline cursor-pointer mb-1">Luxura Boutique | Artisanal Luxury Goods &amp; Crafts</h4>
+<p class="text-[#4d5156] text-sm leading-relaxed">Discover curated artisanal luxury goods. Luxura Boutique offers limited edition handmade crafts from master vendors globally. Free shipping on all boutique...</p>
+</div>
+</div>
+<!-- Social Media Share Image Card -->
+<div class="bg-surface-container-lowest border border-border-light rounded-xl p-lg">
+<div class="flex items-center justify-between mb-lg">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary" data-icon="share">share</span>
+<h3 class="font-label-md text-on-surface uppercase tracking-wider">Social Share Image</h3>
+</div>
+<button class="text-secondary text-label-sm hover:underline font-bold">Replace Image</button>
+</div>
+<div class="relative rounded-lg overflow-hidden border border-border-light group cursor-pointer">
+<div class="bg-cover bg-center w-full aspect-video transition-transform duration-500 group-hover:scale-105" data-alt="A high-end social media preview image for a luxury boutique. The image shows an elegant arrangement of handcrafted leather goods and minimalist jewelry on a marble surface. The lighting is soft and golden, creating an expensive and aspirational mood. The overall composition is clean and modern, with plenty of negative space for text overlays, reflecting a premium corporate SaaS design language with a focus on artisanal quality." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuALI3N8YDPSk8UTGDEbmGfjD0KTucvqs_w7eiD3Zv9pkNuJRhnj3tI_09cl46hZYGdonOIhXZExsbmomhpkPwxYRODpJoLfRZzq1oCJ9egrAcnOPEvCZURNeQVfUL-rU0CIzMCvPp30BEpi1W6Vkf-Gl-evp1WPf0ebfUug4enuSqgo4Ls4FzIT8KA-LAB20VOoF6O5QIIpiHFAqxYT0UXISESiPKKfTQPWKzXblfi6MLqB_6wRl1Skz6ir9GSHAbkkpyF7o9QLpTio')"></div>
+<div class="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+<div class="bg-white/90 p-3 rounded-full shadow-xl">
+<span class="material-symbols-outlined text-primary" data-icon="edit">edit</span>
+</div>
+</div>
+</div>
+<p class="mt-md text-body-sm text-on-surface-variant italic text-center">Recommended: 1200 x 630 pixels</p>
+</div>
+<!-- Advanced Toggle List -->
+<div class="bg-surface-container-lowest border border-border-light rounded-xl p-lg divide-y divide-border-light">
+<div class="py-md flex items-center justify-between first:pt-0">
+<div>
+<p class="font-label-md text-on-surface">Index Boutique on Search Engines</p>
+<p class="text-xs text-on-surface-variant">Allow Google and Bing to crawl your pages.</p>
+</div>
+<button class="relative w-12 h-6 bg-success rounded-full transition-colors flex items-center px-1">
+<span class="block w-4 h-4 bg-white rounded-full translate-x-6 transition-transform"></span>
+</button>
+</div>
+<div class="py-md flex items-center justify-between">
+<div>
+<p class="font-label-md text-on-surface">Enable Sitemap.xml</p>
+<p class="text-xs text-on-surface-variant">Automatically generate and submit store sitemaps.</p>
+</div>
+<button class="relative w-12 h-6 bg-success rounded-full transition-colors flex items-center px-1">
+<span class="block w-4 h-4 bg-white rounded-full translate-x-6 transition-transform"></span>
+</button>
+</div>
+<div class="py-md flex items-center justify-between last:pb-0">
+<div>
+<p class="font-label-md text-on-surface">Canonical Tag Redirection</p>
+<p class="text-xs text-on-surface-variant">Prevents duplicate content issues on subdomains.</p>
+</div>
+<button class="relative w-12 h-6 bg-outline-variant rounded-full transition-colors flex items-center px-1">
+<span class="block w-4 h-4 bg-white rounded-full translate-x-0 transition-transform"></span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Taskbar -->
+<footer class="mt-xl pt-lg border-t border-border-light flex justify-between items-center">
+<div class="flex items-center gap-md text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="lock">lock</span>
+<span class="text-body-sm">All connections are encrypted with 256-bit SSL</span>
+</div>
+<div class="flex items-center gap-sm">
+<span class="w-2 h-2 rounded-full bg-success animate-pulse"></span>
+<span class="text-label-sm font-bold text-success uppercase">System Status: Online</span>
+</div>
+</footer>
+</div>
+</main>
+<!-- Success Toast Notification (Hidden) -->
+<div class="fixed bottom-lg right-lg bg-inverse-surface text-inverse-on-surface px-lg py-md rounded-xl shadow-2xl flex items-center gap-md translate-y-24 transition-transform duration-300 z-[60]" id="toast">
+<span class="material-symbols-outlined text-success" data-icon="check_circle">check_circle</span>
+<p class="font-label-md">Settings updated successfully!</p>
+<button class="ml-xl hover:text-primary-fixed-dim" onclick="hideToast()">
+<span class="material-symbols-outlined text-sm" data-icon="close">close</span>
+</button>
+</div>
+<script>
+        // Simple Interaction logic
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.remove('translate-y-24');
+            setTimeout(hideToast, 5000);
+        }
+
+        function hideToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.add('translate-y-24');
+        }
+
+        // Add visual click feedback to "Publish Settings"
+        const publishBtn = document.querySelector('button.bg-secondary');
+        publishBtn.addEventListener('click', () => {
+            publishBtn.innerText = "Saving...";
+            publishBtn.disabled = true;
+            setTimeout(() => {
+                publishBtn.innerText = "Publish Settings";
+                publishBtn.disabled = false;
+                showToast();
+            }, 1000);
+        });
+
+        // Toggle Switch Interaction
+        const toggles = document.querySelectorAll('button.relative.w-12');
+        toggles.forEach(toggle => {
+            toggle.addEventListener('click', () => {
+                const dot = toggle.querySelector('span');
+                if(toggle.classList.contains('bg-success')) {
+                    toggle.classList.remove('bg-success');
+                    toggle.classList.add('bg-outline-variant');
+                    dot.classList.remove('translate-x-6');
+                    dot.classList.add('translate-x-0');
+                } else {
+                    toggle.classList.add('bg-success');
+                    toggle.classList.remove('bg-outline-variant');
+                    dot.classList.add('translate-x-6');
+                    dot.classList.remove('translate-x-0');
+                }
+            });
+        });
+    </script>
+</body></html>
