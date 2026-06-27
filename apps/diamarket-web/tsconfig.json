@@ -26,12 +26,6 @@
     "paths": {
       "@/*": [
         "./src/*"
-      ],
-      "@diamarket/design-system": [
-        "../../packages/design-system/index.ts"
-      ],
-      "@diamarket/design-system/*": [
-        "../../packages/design-system/*"
       ]
     },
     "types": [
