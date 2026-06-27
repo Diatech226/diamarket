@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Create New Appointment | Diamarket Admin</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .form-section-active {
+            border-left: 4px solid #0058be;
+            background-color: #f8f9ff;
+        }
+        .service-card-selected {
+            border: 2px solid #0058be ! from-surface-container-low to-surface-container;
+            background-color: #eff4ff;
+        }
+    </style>
+<!-- Include Tailwind Config -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-low": "#eff4ff",
+                    "on-secondary-fixed": "#001a42",
+                    "surface": "#f8f9ff",
+                    "tertiary": "#1e1200",
+                    "inverse-surface": "#213145",
+                    "on-surface": "#0b1c30",
+                    "on-primary-container": "#8590a6",
+                    "on-tertiary-fixed": "#271902",
+                    "tertiary-container": "#35260c",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-dim": "#cbdbf5",
+                    "surface-subtle": "#f8fafc",
+                    "error": "#ef4444",
+                    "background": "#f8f9ff",
+                    "primary": "#091426",
+                    "on-tertiary-container": "#a38c6a",
+                    "surface-container-highest": "#d3e4fe",
+                    "inverse-on-surface": "#eaf1ff",
+                    "on-error-container": "#93000a",
+                    "surface-container-high": "#dce9ff",
+                    "success": "#10b981",
+                    "secondary-fixed": "#d8e2ff",
+                    "on-primary-fixed": "#111c2d",
+                    "surface-tint": "#545f73",
+                    "border-light": "#e2e8f0",
+                    "on-secondary-container": "#fefcff",
+                    "warning": "#f59e0b",
+                    "tertiary-fixed-dim": "#ddc39d",
+                    "on-tertiary-fixed-variant": "#564427",
+                    "tertiary-fixed": "#fadfb8",
+                    "on-tertiary": "#ffffff",
+                    "primary-container": "#1e293b",
+                    "on-background": "#0b1c30",
+                    "secondary-container": "#2170e4",
+                    "on-secondary-fixed-variant": "#004395",
+                    "outline-variant": "#c5c6cd",
+                    "on-surface-variant": "#45474c",
+                    "primary-fixed": "#d8e3fb",
+                    "secondary-fixed-dim": "#adc6ff",
+                    "outline": "#75777d",
+                    "secondary": "#0058be",
+                    "on-error": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "surface-variant": "#d3e4fe",
+                    "surface-container": "#e5eeff",
+                    "surface-bright": "#f8f9ff",
+                    "inverse-primary": "#bcc7de",
+                    "primary-fixed-dim": "#bcc7de",
+                    "on-primary-fixed-variant": "#3c475a",
+                    "on-secondary": "#ffffff",
+                    "on-primary": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "lg": "24px",
+                    "margin-mobile": "16px",
+                    "sm": "8px",
+                    "xl": "32px",
+                    "xs": "4px",
+                    "sidebar-width": "260px",
+                    "base": "4px",
+                    "md": "16px",
+                    "gutter": "20px"
+            },
+            "fontFamily": {
+                    "body-md": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "label-md": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-sm": ["Inter"],
+                    "code-sm": ["Inter"]
+            },
+            "fontSize": {
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "code-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+</head>
+<body class="bg-surface font-body-md text-on-surface">
+<!-- Persistent SideNavBar Shell -->
+<aside class="w-sidebar-width h-screen fixed left-0 top-0 bg-primary flex flex-col py-lg z-50">
+<div class="px-md mb-xl">
+<h1 class="font-headline-md text-headline-md font-bold text-on-primary">Diamarket</h1>
+<p class="font-label-sm text-label-sm text-on-primary-container uppercase tracking-widest opacity-80">Admin Console</p>
+</div>
+<nav class="flex-1 space-y-xs overflow-y-auto">
+<a class="flex items-center gap-sm text-on-primary-fixed-variant hover:bg-primary-fixed-variant px-md py-sm transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-sm bg-secondary-container text-on-secondary-container border-l-4 border-secondary px-md py-sm" href="#">
+<span class="material-symbols-outlined">shopping_cart</span>
+<span class="font-label-md text-label-md">Orders</span>
+</a>
+<a class="flex items-center gap-sm text-on-primary-fixed-variant hover:bg-primary-fixed-variant px-md py-sm transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-label-md text-label-md">Products</span>
+</a>
+<a class="flex items-center gap-sm text-on-primary-fixed-variant hover:bg-primary-fixed-variant px-md py-sm transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-md text-label-md">Vendors</span>
+</a>
+<a class="flex items-center gap-sm text-on-primary-fixed-variant hover:bg-primary-fixed-variant px-md py-sm transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">campaign</span>
+<span class="font-label-md text-label-md">Promotions</span>
+</a>
+<a class="flex items-center gap-sm text-on-primary-fixed-variant hover:bg-primary-fixed-variant px-md py-sm transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">photo_library</span>
+<span class="font-label-md text-label-md">Media Library</span>
+</a>
+<a class="flex items-center gap-sm text-on-primary-fixed-variant hover:bg-primary-fixed-variant px-md py-sm transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="font-label-md text-label-md">Audit Logs</span>
+</a>
+<a class="flex items-center gap-sm text-on-primary-fixed-variant hover:bg-primary-fixed-variant px-md py-sm transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</nav>
+<div class="px-md mt-auto pt-lg border-t border-primary-container">
+<a class="flex items-center gap-sm text-on-primary-fixed-variant hover:bg-primary-fixed-variant px-md py-sm mb-xs" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-md text-label-md">Support</span>
+</a>
+<a class="flex items-center gap-sm text-on-primary-fixed-variant hover:bg-primary-fixed-variant px-md py-sm" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-md text-label-md">Log Out</span>
+</a>
+</div>
+</aside>
+<!-- TopAppBar Shell -->
+<header class="fixed top-0 right-0 h-16 flex justify-between items-center w-[calc(100%-260px)] ml-[260px] px-lg z-40 bg-surface border-b border-border-light">
+<div class="flex items-center gap-lg">
+<nav class="flex items-center gap-md">
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary" href="#">Global View</a>
+<a class="font-body-md text-body-md text-secondary font-bold border-b-2 border-secondary pb-1" href="#">Create Appointment</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<button class="p-sm hover:bg-surface-container-low rounded-full transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+</button>
+<div class="flex items-center gap-sm pl-md border-l border-border-light">
+<div class="text-right">
+<p class="font-label-md text-label-md text-on-surface">Alex Hamilton</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant opacity-70">Senior Admin</p>
+</div>
+<img class="w-10 h-10 rounded-full border-2 border-surface-container-highest object-cover" data-alt="A professional headshot of a senior marketplace administrator with a friendly expression, wearing professional attire in a modern, softly-lit office environment. The style is clean and high-trust, consistent with a premium corporate CMS interface using a bright light-mode aesthetic and neutral tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAma6jdcOCEmqcf0iCJ9P3FJMmGFkRyv00S7XpUuW9idChlAMho2mwEhuyHoBibtmYc04ck8nPKalSF2qToYH4PamucoYTSoZAdaXQNmDC214iPohnkprGH7bp7ngEMrvPpwuKgu6ljlzNDYsjUUDfdZ5qFQBHLkDU6GQ1maxyt6zHRDX58Sx3dgob2w2TKR-ts1ZX91goFMWfk297gRS-Ih9tcrZndRp_oPh3xx0sHQcAbLQWd7KjMdGm69J4FwAkakeDXyow31OP5"/>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-[260px] pt-16 min-h-screen bg-background">
+<div class="max-w-7xl mx-auto px-lg py-xl">
+<div class="mb-lg">
+<h2 class="font-display-lg text-display-lg text-on-surface">New Appointment</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Schedule a bespoke session for high-value clients and boutique services.</p>
+</div>
+<!-- Multi-Section Layout with Summary Sidebar -->
+<div class="grid grid-cols-12 gap-lg items-start">
+<!-- Left: Navigation / Progress -->
+<div class="col-span-3 sticky top-24">
+<nav class="space-y-sm">
+<a class="block p-md rounded-lg border border-border-light bg-surface-container-lowest transition-all hover:border-secondary group" href="#section-client">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary">person_search</span>
+<span class="font-label-md text-label-md text-on-surface">Client &amp; Boutique</span>
+</div>
+<p class="mt-1 font-label-sm text-label-sm text-on-surface-variant">Identify participant and location</p>
+</a>
+<a class="block p-md rounded-lg border border-border-light bg-surface-container-lowest transition-all hover:border-secondary" href="#section-service">
+<div class="flex items-center gap-sm text-on-surface-variant">
+<span class="material-symbols-outlined">design_services</span>
+<span class="font-label-md text-label-md">Service Type</span>
+</div>
+</a>
+<a class="block p-md rounded-lg border border-border-light bg-surface-container-lowest transition-all hover:border-secondary" href="#section-datetime">
+<div class="flex items-center gap-sm text-on-surface-variant">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-label-md text-label-md">Date &amp; Time</span>
+</div>
+</a>
+<a class="block p-md rounded-lg border border-border-light bg-surface-container-lowest transition-all hover:border-secondary" href="#section-notes">
+<div class="flex items-center gap-sm text-on-surface-variant">
+<span class="material-symbols-outlined">description</span>
+<span class="font-label-md text-label-md">Instructions</span>
+</div>
+</a>
+</nav>
+</div>
+<!-- Center: Form Sections -->
+<div class="col-span-6 space-y-lg">
+<!-- Section 1: Client & Boutique -->
+<section class="bg-surface-container-lowest rounded-xl border border-border-light overflow-hidden" id="section-client">
+<div class="p-lg bg-surface-container-low border-b border-border-light">
+<h3 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary">person</span>
+                                Client &amp; Boutique
+                            </h3>
+</div>
+<div class="p-lg space-y-md">
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-xs">Search Client</label>
+<div class="relative group">
+<input class="w-full pl-11 pr-md py-md rounded-lg border border-border-light focus:ring-2 focus:ring-secondary focus:border-secondary transition-all outline-none bg-surface-subtle font-body-md text-body-md" placeholder="Start typing client name or ID..." type="text"/>
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant opacity-60">search</span>
+</div>
+<p class="mt-xs font-body-sm text-body-sm text-on-surface-variant">Commonly: Jane Doe, Global Ventures Ltd.</p>
+</div>
+<div class="grid grid-cols-2 gap-md">
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-xs">Select Location</label>
+<select class="w-full px-md py-md rounded-lg border border-border-light focus:ring-2 focus:ring-secondary focus:border-secondary transition-all outline-none bg-surface-subtle font-body-md text-body-md appearance-none">
+<option>Flagship Boutique - London</option>
+<option>Paris Atelier</option>
+<option>New York Suite</option>
+<option>Remote / Digital Consultation</option>
+</select>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-xs">Consultant</label>
+<select class="w-full px-md py-md rounded-lg border border-border-light focus:ring-2 focus:ring-secondary focus:border-secondary transition-all outline-none bg-surface-subtle font-body-md text-body-md appearance-none">
+<option>Assign Automatically</option>
+<option>Sarah Jenkins (Senior Gemologist)</option>
+<option>Michael Chen (Lead Watchmaker)</option>
+</select>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 2: Service Type -->
+<section class="bg-surface-container-lowest rounded-xl border border-border-light overflow-hidden" id="section-service">
+<div class="p-lg bg-surface-container-low border-b border-border-light">
+<h3 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary">diamond</span>
+                                Service Type
+                            </h3>
+</div>
+<div class="p-lg">
+<div class="grid grid-cols-3 gap-md">
+<label class="cursor-pointer group">
+<input checked="" class="hidden peer" name="service" type="radio"/>
+<div class="h-full p-md border border-border-light rounded-xl transition-all peer-checked:border-secondary peer-checked:bg-surface-container-low hover:border-secondary-fixed text-center flex flex-col items-center justify-center">
+<span class="material-symbols-outlined text-headline-md mb-sm text-on-surface-variant peer-checked:text-secondary">visibility</span>
+<span class="font-label-md text-label-md text-on-surface">Private Viewing</span>
+<p class="text-[11px] text-on-surface-variant mt-1">60 Minutes</p>
+</div>
+</label>
+<label class="cursor-pointer group">
+<input class="hidden peer" name="service" type="radio"/>
+<div class="h-full p-md border border-border-light rounded-xl transition-all peer-checked:border-secondary peer-checked:bg-surface-container-low hover:border-secondary-fixed text-center flex flex-col items-center justify-center">
+<span class="material-symbols-outlined text-headline-md mb-sm text-on-surface-variant">build</span>
+<span class="font-label-md text-label-md text-on-surface">Repair</span>
+<p class="text-[11px] text-on-surface-variant mt-1">30 Minutes</p>
+</div>
+</label>
+<label class="cursor-pointer group">
+<input class="hidden peer" name="service" type="radio"/>
+<div class="h-full p-md border border-border-light rounded-xl transition-all peer-checked:border-secondary peer-checked:bg-surface-container-low hover:border-secondary-fixed text-center flex flex-col items-center justify-center">
+<span class="material-symbols-outlined text-headline-md mb-sm text-on-surface-variant">auto_awesome</span>
+<span class="font-label-md text-label-md text-on-surface">Custom Order</span>
+<p class="text-[11px] text-on-surface-variant mt-1">90 Minutes</p>
+</div>
+</label>
+</div>
+</div>
+</section>
+<!-- Section 3: Date & Time -->
+<section class="bg-surface-container-lowest rounded-xl border border-border-light overflow-hidden" id="section-datetime">
+<div class="p-lg bg-surface-container-low border-b border-border-light">
+<h3 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary">calendar_month</span>
+                                Date &amp; Time
+                            </h3>
+</div>
+<div class="p-lg grid grid-cols-2 gap-lg">
+<!-- Calendar Placeholder -->
+<div class="border border-border-light rounded-lg p-md">
+<div class="flex justify-between items-center mb-md">
+<p class="font-label-md text-label-md">October 2023</p>
+<div class="flex gap-xs">
+<button class="p-xs hover:bg-surface-container-high rounded"><span class="material-symbols-outlined text-[18px]">chevron_left</span></button>
+<button class="p-xs hover:bg-surface-container-high rounded"><span class="material-symbols-outlined text-[18px]">chevron_right</span></button>
+</div>
+</div>
+<div class="grid grid-cols-7 gap-xs text-center">
+<span class="font-label-sm text-label-sm opacity-50">S</span>
+<span class="font-label-sm text-label-sm opacity-50">M</span>
+<span class="font-label-sm text-label-sm opacity-50">T</span>
+<span class="font-label-sm text-label-sm opacity-50">W</span>
+<span class="font-label-sm text-label-sm opacity-50">T</span>
+<span class="font-label-sm text-label-sm opacity-50">F</span>
+<span class="font-label-sm text-label-sm opacity-50">S</span>
+<!-- Simplified Calendar Grid -->
+<button class="p-sm text-label-sm rounded-lg hover:bg-surface-container-high">24</button>
+<button class="p-sm text-label-sm rounded-lg hover:bg-surface-container-high">25</button>
+<button class="p-sm text-label-sm rounded-lg bg-secondary text-on-secondary shadow-sm">26</button>
+<button class="p-sm text-label-sm rounded-lg hover:bg-surface-container-high">27</button>
+<button class="p-sm text-label-sm rounded-lg hover:bg-surface-container-high">28</button>
+<button class="p-sm text-label-sm rounded-lg hover:bg-surface-container-high">29</button>
+<button class="p-sm text-label-sm rounded-lg hover:bg-surface-container-high">30</button>
+</div>
+</div>
+<!-- Time Slots -->
+<div>
+<p class="font-label-md text-label-md mb-md">Available Slots</p>
+<div class="grid grid-cols-2 gap-sm">
+<button class="py-sm px-md border border-border-light rounded-lg font-body-sm text-body-sm hover:border-secondary transition-all">09:00 AM</button>
+<button class="py-sm px-md border border-border-light rounded-lg font-body-sm text-body-sm hover:border-secondary transition-all">10:30 AM</button>
+<button class="py-sm px-md bg-secondary-container text-on-secondary-container rounded-lg font-label-sm text-label-sm border border-secondary">01:00 PM</button>
+<button class="py-sm px-md border border-border-light rounded-lg font-body-sm text-body-sm hover:border-secondary transition-all">02:30 PM</button>
+<button class="py-sm px-md border border-border-light rounded-lg font-body-sm text-body-sm hover:border-secondary transition-all">04:00 PM</button>
+<button class="py-sm px-md border border-border-light rounded-lg font-body-sm text-body-sm hover:border-secondary transition-all">05:30 PM</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 4: Notes & Instructions -->
+<section class="bg-surface-container-lowest rounded-xl border border-border-light overflow-hidden" id="section-notes">
+<div class="p-lg bg-surface-container-low border-b border-border-light">
+<h3 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary">notes</span>
+                                Notes &amp; Instructions
+                            </h3>
+</div>
+<div class="p-lg space-y-md">
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-xs">Internal Notes</label>
+<textarea class="w-full px-md py-md rounded-lg border border-border-light focus:ring-2 focus:ring-secondary focus:border-secondary transition-all outline-none bg-surface-subtle font-body-md text-body-md" placeholder="Specific client preferences, previous purchase context..." rows="4"></textarea>
+</div>
+<div class="flex items-center gap-sm">
+<input class="w-5 h-5 rounded text-secondary border-border-light focus:ring-secondary" id="priority" type="checkbox"/>
+<label class="font-body-md text-body-md text-on-surface" for="priority">Mark as High Priority Engagement</label>
+</div>
+</div>
+</section>
+</div>
+<!-- Right: Summary Sidebar -->
+<div class="col-span-3 sticky top-24 space-y-lg">
+<div class="bg-surface-container-lowest rounded-xl border border-border-light p-lg shadow-sm">
+<h4 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-md border-b border-border-light pb-sm">Booking Summary</h4>
+<ul class="space-y-md">
+<li class="flex items-start gap-sm">
+<span class="material-symbols-outlined text-success">check_circle</span>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Client</p>
+<p class="font-body-md text-body-md font-bold">Unassigned (Search pending)</p>
+</div>
+</li>
+<li class="flex items-start gap-sm">
+<span class="material-symbols-outlined text-success">check_circle</span>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Service</p>
+<p class="font-body-md text-body-md font-bold">Private Viewing</p>
+</div>
+</li>
+<li class="flex items-start gap-sm">
+<span class="material-symbols-outlined text-secondary">pending</span>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Schedule</p>
+<p class="font-body-md text-body-md font-bold">Oct 26, 01:00 PM</p>
+</div>
+</li>
+</ul>
+<div class="mt-lg pt-lg border-t border-border-light">
+<div class="flex justify-between items-center mb-md">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Consultant availability</span>
+<span class="px-xs py-xs bg-success/10 text-success rounded text-[10px] font-bold uppercase">Optimal</span>
+</div>
+<div class="space-y-sm">
+<div class="flex items-center justify-between p-sm rounded bg-surface-container-low">
+<span class="font-body-sm text-body-sm">SMS Notification</span>
+<span class="material-symbols-outlined text-success">toggle_on</span>
+</div>
+<div class="flex items-center justify-between p-sm rounded bg-surface-container-low">
+<span class="font-body-sm text-body-sm">Email Confirmation</span>
+<span class="material-symbols-outlined text-success">toggle_on</span>
+</div>
+</div>
+</div>
+<button class="w-full mt-xl bg-secondary text-on-secondary py-md rounded-lg font-label-md text-label-md hover:bg-secondary-container transition-all shadow-md active:opacity-90">
+                            Confirm Appointment
+                        </button>
+<button class="w-full mt-sm bg-transparent text-on-surface-variant py-sm rounded-lg font-body-sm text-body-sm hover:bg-surface-container-high transition-all">
+                            Save as Draft
+                        </button>
+</div>
+<!-- Availability Visualization -->
+<div class="bg-primary text-on-primary rounded-xl p-lg">
+<div class="flex items-center justify-between mb-md">
+<h5 class="font-label-md text-label-md">Staff Capacity</h5>
+<span class="material-symbols-outlined text-surface-dim">trending_up</span>
+</div>
+<div class="space-y-md">
+<div>
+<div class="flex justify-between font-label-sm text-label-sm mb-xs opacity-80">
+<span>London Boutique</span>
+<span>85% Full</span>
+</div>
+<div class="h-1.5 w-full bg-primary-container rounded-full overflow-hidden">
+<div class="h-full bg-warning w-[85%]"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between font-label-sm text-label-sm mb-xs opacity-80">
+<span>Consultant Load</span>
+<span>Low</span>
+</div>
+<div class="h-1.5 w-full bg-primary-container rounded-full overflow-hidden">
+<div class="h-full bg-success w-[30%]"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<script>
+        // Micro-interactions for navigation scroll highlighting
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Simple form interaction mockup: updating "Client" in summary on input
+        const clientInput = document.querySelector('input[placeholder="Start typing client name or ID..."]');
+        const summaryClient = document.querySelectorAll('.font-body-md.font-bold')[0];
+        
+        clientInput.addEventListener('input', (e) => {
+            if(e.target.value.length > 0) {
+                summaryClient.textContent = e.target.value;
+                summaryClient.parentElement.parentElement.querySelector('.material-symbols-outlined').classList.replace('text-success', 'text-secondary');
+            } else {
+                summaryClient.textContent = "Unassigned (Search pending)";
+            }
+        });
+    </script>
+</body></html>

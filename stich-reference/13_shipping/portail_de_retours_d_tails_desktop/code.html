@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-container": "#785a1a",
+                    "surface": "#f8f9ff",
+                    "outline-variant": "#c6c6cd",
+                    "inverse-on-surface": "#eaf1ff",
+                    "error": "#ba1a1a",
+                    "inverse-surface": "#213145",
+                    "tertiary-fixed": "#e0e3e5",
+                    "on-primary-fixed-variant": "#3f465c",
+                    "surface-tint": "#565e74",
+                    "primary": "#000000",
+                    "surface-bright": "#f8f9ff",
+                    "outline": "#76777d",
+                    "inverse-primary": "#bec6e0",
+                    "on-tertiary-fixed": "#191c1e",
+                    "on-primary-fixed": "#131b2e",
+                    "error-container": "#ffdad6",
+                    "on-secondary-fixed-variant": "#5d4201",
+                    "on-background": "#0b1c30",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-low": "#eff4ff",
+                    "secondary-container": "#fed488",
+                    "on-tertiary-container": "#818486",
+                    "on-surface-variant": "#45464d",
+                    "tertiary-container": "#191c1e",
+                    "primary-fixed-dim": "#bec6e0",
+                    "primary-fixed": "#dae2fd",
+                    "on-secondary-fixed": "#261900",
+                    "surface-variant": "#d3e4fe",
+                    "on-tertiary-fixed-variant": "#444749",
+                    "on-secondary": "#ffffff",
+                    "tertiary": "#000000",
+                    "on-surface": "#0b1c30",
+                    "surface-container": "#e5eeff",
+                    "on-error": "#ffffff",
+                    "background": "#f8f9ff",
+                    "on-error-container": "#93000a",
+                    "tertiary-fixed-dim": "#c4c7c9",
+                    "on-primary-container": "#7c839b",
+                    "secondary-fixed": "#ffdea5",
+                    "surface-container-highest": "#d3e4fe",
+                    "on-primary": "#ffffff",
+                    "surface-dim": "#cbdbf5",
+                    "on-tertiary": "#ffffff",
+                    "primary-container": "#131b2e",
+                    "secondary": "#775a19",
+                    "surface-container-high": "#dce9ff",
+                    "secondary-fixed-dim": "#e9c176"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "16px",
+                    "stack-sm": "8px",
+                    "container-margin": "24px",
+                    "stack-md": "16px",
+                    "section-gap": "64px",
+                    "stack-lg": "32px"
+            },
+            "fontFamily": {
+                    "headline-lg-mobile": ["Playfair Display"],
+                    "body-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "display-lg": ["Playfair Display"],
+                    "label-sm": ["Inter"],
+                    "headline-md": ["Playfair Display"],
+                    "headline-lg": ["Playfair Display"],
+                    "label-md": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.03em", "fontWeight": "500"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #f8f9ff;
+            color: #0b1c30;
+            overflow-x: hidden;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #E2E8F0;
+        }
+        .input-underline {
+            border: none;
+            border-bottom: 1px solid #E2E8F0;
+            background: transparent;
+            border-radius: 0;
+            padding: 12px 0;
+            transition: border-color 0.3s ease;
+        }
+        .input-underline:focus {
+            outline: none;
+            border-bottom: 1px solid #000000;
+            box-shadow: none;
+        }
+        .step-inactive { opacity: 0.4; }
+    </style>
+</head>
+<body class="font-body-md text-body-md selection:bg-secondary-container">
+<!-- Side Navigation Shell -->
+<nav class="fixed left-0 top-0 h-screen w-72 z-40 flex flex-col pt-24 bg-surface-container-lowest border-r border-outline-variant/30">
+<div class="px-8 mb-12">
+<h1 class="font-headline-md text-headline-md text-primary tracking-tight">ESTELLE MAISON</h1>
+<p class="font-label-md text-label-md uppercase tracking-widest text-on-surface-variant mt-1">VOTRE COMPTE</p>
+</div>
+<div class="flex-1 flex flex-col space-y-2">
+<a class="flex items-center space-x-4 py-4 px-6 cursor-pointer text-on-surface-variant hover:text-secondary transition-all duration-300" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md uppercase tracking-widest">Dashboard</span>
+</a>
+<!-- Active State: Orders corresponds to the return journey -->
+<a class="flex items-center space-x-4 py-4 px-6 cursor-pointer text-primary border-b border-secondary p-2 bg-surface-container-low" href="#">
+<span class="material-symbols-outlined">shopping_bag</span>
+<span class="font-label-md text-label-md uppercase tracking-widest">Orders</span>
+</a>
+<a class="flex items-center space-x-4 py-4 px-6 cursor-pointer text-on-surface-variant hover:text-secondary transition-all duration-300" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-md text-label-md uppercase tracking-widest">Profile</span>
+</a>
+<a class="flex items-center space-x-4 py-4 px-6 cursor-pointer text-on-surface-variant hover:text-secondary transition-all duration-300" href="#">
+<span class="material-symbols-outlined">favorite</span>
+<span class="font-label-md text-label-md uppercase tracking-widest">Wishlist</span>
+</a>
+<a class="flex items-center space-x-4 py-4 px-6 cursor-pointer text-on-surface-variant hover:text-secondary transition-all duration-300" href="#">
+<span class="material-symbols-outlined">support_agent</span>
+<span class="font-label-md text-label-md uppercase tracking-widest">Concierge</span>
+</a>
+</div>
+<div class="mt-auto pb-12 border-t border-outline-variant/10">
+<div class="px-8 pt-8 mb-6">
+<button class="w-full h-12 bg-primary text-on-primary font-label-md text-label-md uppercase tracking-widest hover:opacity-90 transition-opacity">
+                    Shop New Collection
+                </button>
+</div>
+<a class="flex items-center space-x-4 py-4 px-6 cursor-pointer text-on-surface-variant hover:text-error transition-all duration-300" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-md text-label-md uppercase tracking-widest">Log Out</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="ml-72 min-h-screen bg-surface">
+<!-- Header -->
+<header class="sticky top-0 z-30 bg-surface flex justify-between items-center w-full px-container-margin py-stack-md border-b border-outline-variant/30 backdrop-blur-md bg-opacity-90">
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-primary-fixed-dim hover:text-primary transition-colors">arrow_back</button>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Order #EST-8829-23</span>
+<h2 class="font-headline-lg text-headline-lg tracking-tight">Return Details</h2>
+</div>
+</div>
+<div class="flex items-center space-x-6">
+<span class="material-symbols-outlined cursor-pointer text-on-surface-variant hover:text-primary">search</span>
+<span class="material-symbols-outlined cursor-pointer text-on-surface-variant hover:text-primary">favorite</span>
+<span class="material-symbols-outlined cursor-pointer text-on-surface-variant hover:text-primary">person</span>
+</div>
+</header>
+<!-- Content Area -->
+<div class="max-w-[1200px] mx-auto px-container-margin py-section-gap">
+<!-- Progress Stepper -->
+<div class="flex justify-between mb-16 relative">
+<div class="absolute top-1/2 left-0 w-full h-[1px] bg-outline-variant/30 -z-10"></div>
+<div class="flex flex-col items-center gap-2 bg-surface px-4">
+<div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-label-md">1</div>
+<span class="font-label-sm text-label-sm uppercase tracking-widest font-bold">Select Item</span>
+</div>
+<div class="flex flex-col items-center gap-2 bg-surface px-4">
+<div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-label-md">2</div>
+<span class="font-label-sm text-label-sm uppercase tracking-widest font-bold">Details</span>
+</div>
+<div class="flex flex-col items-center gap-2 bg-surface px-4 step-inactive">
+<div class="w-8 h-8 rounded-full border border-outline-variant flex items-center justify-center font-label-md">3</div>
+<span class="font-label-sm text-label-sm uppercase tracking-widest">Resolution</span>
+</div>
+<div class="flex flex-col items-center gap-2 bg-surface px-4 step-inactive">
+<div class="w-8 h-8 rounded-full border border-outline-variant flex items-center justify-center font-label-md">4</div>
+<span class="font-label-sm text-label-sm uppercase tracking-widest">Confirmation</span>
+</div>
+</div>
+<div class="grid grid-cols-12 gap-gutter">
+<!-- Left Column: Product Preview Card -->
+<div class="col-span-12 lg:col-span-5">
+<div class="bg-surface-container-lowest border border-outline-variant/20 p-stack-lg sticky top-32">
+<div class="aspect-[4/5] bg-surface-container-low overflow-hidden mb-6 group cursor-pointer">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Close-up studio shot of a luxurious black cashmere turtleneck sweater, draped elegantly against a minimalist off-white background. The lighting is soft and directional, highlighting the fine knit texture and premium quality of the fabric. The overall mood is sophisticated and exclusive, reflecting a quiet luxury aesthetic with deep blacks and neutral tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDssMA3inMv5S3H78CrcA211Kbe-k4esDZVZvmD8e_D13CIJ1ncUq-3BZG86MZoIGPTei2z0RdMsSfIfce-1PaWiLs2HOFb1aYpg6JsTetRvdRDpbbJJOAzJa397mxuzu8a9p_a_dqX_MG5FPF4K2Gt_a_7cmuRR_wcFFY6UaMfllGAQEwC_MB5wUgPNZe0fwWdFrgHghOxWGZZE7MadqN8ja2H4A02boxRPVjKj4vxpfzaSZjCKSoPy-bt5QBbwIpg3uR3nPRRprT"/>
+</div>
+<div class="space-y-2">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Ready-to-Wear</p>
+<h3 class="font-headline-md text-headline-md">Cashmere Ribbed Turtleneck</h3>
+<div class="flex justify-between items-center pt-4 border-t border-outline-variant/10">
+<span class="font-label-md text-label-md">Size: EU 38</span>
+<span class="font-label-md text-label-md">€ 1,250</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Return Form -->
+<div class="col-span-12 lg:col-span-7 space-y-stack-lg pl-0 lg:pl-12">
+<!-- Reason Section -->
+<section class="space-y-6">
+<div class="space-y-2">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Reason for Return</label>
+<div class="relative">
+<select class="w-full input-underline appearance-none cursor-pointer pr-10 font-body-md text-body-md">
+<option disabled="" selected="" value="">Select a reason...</option>
+<option value="size">Size issue (too small/large)</option>
+<option value="mind">Changed my mind</option>
+<option value="quality">Quality not as expected</option>
+<option value="damaged">Item arrived damaged</option>
+<option value="wrong">Incorrect item received</option>
+</select>
+<span class="material-symbols-outlined absolute right-0 bottom-3 pointer-events-none text-on-surface-variant">expand_more</span>
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Additional Comments</label>
+<textarea class="w-full input-underline resize-none focus:border-primary" placeholder="Describe the issue or provide feedback (Optional)" rows="4"></textarea>
+</div>
+</section>
+<!-- Photo Upload Section -->
+<section class="pt-8 space-y-6">
+<div class="space-y-2">
+<h4 class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Quality Assurance Photos</h4>
+<p class="text-on-surface-variant text-label-md">To expedite your request, please provide clear photos of the item’s tags and any reported damage.</p>
+</div>
+<div class="grid grid-cols-3 gap-4">
+<!-- Upload Trigger -->
+<div class="aspect-square border border-dashed border-outline-variant flex flex-col items-center justify-center cursor-pointer hover:bg-surface-container-low transition-colors group">
+<span class="material-symbols-outlined text-primary mb-2 group-hover:scale-110 transition-transform">add_a_photo</span>
+<span class="font-label-sm text-label-sm uppercase tracking-tighter">Add Photo</span>
+</div>
+<!-- Placeholder Slots -->
+<div class="aspect-square bg-surface-container-low border border-outline-variant/10 relative overflow-hidden group">
+<img class="w-full h-full object-cover" data-alt="A minimalist overhead shot of a high-end apparel care label attached to a black fabric garment. The label features clean, modern typography against a white silk background. The lighting is bright and even, emphasizing the crisp texture and luxury branding. Soft shadows create a sense of depth while maintaining a bright, professional light-mode aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA22lwB_EsHdC9ZuRDn9EDbGAm_4ZFNcvuRBe4q79RFgggh0uZWtYn5oOB2xSbdzNb3YYs4jNLrgCs2KbtSBjtb4k_eSkLvWUo-EDNbTn5FncdLcE0Pg48SwEbnvTInMMDJP1knsCEf1RgE26Sn3m-inqAkVkQkY15KWD4Qv3Tg01JlBtCJKMlR3yM7zMjSoxFHgEQdNF-SyQqsYjSxiBE-uidBtALoHCKGxEK7FYSyWEuXQ-AdOvxwu7m1tPK0bO2P7KrAOR-RTjR-"/>
+<div class="absolute inset-0 bg-primary/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary cursor-pointer">delete</span>
+</div>
+</div>
+<div class="aspect-square bg-surface-container-low border border-outline-variant/10 relative overflow-hidden group">
+<img class="w-full h-full object-cover" data-alt="Detailed close-up photo of a delicate seam on a luxury cashmere garment, illustrating quality craftsmanship. The focus is sharp on the stitching, while the surrounding black fabric falls into a soft blur. The lighting is diffused and natural, highlighting the premium materiality within a serene, high-end studio setting. The color palette is monochrome and elegant." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCs9urtkZgZQXLKPrrm0AF7Qn25f4ZsRL8fYg-QGYOjoj60YzsspPeVnZANN2QS_cOq7m9fQR5h_tRZGzcsd8juQrB5Ja58jqipdL6qOfFlUC0T-O3RQi_zG0kYwnn9D4rBXDo6rNWbdVW0SX_VfTjMEBUv4O5bwFC2EyedCO_nBhHKcLLYkyl-E3KzSslvp-CtWZ1nHehj7BZUaH90Crkj1L6cSn_k92qJA-bRIntz--TUz_pccDGfNGDgbvuwS9R6QHRcyl_4y82W"/>
+<div class="absolute inset-0 bg-primary/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary cursor-pointer">delete</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Actions -->
+<footer class="pt-12 flex items-center justify-between border-t border-outline-variant/30">
+<button class="h-14 px-8 border border-outline font-label-md text-label-md uppercase tracking-widest hover:border-primary hover:text-primary transition-all">
+                            Save as Draft
+                        </button>
+<button class="h-14 px-12 bg-primary text-on-primary font-label-md text-label-md uppercase tracking-widest hover:opacity-90 transition-opacity flex items-center gap-3">
+                            Continue
+                            <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</footer>
+</div>
+</div>
+</div>
+</main>
+<!-- Micro-interaction script -->
+<script>
+        document.querySelectorAll('select').forEach(select => {
+            select.addEventListener('change', (e) => {
+                if(e.target.value) {
+                    e.target.classList.add('text-primary');
+                    e.target.classList.remove('text-on-surface-variant');
+                }
+            });
+        });
+
+        // Simple mock for photo deletion
+        document.querySelectorAll('.material-symbols-outlined').forEach(icon => {
+            if(icon.textContent === 'delete') {
+                icon.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const parent = e.target.closest('div.aspect-square');
+                    parent.style.opacity = '0';
+                    setTimeout(() => parent.remove(), 300);
+                });
+            }
+        });
+    </script>
+</body></html>

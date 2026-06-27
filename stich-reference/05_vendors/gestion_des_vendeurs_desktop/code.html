@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Vendors Management | Diamarket</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+            border: 1px solid #e2e8f0;
+        }
+        .active-tab-indicator {
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            height: 2px;
+            background-color: #0058be;
+            transition: all 0.3s ease;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "inverse-surface": "#213145",
+                      "on-tertiary-fixed-variant": "#564427",
+                      "primary-fixed-dim": "#bcc7de",
+                      "surface-variant": "#d3e4fe",
+                      "on-primary-container": "#8590a6",
+                      "success": "#10b981",
+                      "on-primary": "#ffffff",
+                      "background": "#f8f9ff",
+                      "error": "#ef4444",
+                      "warning": "#f59e0b",
+                      "inverse-on-surface": "#eaf1ff",
+                      "on-secondary-fixed-variant": "#004395",
+                      "secondary-fixed": "#d8e2ff",
+                      "tertiary-fixed": "#fadfb8",
+                      "outline": "#75777d",
+                      "surface-dim": "#cbdbf5",
+                      "secondary": "#0058be",
+                      "on-tertiary-container": "#a38c6a",
+                      "secondary-container": "#2170e4",
+                      "on-background": "#0b1c30",
+                      "surface-container-lowest": "#ffffff",
+                      "inverse-primary": "#bcc7de",
+                      "surface-container": "#e5eeff",
+                      "tertiary": "#1e1200",
+                      "on-primary-fixed": "#111c2d",
+                      "secondary-fixed-dim": "#adc6ff",
+                      "surface-subtle": "#f8fafc",
+                      "on-tertiary": "#ffffff",
+                      "on-secondary-fixed": "#001a42",
+                      "on-error-container": "#93000a",
+                      "on-secondary-container": "#fefcff",
+                      "tertiary-fixed-dim": "#ddc39d",
+                      "surface-bright": "#f8f9ff",
+                      "on-primary-fixed-variant": "#3c475a",
+                      "surface": "#f8f9ff",
+                      "tertiary-container": "#35260c",
+                      "border-light": "#e2e8f0",
+                      "surface-container-highest": "#d3e4fe",
+                      "error-container": "#ffdad6",
+                      "on-error": "#ffffff",
+                      "on-surface": "#0b1c30",
+                      "on-surface-variant": "#45474c",
+                      "primary-fixed": "#d8e3fb",
+                      "surface-tint": "#545f73",
+                      "primary": "#091426",
+                      "surface-container-low": "#eff4ff",
+                      "surface-container-high": "#dce9ff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "md": "16px",
+                      "lg": "24px",
+                      "xs": "4px",
+                      "sm": "8px",
+                      "sidebar-width": "260px",
+                      "xl": "32px",
+                      "margin-mobile": "16px",
+                      "base": "4px",
+                      "gutter": "20px"
+              },
+              "fontFamily": {
+                      "display-lg": ["Inter"],
+                      "body-lg": ["Inter"],
+                      "body-md": ["Inter"],
+                      "code-sm": ["Inter"],
+                      "label-sm": ["Inter"],
+                      "label-md": ["Inter"],
+                      "body-sm": ["Inter"],
+                      "headline-md": ["Inter"],
+                      "headline-sm": ["Inter"]
+              },
+              "fontSize": {
+                      "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "code-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                      "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                      "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                      "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen pb-20 md:pb-0">
+<!-- TopAppBar from JSON -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-margin-mobile h-16 bg-surface border-b border-outline-variant">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-primary" data-icon="diamond" style="font-size: 24px;">diamond</span>
+<h1 class="font-headline-md text-headline-md font-bold text-primary">Diamarket</h1>
+</div>
+<nav class="hidden md:flex gap-lg items-center">
+<a class="font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low transition-colors px-3 py-2 rounded" href="#">Dashboard</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low transition-colors px-3 py-2 rounded" href="#">Products</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low transition-colors px-3 py-2 rounded" href="#">Orders</a>
+<a class="font-label-md text-label-md text-secondary font-bold hover:bg-surface-container-low transition-colors px-3 py-2 rounded" href="#">Vendors</a>
+</nav>
+<div class="flex items-center gap-sm">
+<button class="p-2 hover:bg-surface-container rounded-full transition-colors relative">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a senior marketplace administrator, styled with corporate clean lighting and a minimalist soft gray background. The subject is wearing a crisp navy blazer, projecting authority and reliability for a CMS dashboard profile. The image has high clarity and a modern, high-trust aesthetic matching the Diamarket brand." src="https://lh3.googleusercontent.com/aida-public/AB6AXuASUQy4ATcFmK3IWZnNFp-jf7-BrG9d4FCIc9YIOPYLOMoVWbVJtyKUkquJAMo8-bB7fp7Bfb2hTuTizV6XOuEfIUkrYK1XbwlkuvhU4Fixgdk-ve8F27ZcabWkKQsnOswAfZ_au8MG8JF-6xbYdJoeg1s5eQECOfdYtf25hnbL8uExQjJh8xNTGew5-_yCZE5eEnOFT0AMEzYXtgy-wjo0auYhsJgdSR6AukK5gRLw5G7NUkDa9gLBtm9rmi7TIl3tf_Xah2I9ivvx"/>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="pt-24 pb-12 px-margin-mobile md:px-lg max-w-7xl mx-auto">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-md mb-lg">
+<div>
+<h2 class="font-display-lg text-display-lg text-primary mb-xs">Vendors</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Manage your marketplace partnerships and onboarding requests.</p>
+</div>
+<!-- Search Bar -->
+<div class="relative w-full md:w-80 group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-secondary transition-colors" data-icon="search">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container border border-outline-variant rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary transition-all outline-none font-body-md text-body-md" placeholder="Search for specific vendors..." type="text"/>
+</div>
+<div class="hidden md:flex items-center gap-sm">
+<button class="flex items-center gap-xs px-3 py-2 border border-outline-variant rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low hover:border-secondary transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="description">description</span>
+    Exporter CSV
+  </button>
+<button class="flex items-center gap-xs px-3 py-2 border border-outline-variant rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low hover:border-secondary transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="table_chart">table_chart</span>
+    Exporter Excel
+  </button>
+</div></div>
+<!-- Tabs Navigation -->
+<div class="flex border-b border-outline-variant mb-lg relative">
+<button class="px-lg py-sm font-label-md text-label-md text-secondary transition-all relative" id="btn-active" onclick="switchTab('active')">
+                Active Vendors
+                <div class="active-tab-indicator w-full" id="indicator-active"></div>
+</button>
+<button class="px-lg py-sm font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-all relative" id="btn-requests" onclick="switchTab('requests')">
+                New Requests
+                <span class="ml-2 bg-error text-on-error text-[10px] px-1.5 py-0.5 rounded-full">5</span>
+<div class="active-tab-indicator w-0" id="indicator-requests"></div>
+</button>
+</div>
+<!-- Content Area -->
+<div class="space-y-sm" id="tab-active">
+<!-- Active Vendor Cards Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-md">
+<!-- Vendor Card 1 -->
+<div class="glass-card p-md rounded-xl flex items-center justify-between hover:border-secondary transition-colors group">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-lg bg-surface-container flex items-center justify-center border border-outline-variant overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A minimalist and premium boutique storefront logo design for a vendor named 'Aura Gems'. The logo features a stylized diamond icon in deep navy blue on a clean white background, reflecting a high-end luxury brand aesthetic. Professional corporate design with clean lines and balanced proportions for a CMS vendor profile." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXqOJcYJJpRwu7Kj01dOhF9VdCD1vjR40TR1Ck3PozY-Wm9U6EgqtuBAF_u57TaX0jjNWWnem6InNp1JtGSM_RdhTR7Nq1c5GwsVP2YCt9ADoxKTzUy6ZfAubrXmerapB7xPOiKogfmnAXT3QGdwtHw1hipLQXKH09wfrMYkK7P6KIYSsssP26OgsRxAVAfbncfZj63lX2jviLm5VysfxqMFWEsItKYwWvph33hH95IFZRfO1ew6spzrPR948OjC77kOB3VcAi7ceM"/>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-primary">Aura Gems</h3>
+<div class="flex gap-md mt-1">
+<span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]" data-icon="inventory_2">inventory_2</span> 1,240 Products
+                                </span>
+<span class="font-label-sm text-label-sm text-success flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]" data-icon="trending_up">trending_up</span> $42.5k Sales
+                                </span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<div class="hidden sm:block text-right mr-sm">
+<p class="font-label-sm text-label-sm text-on-surface-variant">Status</p>
+<p class="font-body-sm text-body-sm text-success font-semibold">Active</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+</div>
+</div>
+<!-- Vendor Card 2 -->
+<div class="glass-card p-md rounded-xl flex items-center justify-between hover:border-secondary transition-colors group">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-lg bg-surface-container flex items-center justify-center border border-outline-variant overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional tech-focused brand logo for 'Digital Horizons'. The design uses clean sans-serif typography with a geometric sunburst icon in slate gray and royal blue. The background is a soft off-white. This logo represents a high-performing vendor in an electronic marketplace environment, styled with a modern SaaS aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBW1HgxQ41iD7M5dFxMFsfC14qUO87QHmYR1eAc1etI_DsyvPBASqeJUCsa76p29R-lc3umPPN4QabzqbhLiiVMNN-HPWr0fo1kPoblE5KQNWPWmDI6X5ZetQz067XI7Igmff7jMSQNVKV6ywIrQAhhs-vvoXJy7_rr98EcKPBAxhSi1NYVs-BUXTKVXYzPune4pDjPw9VYJjcVHuHuKDwR3iA7m5KwniFRPkVpPEVIzquYJrAxJXNsP1yfrmLXhCC10rzpKOWuU5pF"/>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-primary">Digital Horizons</h3>
+<div class="flex gap-md mt-1">
+<span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]" data-icon="inventory_2">inventory_2</span> 856 Products
+                                </span>
+<span class="font-label-sm text-label-sm text-warning flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]" data-icon="trending_flat">trending_flat</span> $12.8k Sales
+                                </span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<div class="hidden sm:block text-right mr-sm">
+<p class="font-label-sm text-label-sm text-on-surface-variant">Status</p>
+<p class="font-body-sm text-body-sm text-success font-semibold">Active</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+</div>
+</div>
+<!-- Vendor Card 3 (Suspended) -->
+<div class="glass-card p-md rounded-xl flex items-center justify-between hover:border-secondary transition-colors group opacity-80">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-lg bg-surface-container flex items-center justify-center border border-outline-variant overflow-hidden grayscale">
+<img class="w-full h-full object-cover" data-alt="A vintage-inspired luxury watch vendor logo named 'Timeless Goods'. The logo features a detailed illustration of a clock gear in charcoal gray, set against a parchment-textured background. The overall mood is sophisticated and established, fitting for a curated boutique in a professional marketplace CMS dashboard." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBsrqJCOie8qSS6nvBQw-sDuP394ZVur6oTPKHvpTpXknl48D1MRsdMQT7Dri68DHwEbzZAzintXeCED3raio8k6sffOv0U-w9ViUv-V1KH7d1QJCe8els1Rmrck_tIqQZq-b7Bp8Y01GOPhWvHd_V7VuLNoT2vbAuGY54ec7z3waKh7ZatRNRYqKz5n1ARCIOk8DtWg3IoBM8SDigplYeP8Jm9l_vEQbER0cx2MaWA8eOoF5X8o_8AKsyapir1e8_tXc36lCLhJBN6"/>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface-variant">Timeless Goods</h3>
+<div class="flex gap-md mt-1">
+<span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]" data-icon="inventory_2">inventory_2</span> 12 Products
+                                </span>
+<span class="font-label-sm text-label-sm text-error flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]" data-icon="trending_down">trending_down</span> $0.0 Sales
+                                </span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<div class="hidden sm:block text-right mr-sm">
+<p class="font-label-sm text-label-sm text-on-surface-variant">Status</p>
+<p class="font-body-sm text-body-sm text-error font-semibold">Suspended</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+</div>
+</div>
+<!-- Vendor Card 4 -->
+<div class="glass-card p-md rounded-xl flex items-center justify-between hover:border-secondary transition-colors group">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-lg bg-surface-container flex items-center justify-center border border-outline-variant overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A modern, eco-friendly lifestyle brand logo for 'Green Roots'. The design incorporates a minimalist leaf icon in sage green with elegant, thin typography. The layout is balanced and airy, reflecting a sustainable and premium vendor profile for a high-trust digital marketplace CMS platform." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDsTgjx2I9DAVTezocuqFZR8jLeUiT2w8mA7rk50epAIbrsuXCA052Mymb8CsenPiNa3MVvVYtUPtJm3Y_WhjvvScIeRR1uIKpWjGuyophXuNpWbtKCt7pj8AVBN7Kmxv-UcJ8j3BfM4W1e4cLjdaGstrN0RX5lZu0UoQvhzhu-VK30uufbJgBui2WFWbD5dj2x3uiept8Ma2QM4t0IeEvFmlcbU_tHVKb2S2iI8Tq5U5WLZkw9FTsHDPRMc6BJ7nrKQqCIwN1qCmha"/>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-primary">Green Roots</h3>
+<div class="flex gap-md mt-1">
+<span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]" data-icon="inventory_2">inventory_2</span> 442 Products
+                                </span>
+<span class="font-label-sm text-label-sm text-success flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]" data-icon="trending_up">trending_up</span> $28.1k Sales
+                                </span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<div class="hidden sm:block text-right mr-sm">
+<p class="font-label-sm text-label-sm text-on-surface-variant">Status</p>
+<p class="font-body-sm text-body-sm text-success font-semibold">Active</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+</div>
+</div>
+</div>
+</div>
+<div class="hidden space-y-sm" id="tab-requests">
+<!-- Request Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-md">
+<!-- Request 1 -->
+<div class="glass-card p-md rounded-xl flex flex-col justify-between hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start mb-md">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">New Application</p>
+<h3 class="font-headline-sm text-headline-sm text-primary mt-1">Velvet Vibe</h3>
+</div>
+<div class="text-right">
+<p class="font-label-sm text-label-sm text-on-surface-variant">Submitted</p>
+<p class="font-body-sm text-body-sm font-medium">Oct 24, 2023</p>
+</div>
+</div>
+<div class="flex items-center gap-sm mb-lg">
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="A professional profile photo of a young entrepreneur, Julian Vance, with a friendly and confident expression. He is wearing a minimalist cream sweater against a soft-focus office background. The lighting is bright and natural, reinforcing the corporate and modern professional aesthetic of the Diamarket CMS vendor management page." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBmTdh27c_xANHlgj5jHVNAmX5IiyWU8XYBmy5rormgvL_x7W07KQhsFx5dBJzbh7iF2Ox_O3OnlgPFmvMrKMMSD1KPQsPqTU1qKj5TrN_AxlnLjwGH9Pm8ISWFrMNarmlL9kygqgIP4wIQZnY6qa7W8egRWrOmGcfXMkOCJ-7hwXcD7irxr8W-NIMZhLD7X7z7GvWV0tAeinR13Jgqwc-1AghLPCb5e_JR2vO8W8u2NeSKr2RclmwkXIy11v5RIEzaD72sS78zyAfo"/>
+</div>
+<div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Owner</p>
+<p class="font-label-md text-label-md font-semibold text-primary">Julian Vance</p>
+</div>
+</div>
+<div class="flex gap-sm pt-md border-t border-outline-variant">
+<button class="flex-1 py-2 rounded font-label-md text-label-md border border-error text-error hover:bg-error-container transition-colors">Reject</button>
+<button class="flex-1 py-2 rounded font-label-md text-label-md bg-secondary text-on-secondary hover:bg-secondary-container transition-colors">Approve</button>
+</div>
+</div>
+<!-- Request 2 -->
+<div class="glass-card p-md rounded-xl flex flex-col justify-between hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start mb-md">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">New Application</p>
+<h3 class="font-headline-sm text-headline-sm text-primary mt-1">Lumina Tech</h3>
+</div>
+<div class="text-right">
+<p class="font-label-sm text-label-sm text-on-surface-variant">Submitted</p>
+<p class="font-body-sm text-body-sm font-medium">Oct 22, 2023</p>
+</div>
+</div>
+<div class="flex items-center gap-sm mb-lg">
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="A professional and approachable headshot of Sophia Chen, a tech company founder. She has a warm smile and is wearing stylish glasses and a professional blazer. The background is a clean, modern studio setting with soft lighting. The image quality is high-definition, fitting for an administrative dashboard interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBk60ZYf0CE8rLPAET3TLm2tIYtdWhU3xwkh2Rgu04yByX5mPRi3NUanPzxnX5rhQP_fFUyd14uefgkzN8_SlggzVqIov0_jWx7PlJLLRJfdLQl_6Ariq1n6mfGzre0F77bRkinQKsI7NH1oo2wsIxdK8YmPM49xVtnSTpqsuMInXNihFdl1Z_tIz9G4k6v6o-ExVMpRB2s13JT_Ul3YjhQvElnfySa19iyZHxV3_JNScdyewP2m1jtQEyvhqojFQEl8E7uZlePM6Fa"/>
+</div>
+<div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Owner</p>
+<p class="font-label-md text-label-md font-semibold text-primary">Sophia Chen</p>
+</div>
+</div>
+<div class="flex gap-sm pt-md border-t border-outline-variant">
+<button class="flex-1 py-2 rounded font-label-md text-label-md border border-error text-error hover:bg-error-container transition-colors">Reject</button>
+<button class="flex-1 py-2 rounded font-label-md text-label-md bg-secondary text-on-secondary hover:bg-secondary-container transition-colors">Approve</button>
+</div>
+</div>
+<!-- Request 3 -->
+<div class="glass-card p-md rounded-xl flex flex-col justify-between hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start mb-md">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">New Application</p>
+<h3 class="font-headline-sm text-headline-sm text-primary mt-1">Urban Threads</h3>
+</div>
+<div class="text-right">
+<p class="font-label-sm text-label-sm text-on-surface-variant">Submitted</p>
+<p class="font-body-sm text-body-sm font-medium">Oct 21, 2023</p>
+</div>
+</div>
+<div class="flex items-center gap-sm mb-lg">
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="A sharp, professional headshot of Marcus Thorne, a fashion industry entrepreneur. He is wearing a modern tailored suit with a confident, visionary look. The background is a neutral, architecturally clean space with soft shadows. High-end photography style suitable for a premium marketplace CMS system." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBcHZq4XQXX-2fRf14qyXwu0EMXmeFKXMbYZrp-mmN8xffRTb3CEmMPNkqduoqnMvKu1gJAUorHy09x6pk4iG-xWNyhZWACPjEXkMwDRNhtMXi7vDftkKIeKZ2p3V0AUYOOHIhlKHe1GT-ZZ7GS9iHvqowBMxjqgbB4D-SFrhcTzNCd1no5KUTuR5X8DWRBxMX3Ldh4JimvPbiZvtJfjuCDDKi83L0e6SHbP2T-5-P_Dn3_rwbE80OAGIqqAufJbBkMSA82rTruC1uZ"/>
+</div>
+<div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Owner</p>
+<p class="font-label-md text-label-md font-semibold text-primary">Marcus Thorne</p>
+</div>
+</div>
+<div class="flex gap-sm pt-md border-t border-outline-variant">
+<button class="flex-1 py-2 rounded font-label-md text-label-md border border-error text-error hover:bg-error-container transition-colors">Reject</button>
+<button class="flex-1 py-2 rounded font-label-md text-label-md bg-secondary text-on-secondary hover:bg-secondary-container transition-colors">Approve</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar from JSON (Visible on mobile) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 py-3 pb-safe bg-surface border-t border-outline-variant">
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 active:scale-95 transition-transform duration-150">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-sm text-label-sm">Dashboard</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 active:scale-95 transition-transform duration-150">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="font-label-sm text-label-sm">Products</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 active:scale-95 transition-transform duration-150">
+<span class="material-symbols-outlined" data-icon="shopping_cart">shopping_cart</span>
+<span class="font-label-sm text-label-sm">Orders</span>
+</button>
+<button class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-4 py-1 active:scale-95 transition-transform duration-150">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-label-sm text-label-sm">Vendors</span>
+</button>
+</nav>
+<script>
+        function switchTab(tab) {
+            const activeContent = document.getElementById('tab-active');
+            const requestsContent = document.getElementById('tab-requests');
+            const activeIndicator = document.getElementById('indicator-active');
+            const requestsIndicator = document.getElementById('indicator-requests');
+            const btnActive = document.getElementById('btn-active');
+            const btnRequests = document.getElementById('btn-requests');
+
+            if (tab === 'active') {
+                activeContent.classList.remove('hidden');
+                requestsContent.classList.add('hidden');
+                activeIndicator.style.width = '100%';
+                requestsIndicator.style.width = '0';
+                btnActive.classList.add('text-secondary');
+                btnActive.classList.remove('text-on-surface-variant');
+                btnRequests.classList.remove('text-secondary');
+                btnRequests.classList.add('text-on-surface-variant');
+            } else {
+                activeContent.classList.add('hidden');
+                requestsContent.classList.remove('hidden');
+                activeIndicator.style.width = '0';
+                requestsIndicator.style.width = '100%';
+                btnRequests.classList.add('text-secondary');
+                btnRequests.classList.remove('text-on-surface-variant');
+                btnActive.classList.remove('text-secondary');
+                btnActive.classList.add('text-on-surface-variant');
+            }
+        }
+    </script>
+</body></html>

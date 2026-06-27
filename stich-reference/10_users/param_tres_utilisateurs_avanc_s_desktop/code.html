@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Diamarket Admin Console - Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-container": "#a38c6a",
+                    "on-surface-variant": "#45474c",
+                    "inverse-surface": "#213145",
+                    "outline-variant": "#c5c6cd",
+                    "border-light": "#e2e8f0",
+                    "on-tertiary-fixed-variant": "#564427",
+                    "error-container": "#ffdad6",
+                    "on-primary-fixed-variant": "#3c475a",
+                    "on-primary": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "surface-container-high": "#dce9ff",
+                    "on-background": "#0b1c30",
+                    "on-tertiary": "#ffffff",
+                    "on-error": "#ffffff",
+                    "surface-bright": "#f8f9ff",
+                    "primary-fixed": "#d8e3fb",
+                    "tertiary-container": "#35260c",
+                    "tertiary-fixed": "#fadfb8",
+                    "surface-container-highest": "#d3e4fe",
+                    "surface-variant": "#d3e4fe",
+                    "secondary-fixed-dim": "#adc6ff",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "surface-tint": "#545f73",
+                    "outline": "#75777d",
+                    "surface-dim": "#cbdbf5",
+                    "secondary-fixed": "#d8e2ff",
+                    "background": "#f8f9ff",
+                    "on-surface": "#0b1c30",
+                    "on-secondary-fixed-variant": "#004395",
+                    "inverse-primary": "#bcc7de",
+                    "primary": "#091426",
+                    "inverse-on-surface": "#eaf1ff",
+                    "primary-container": "#1e293b",
+                    "on-primary-fixed": "#111c2d",
+                    "surface-container": "#e5eeff",
+                    "on-tertiary-fixed": "#271902",
+                    "surface-subtle": "#f8fafc",
+                    "on-primary-container": "#8590a6",
+                    "tertiary": "#1e1200",
+                    "primary-fixed-dim": "#bcc7de",
+                    "tertiary-fixed-dim": "#ddc39d",
+                    "secondary-container": "#2170e4",
+                    "on-secondary-fixed": "#001a42",
+                    "error": "#ef4444",
+                    "surface-container-low": "#eff4ff",
+                    "success": "#10b981",
+                    "warning": "#f59e0b",
+                    "surface": "#f8f9ff",
+                    "on-secondary-container": "#fefcff",
+                    "secondary": "#0058be"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "xs": "4px",
+                    "sidebar-width": "260px",
+                    "lg": "24px",
+                    "xl": "32px",
+                    "margin-mobile": "16px",
+                    "sm": "8px",
+                    "gutter": "20px",
+                    "base": "4px",
+                    "md": "16px"
+            },
+            "fontFamily": {
+                    "label-sm": ["Inter"],
+                    "headline-sm": ["Inter"],
+                    "code-sm": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "label-md": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                    "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "code-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9ff;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .sidebar-item-active {
+            border-left-width: 4px;
+        }
+        /* Custom scrollbar for admin look */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- SideNavBar -->
+<aside class="w-sidebar-width h-screen fixed left-0 top-0 bg-primary dark:bg-primary-container flex flex-col py-lg z-50">
+<div class="px-md mb-xl">
+<h1 class="font-headline-md text-headline-md font-bold text-on-primary dark:text-on-primary-container">Diamarket</h1>
+<p class="font-label-sm text-label-sm text-on-primary-fixed-variant opacity-70">Admin Console</p>
+</div>
+<nav class="flex-grow space-y-xs">
+<a class="flex items-center gap-sm text-on-primary-fixed-variant hover:bg-primary-fixed-variant px-md py-sm transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-sm text-on-primary-fixed-variant hover:bg-primary-fixed-variant px-md py-sm transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="font-label-md text-label-md">Products</span>
+</a>
+<a class="flex items-center gap-sm text-on-primary-fixed-variant hover:bg-primary-fixed-variant px-md py-sm transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="shopping_cart">shopping_cart</span>
+<span class="font-label-md text-label-md">Orders</span>
+</a>
+<a class="flex items-center gap-sm text-on-primary-fixed-variant hover:bg-primary-fixed-variant px-md py-sm transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-label-md text-label-md">Vendors</span>
+</a>
+<a class="flex items-center gap-sm text-on-primary-fixed-variant hover:bg-primary-fixed-variant px-md py-sm transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="campaign">campaign</span>
+<span class="font-label-md text-label-md">Promotions</span>
+</a>
+<a class="flex items-center gap-sm text-on-primary-fixed-variant hover:bg-primary-fixed-variant px-md py-sm transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="photo_library">photo_library</span>
+<span class="font-label-md text-label-md">Media Library</span>
+</a>
+<a class="flex items-center gap-sm text-on-primary-fixed-variant hover:bg-primary-fixed-variant px-md py-sm transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+<span class="font-label-md text-label-md">Audit Logs</span>
+</a>
+<a class="flex items-center gap-sm bg-secondary-container text-on-secondary-container border-l-4 border-secondary px-md py-sm transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</nav>
+<div class="mt-auto px-md space-y-xs">
+<button class="w-full bg-secondary text-on-secondary py-sm rounded-lg font-label-md flex items-center justify-center gap-xs mb-lg hover:opacity-90">
+<span class="material-symbols-outlined" data-icon="add">add</span> New Product
+            </button>
+<a class="flex items-center gap-sm text-on-primary-fixed-variant hover:bg-primary-fixed-variant px-md py-sm transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="font-label-md text-label-md">Support</span>
+</a>
+<a class="flex items-center gap-sm text-on-primary-fixed-variant hover:bg-primary-fixed-variant px-md py-sm transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="font-label-md text-label-md">Log Out</span>
+</a>
+</div>
+</aside>
+<!-- TopAppBar -->
+<header class="fixed top-0 right-0 h-16 flex justify-between items-center w-[calc(100%-260px)] ml-[260px] px-lg z-40 bg-surface border-b border-border-light dark:border-outline-variant">
+<div class="flex items-center gap-lg flex-1">
+<div class="relative w-96">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" data-icon="search">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container-low border border-outline-variant rounded-full text-body-md focus:outline-none focus:ring-2 focus:ring-secondary transition-all" placeholder="Search admin settings..." type="text"/>
+</div>
+<nav class="flex gap-md">
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors duration-150" href="#">Global View</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors duration-150" href="#">Help Center</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<button class="p-2 hover:bg-surface-container-low rounded-full transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<div class="flex items-center gap-sm pl-md border-l border-outline-variant">
+<img class="w-8 h-8 rounded-full border border-outline-variant object-cover" data-alt="Professional headshot of a female administrator in a sharp navy blazer, set against a clean, soft-focus office background. The lighting is crisp and modern, reflecting a high-trust corporate atmosphere with a sophisticated and authoritative presence." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3tcYb-2Gk-lk2jQ2AOkjAOfsoix6O_kHJFEDVNIMwcnaxOb83aANcBsUtIhg8C_UOXoTv56tSL9WR8jnZQCnIm7e7ybgbzG4_8VAJF4kvaZWlh_5nwtaE7VLkCyiRFdAEWa3d40r7qbBMi7nb55bahzU0nvx4XG0uFDH2AO7BsHV_9B1xiB35ve3m2BhpdXdkeLIJjNn6FEvYUdvRDfqEVZ9ECSrrgXHAUuUKDRoBliNvUsH72c0ddSUsn5SwCBZVaIqxqXt4gURW"/>
+<div class="hidden xl:block">
+<p class="font-label-md text-label-md text-on-surface">Alex Admin</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Master Level</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="ml-sidebar-width pt-16 min-h-screen">
+<div class="p-lg max-w-7xl mx-auto">
+<header class="mb-lg">
+<h2 class="font-display-lg text-display-lg text-on-surface">Settings</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Manage your account security, notification preferences, and developer tools.</p>
+</header>
+<div class="grid grid-cols-12 gap-lg items-start">
+<!-- Left Navigation Column -->
+<nav class="col-span-3 space-y-xs sticky top-24">
+<button class="w-full text-left flex items-center gap-sm p-md rounded-lg bg-surface-container-highest text-secondary border-r-4 border-secondary font-label-md transition-all" onclick="scrollToSection('security')">
+<span class="material-symbols-outlined" data-icon="shield">shield</span>
+                        Security
+                    </button>
+<button class="w-full text-left flex items-center gap-sm p-md rounded-lg text-on-surface-variant hover:bg-surface-container-low font-label-md transition-all" onclick="scrollToSection('notifications')">
+<span class="material-symbols-outlined" data-icon="notifications_active">notifications_active</span>
+                        Notifications
+                    </button>
+<button class="w-full text-left flex items-center gap-sm p-md rounded-lg text-on-surface-variant hover:bg-surface-container-low font-label-md transition-all" onclick="scrollToSection('preferences')">
+<span class="material-symbols-outlined" data-icon="tune">tune</span>
+                        Preferences
+                    </button>
+<button class="w-full text-left flex items-center gap-sm p-md rounded-lg text-on-surface-variant hover:bg-surface-container-low font-label-md transition-all" onclick="scrollToSection('developers')">
+<span class="material-symbols-outlined" data-icon="code">code</span>
+                        Developers
+                    </button>
+</nav>
+<!-- Center Content Column -->
+<div class="col-span-9 space-y-lg pb-xl">
+<!-- SECURITY SECTION -->
+<section class="bg-surface-subtle border border-border-light rounded-xl overflow-hidden scroll-mt-24" id="security">
+<div class="p-lg border-b border-border-light flex justify-between items-center bg-white">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Security</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Manage your password and account protection</p>
+</div>
+<button class="bg-primary text-on-primary px-lg py-sm rounded-lg font-label-md hover:opacity-90 transition-opacity">Change Password</button>
+</div>
+<div class="p-lg space-y-lg bg-white">
+<!-- 2FA Toggle -->
+<div class="flex items-center justify-between p-md bg-surface-container-lowest border border-border-light rounded-lg">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-secondary-fixed flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined" data-icon="vibration">vibration</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Two-Factor Authentication (2FA)</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Adds an extra layer of security to your admin account.</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-success"></div>
+</label>
+</div>
+<!-- Active Sessions List -->
+<div>
+<h4 class="font-label-md text-label-md text-on-surface mb-md">Active Sessions</h4>
+<div class="border border-border-light rounded-lg overflow-hidden">
+<table class="w-full text-left text-body-md border-collapse">
+<thead class="bg-surface-container-low text-label-sm uppercase tracking-wider text-on-surface-variant">
+<tr>
+<th class="px-md py-sm font-semibold">Device / Browser</th>
+<th class="px-md py-sm font-semibold">Location</th>
+<th class="px-md py-sm font-semibold">Last Activity</th>
+<th class="px-md py-sm font-semibold text-right">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-light">
+<tr class="hover:bg-surface-subtle transition-colors">
+<td class="px-md py-md flex items-center gap-sm">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="laptop_mac">laptop_mac</span>
+<div>
+<p class="font-label-md">Chrome on MacOS</p>
+<p class="text-xs text-on-surface-variant">Current Session</p>
+</div>
+</td>
+<td class="px-md py-md text-on-surface-variant">London, UK</td>
+<td class="px-md py-md text-on-surface-variant">Just now</td>
+<td class="px-md py-md text-right"><span class="text-success font-label-sm">Active</span></td>
+</tr>
+<tr class="hover:bg-surface-subtle transition-colors">
+<td class="px-md py-md flex items-center gap-sm">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="phone_iphone">phone_iphone</span>
+<div>
+<p class="font-label-md">Safari on iPhone 15</p>
+<p class="text-xs text-on-surface-variant">Diamarket Admin App</p>
+</div>
+</td>
+<td class="px-md py-md text-on-surface-variant">London, UK</td>
+<td class="px-md py-md text-on-surface-variant">2 hours ago</td>
+<td class="px-md py-md text-right"><button class="text-error font-label-sm hover:underline">Revoke</button></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<!-- NOTIFICATIONS SECTION -->
+<section class="bg-surface-subtle border border-border-light rounded-xl overflow-hidden scroll-mt-24" id="notifications">
+<div class="p-lg border-b border-border-light bg-white">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Notifications</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Choose how and when you want to be alerted</p>
+</div>
+<div class="p-lg space-y-md bg-white">
+<div class="flex items-center justify-between py-sm">
+<div>
+<p class="font-label-md text-label-md text-on-surface">Sales Alerts</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Instant notification for every successful marketplace transaction.</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+</div>
+<div class="flex items-center justify-between py-sm border-t border-border-light">
+<div>
+<p class="font-label-md text-label-md text-on-surface">Vendor Messages</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Direct messages from marketplace vendors and support requests.</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+</div>
+<div class="flex items-center justify-between py-sm border-t border-border-light">
+<div>
+<p class="font-label-md text-label-md text-on-surface">Weekly Reports</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Summary of marketplace performance, growth, and pending audits.</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+</div>
+</div>
+</section>
+<!-- PREFERENCES SECTION -->
+<section class="bg-surface-subtle border border-border-light rounded-xl overflow-hidden scroll-mt-24" id="preferences">
+<div class="p-lg border-b border-border-light bg-white">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Preferences</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Customize your admin interface and localization</p>
+</div>
+<div class="p-lg grid grid-cols-2 gap-lg bg-white">
+<div>
+<label class="font-label-md text-label-md text-on-surface block mb-xs">Display Language</label>
+<select class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-md text-body-md focus:ring-2 focus:ring-secondary focus:border-secondary transition-all">
+<option>English (United Kingdom)</option>
+<option>English (United States)</option>
+<option>French (France)</option>
+<option>German (Germany)</option>
+<option>Spanish (Spain)</option>
+</select>
+</div>
+<div>
+<label class="font-label-md text-label-md text-on-surface block mb-xs">Timezone</label>
+<select class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-md text-body-md focus:ring-2 focus:ring-secondary focus:border-secondary transition-all">
+<option>(GMT +00:00) London, Lisbon</option>
+<option>(GMT -05:00) New York, Toronto</option>
+<option>(GMT +01:00) Paris, Berlin</option>
+<option>(GMT +08:00) Singapore, Beijing</option>
+</select>
+</div>
+<div class="col-span-2 p-md bg-surface-container-low rounded-lg flex items-center justify-between border border-border-light">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary" data-icon="dark_mode">dark_mode</span>
+<div>
+<p class="font-label-md text-label-md">Dark Mode</p>
+<p class="text-xs text-on-surface-variant">Toggle visual theme between Light and Dark surfaces.</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+</div>
+</div>
+</section>
+<!-- DEVELOPERS SECTION -->
+<section class="bg-surface-subtle border border-border-light rounded-xl overflow-hidden scroll-mt-24" id="developers">
+<div class="p-lg border-b border-border-light flex justify-between items-center bg-white">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Developers</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">API access and integration tools</p>
+</div>
+<button class="bg-secondary-container text-on-secondary-container px-lg py-sm rounded-lg font-label-md hover:bg-opacity-80 transition-all">Generate new key</button>
+</div>
+<div class="p-lg bg-white">
+<div class="space-y-md">
+<div class="p-md bg-surface-container border border-border-light rounded-lg">
+<div class="flex justify-between items-center mb-xs">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Production API Key</span>
+<span class="text-xs text-on-tertiary-container bg-tertiary-fixed px-2 py-0.5 rounded-full font-semibold">Active</span>
+</div>
+<div class="flex items-center gap-sm">
+<code class="flex-grow font-code-sm text-code-sm bg-primary text-on-primary-container p-sm rounded border border-outline-variant font-mono truncate">
+                                            dm_live_928374928374928374_prod_auth_xyz
+                                        </code>
+<button class="p-sm bg-white border border-border-light rounded hover:bg-surface-container-low transition-colors text-secondary" title="Copy to clipboard">
+<span class="material-symbols-outlined" data-icon="content_copy">content_copy</span>
+</button>
+</div>
+<p class="mt-xs text-xs text-on-surface-variant italic">Created on: Dec 12, 2023 • Last used: 4 minutes ago</p>
+</div>
+<div class="p-md border border-dashed border-outline-variant rounded-lg bg-surface-bright flex items-center gap-md">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="terminal">terminal</span>
+<div class="flex-grow">
+<p class="font-label-md text-label-md">Webhooks & Endpoints</p>
+<p class="text-xs text-on-surface-variant">Configure callback URLs for order events and inventory updates.</p>
+</div>
+<button class="text-secondary font-label-md flex items-center hover:underline">
+                                        Manage <span class="material-symbols-outlined text-sm ml-1" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+</div>
+</div>
+</div>
+</main>
+<script>
+        function scrollToSection(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                
+                // Update active state in sidebar (UI only for demo)
+                document.querySelectorAll('nav.col-span-3 button').forEach(btn => {
+                    btn.classList.remove('bg-surface-container-highest', 'text-secondary', 'border-r-4', 'border-secondary');
+                    btn.classList.add('text-on-surface-variant', 'hover:bg-surface-container-low');
+                });
+                
+                const activeBtn = Array.from(document.querySelectorAll('nav.col-span-3 button')).find(btn => btn.getAttribute('onclick').includes(id));
+                if (activeBtn) {
+                    activeBtn.classList.remove('text-on-surface-variant', 'hover:bg-surface-container-low');
+                    activeBtn.classList.add('bg-surface-container-highest', 'text-secondary', 'border-r-4', 'border-secondary');
+                }
+            }
+        }
+
+        // Add a simple scroll spy to highlight active nav
+        window.addEventListener('scroll', () => {
+            const sections = ['security', 'notifications', 'preferences', 'developers'];
+            let current = '';
+
+            sections.forEach(section => {
+                const element = document.getElementById(section);
+                const rect = element.getBoundingClientRect();
+                if (rect.top <= 120) {
+                    current = section;
+                }
+            });
+
+            if (current) {
+                document.querySelectorAll('nav.col-span-3 button').forEach(btn => {
+                    btn.classList.remove('bg-surface-container-highest', 'text-secondary', 'border-r-4', 'border-secondary');
+                    btn.classList.add('text-on-surface-variant', 'hover:bg-surface-container-low');
+                    if (btn.getAttribute('onclick').includes(current)) {
+                        btn.classList.remove('text-on-surface-variant', 'hover:bg-surface-container-low');
+                        btn.classList.add('bg-surface-container-highest', 'text-secondary', 'border-r-4', 'border-secondary');
+                    }
+                });
+            }
+        });
+    </script>
+</body></html>

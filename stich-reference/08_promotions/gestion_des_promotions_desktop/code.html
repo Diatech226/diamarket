@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Diamarket Admin - Promotions Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary": "#ffffff",
+                    "tertiary-container": "#35260c",
+                    "primary-fixed": "#d8e3fb",
+                    "surface-container": "#e5eeff",
+                    "outline-variant": "#c5c6cd",
+                    "error": "#ef4444",
+                    "primary-container": "#1e293b",
+                    "on-surface": "#0b1c30",
+                    "on-primary-fixed-variant": "#3c475a",
+                    "inverse-primary": "#bcc7de",
+                    "surface-container-highest": "#d3e4fe",
+                    "secondary-fixed": "#d8e2ff",
+                    "error-container": "#ffdad6",
+                    "on-secondary-fixed": "#001a42",
+                    "tertiary-fixed-dim": "#ddc39d",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary-container": "#2170e4",
+                    "on-background": "#0b1c30",
+                    "surface": "#f8f9ff",
+                    "background": "#f8f9ff",
+                    "surface-bright": "#f8f9ff",
+                    "on-error": "#ffffff",
+                    "surface-container-low": "#eff4ff",
+                    "success": "#10b981",
+                    "tertiary": "#1e1200",
+                    "border-light": "#e2e8f0",
+                    "primary": "#091426",
+                    "secondary-fixed-dim": "#adc6ff",
+                    "warning": "#f59e0b",
+                    "on-tertiary-fixed": "#271902",
+                    "surface-tint": "#545f73",
+                    "on-primary-container": "#8590a6",
+                    "surface-subtle": "#f8fafc",
+                    "secondary": "#0058be",
+                    "inverse-surface": "#213145",
+                    "on-primary": "#ffffff",
+                    "surface-dim": "#cbdbf5",
+                    "primary-fixed-dim": "#bcc7de",
+                    "inverse-on-surface": "#eaf1ff",
+                    "on-secondary-fixed-variant": "#004395",
+                    "surface-container-high": "#dce9ff",
+                    "on-tertiary-fixed-variant": "#564427",
+                    "outline": "#75777d",
+                    "surface-variant": "#d3e4fe",
+                    "on-tertiary": "#ffffff",
+                    "on-tertiary-container": "#a38c6a",
+                    "tertiary-fixed": "#fadfb8",
+                    "on-primary-fixed": "#111c2d",
+                    "on-surface-variant": "#45474c",
+                    "on-error-container": "#93000a",
+                    "on-secondary-container": "#fefcff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "xs": "4px",
+                    "sm": "8px",
+                    "xl": "32px",
+                    "margin-mobile": "16px",
+                    "base": "4px",
+                    "sidebar-width": "260px",
+                    "lg": "24px",
+                    "gutter": "20px",
+                    "md": "16px"
+            },
+            "fontFamily": {
+                    "label-sm": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "label-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "code-sm": ["Inter"],
+                    "headline-sm": ["Inter"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                    "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "code-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9ff;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .sidebar-active-indicator {
+            position: absolute;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background-color: #0058be;
+        }
+        /* Custom scrollbar for data density */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="flex min-h-screen text-on-surface">
+<!-- SIDEBAR NAVIGATION (Diamarket Admin Style) -->
+<aside class="w-sidebar-width h-screen fixed left-0 top-0 bg-primary z-50 flex flex-col py-lg">
+<!-- Brand Header -->
+<div class="px-md mb-xl">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 bg-secondary-container rounded-lg flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">store</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-on-primary">Diamarket</h1>
+<p class="font-label-sm text-label-sm text-on-primary-container opacity-70">Admin Console</p>
+</div>
+</div>
+</div>
+<!-- Primary CTA -->
+<div class="px-md mb-lg">
+<button class="w-full flex items-center justify-center gap-sm bg-secondary text-on-secondary py-sm rounded-xl font-label-md transition-all hover:bg-secondary-container active:scale-95">
+<span class="material-symbols-outlined">add</span>
+                New Product
+            </button>
+</div>
+<!-- Navigation Tabs -->
+<nav class="flex-1 overflow-y-auto">
+<div class="space-y-1">
+<!-- Dashboard -->
+<a class="flex items-center gap-sm text-on-primary-fixed-variant hover:bg-primary-fixed-variant px-md py-sm transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<!-- Products -->
+<a class="flex items-center gap-sm text-on-primary-fixed-variant hover:bg-primary-fixed-variant px-md py-sm transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="font-label-md text-label-md">Products</span>
+</a>
+<!-- Orders -->
+<a class="flex items-center gap-sm text-on-primary-fixed-variant hover:bg-primary-fixed-variant px-md py-sm transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="shopping_cart">shopping_cart</span>
+<span class="font-label-md text-label-md">Orders</span>
+</a>
+<!-- Vendors -->
+<a class="flex items-center gap-sm text-on-primary-fixed-variant hover:bg-primary-fixed-variant px-md py-sm transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-label-md text-label-md">Vendors</span>
+</a>
+<!-- Promotions (ACTIVE) -->
+<a class="flex items-center gap-sm bg-secondary-container text-on-secondary-container border-l-4 border-secondary px-md py-sm" href="#">
+<span class="material-symbols-outlined" data-icon="campaign" style="font-variation-settings: 'FILL' 1;">campaign</span>
+<span class="font-label-md text-label-md">Promotions</span>
+</a>
+<!-- Media Library -->
+<a class="flex items-center gap-sm text-on-primary-fixed-variant hover:bg-primary-fixed-variant px-md py-sm transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="photo_library">photo_library</span>
+<span class="font-label-md text-label-md">Media Library</span>
+</a>
+<!-- Audit Logs -->
+<a class="flex items-center gap-sm text-on-primary-fixed-variant hover:bg-primary-fixed-variant px-md py-sm transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+<span class="font-label-md text-label-md">Audit Logs</span>
+</a>
+<!-- Settings -->
+<a class="flex items-center gap-sm text-on-primary-fixed-variant hover:bg-primary-fixed-variant px-md py-sm transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</div>
+</nav>
+<!-- Footer Tabs -->
+<div class="mt-auto border-t border-primary-container pt-md">
+<a class="flex items-center gap-sm text-on-primary-fixed-variant hover:bg-primary-fixed-variant px-md py-sm transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="font-label-md text-label-md">Support</span>
+</a>
+<a class="flex items-center gap-sm text-on-primary-fixed-variant hover:bg-primary-fixed-variant px-md py-sm transition-colors duration-200 text-error" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="font-label-md text-label-md">Log Out</span>
+</a>
+</div>
+</aside>
+<!-- MAIN CONTENT WRAPPER -->
+<main class="flex-1 ml-[260px] flex flex-col min-h-screen">
+<!-- TOP APP BAR -->
+<header class="fixed top-0 right-0 h-16 w-[calc(100%-260px)] bg-surface border-b border-border-light z-40 px-lg flex items-center justify-between">
+<!-- Search Bar -->
+<div class="flex-1 max-w-xl">
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container-low border border-outline-variant rounded-full font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary transition-all" placeholder="Search promotions, campaigns, or coupons..." type="text"/>
+</div>
+</div>
+<!-- Trailing Actions -->
+<div class="flex items-center gap-md">
+<nav class="hidden lg:flex items-center gap-lg mr-md">
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors" href="#">Global View</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors" href="#">Help Center</a>
+</nav>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<div class="h-8 w-[1px] bg-outline-variant mx-sm"></div>
+<div class="flex items-center gap-sm cursor-pointer hover:bg-surface-container-low p-1 pr-3 rounded-full transition-colors">
+<div class="w-8 h-8 rounded-full bg-surface-dim overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a business administrator in a well-lit corporate office. The person is wearing a navy blue blazer and has a friendly, confident expression. The background is slightly blurred showing a modern, glass-walled conference room with subtle blue accents to match the corporate UI palette." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBZ_cpmyXRA_heowQNruipwJrAkXj0Fr3cGPoqsf4iAMcXV0vuNunuPBXRlkfEMY0OJfXyZj9-L0BxWTv6Sh1DXvPLmUvoUp9HM1kXGA87pgdge2j7z0sQYbVQL5k5FGHiW4gSg5uX4DhJOblCEoSL8mnuGHjN1VKQLM7ZDcPfpg0nfMKUKtgpno0odnkdfZJcbPtwKdGK1Fn5eHNLY08FgLKV8BHLbfThKbXjeaklyMp6v0m5a2ah4t33WtEsIUuVAJg81HqgQWuXm"/>
+</div>
+<div class="hidden xl:block">
+<p class="font-label-md text-label-md text-on-surface leading-none">Admin User</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Super Admin</p>
+</div>
+</div>
+</div>
+</header>
+<!-- CANVAS CONTENT -->
+<div class="mt-16 p-lg flex flex-col gap-lg overflow-y-auto">
+<!-- Quick Stats Header -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
+<!-- Total Active Promos -->
+<div class="bg-surface-container-lowest border border-border-light rounded-xl p-md flex items-center gap-md">
+<div class="w-12 h-12 rounded-full bg-secondary-fixed flex items-center justify-center text-on-secondary-fixed-variant">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">campaign</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase">Active Promos</p>
+<h2 class="font-headline-md text-headline-md text-on-surface">24</h2>
+<div class="flex items-center gap-xs text-success font-label-sm">
+<span class="material-symbols-outlined text-[16px]">trending_up</span>
+<span>+4 this week</span>
+</div>
+</div>
+</div>
+<!-- Total Revenue from Promos -->
+<div class="bg-surface-container-lowest border border-border-light rounded-xl p-md flex items-center gap-md">
+<div class="w-12 h-12 rounded-full bg-tertiary-fixed flex items-center justify-center text-on-tertiary-fixed-variant">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">payments</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase">Promo Revenue</p>
+<h2 class="font-headline-md text-headline-md text-on-surface">$142,850</h2>
+<div class="flex items-center gap-xs text-success font-label-sm">
+<span class="material-symbols-outlined text-[16px]">trending_up</span>
+<span>12.5% vs last month</span>
+</div>
+</div>
+</div>
+<!-- Avg. Discount Rate -->
+<div class="bg-surface-container-lowest border border-border-light rounded-xl p-md flex items-center gap-md">
+<div class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">percent</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase">Avg. Discount</p>
+<h2 class="font-headline-md text-headline-md text-on-surface">18.2%</h2>
+<div class="flex items-center gap-xs text-on-surface-variant font-label-sm opacity-60">
+<span class="material-symbols-outlined text-[16px]">horizontal_rule</span>
+<span>Stable performance</span>
+</div>
+</div>
+</div>
+<!-- Usage Conversion -->
+<div class="bg-surface-container-lowest border border-border-light rounded-xl p-md flex items-center gap-md">
+<div class="w-12 h-12 rounded-full bg-error-container flex items-center justify-center text-on-error-container">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">analytics</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase">Conversion Rate</p>
+<h2 class="font-headline-md text-headline-md text-on-surface">4.2%</h2>
+<div class="flex items-center gap-xs text-error font-label-sm">
+<span class="material-symbols-outlined text-[16px]">trending_down</span>
+<span>-0.8% decrease</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Promotions Catalog Section -->
+<section class="bg-surface-container-lowest border border-border-light rounded-xl overflow-hidden shadow-sm">
+<!-- Table Toolbar -->
+<div class="p-md border-b border-border-light flex flex-wrap items-center justify-between gap-md bg-surface-subtle">
+<div class="flex items-center gap-md">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Promotion Catalog</h3>
+<div class="flex gap-xs">
+<span class="px-2 py-0.5 bg-secondary-container text-on-secondary-container rounded-full text-label-sm">All 142</span>
+<span class="px-2 py-0.5 bg-surface-container text-on-surface-variant rounded-full text-label-sm">Active 24</span>
+</div>
+</div>
+<div class="flex items-center gap-sm">
+<button class="flex items-center gap-xs px-md py-1.5 border border-outline-variant rounded-lg text-label-md font-label-md hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+                            Filter
+                        </button>
+<button class="flex items-center gap-xs px-md py-1.5 border border-outline-variant rounded-lg text-label-md font-label-md hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[18px]">download</span>
+                            Export
+                        </button>
+<button class="flex items-center gap-xs px-md py-1.5 bg-secondary text-on-secondary rounded-lg text-label-md font-label-md hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-[18px]">add_circle</span>
+                            New Promotion
+                        </button>
+</div>
+</div>
+<!-- Data Table -->
+<div class="overflow-x-auto">
+<table class="w-full border-collapse">
+<thead class="bg-surface-container-low">
+<tr>
+<th class="text-left px-lg py-sm font-label-sm text-on-surface-variant uppercase tracking-wider border-b border-border-light">Promotion Name</th>
+<th class="text-left px-lg py-sm font-label-sm text-on-surface-variant uppercase tracking-wider border-b border-border-light">Type</th>
+<th class="text-left px-lg py-sm font-label-sm text-on-surface-variant uppercase tracking-wider border-b border-border-light">Status</th>
+<th class="text-right px-lg py-sm font-label-sm text-on-surface-variant uppercase tracking-wider border-b border-border-light">Usage Count</th>
+<th class="text-center px-lg py-sm font-label-sm text-on-surface-variant uppercase tracking-wider border-b border-border-light">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-light">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-lowest transition-colors group">
+<td class="px-lg py-md">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface">Summer Flash Sale 2024</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">CODE: SUMMER24</span>
+</div>
+</td>
+<td class="px-lg py-md">
+<span class="font-body-md text-body-md">Percentage (25%)</span>
+</td>
+<td class="px-lg py-md">
+<span class="px-2 py-1 rounded-full bg-success/10 text-success text-label-sm font-label-sm flex items-center w-fit gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-success"></span>
+                                        Active
+                                    </span>
+</td>
+<td class="px-lg py-md text-right">
+<span class="font-code-sm text-code-sm font-bold">12,450</span>
+</td>
+<td class="px-lg py-md text-center">
+<div class="flex items-center justify-center gap-sm">
+<button class="p-2 text-on-surface-variant hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-error hover:bg-error/10 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="px-lg py-md">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface">First Purchase Discount</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">CODE: WELCOME10</span>
+</div>
+</td>
+<td class="px-lg py-md">
+<span class="font-body-md text-body-md">Fixed ($10.00)</span>
+</td>
+<td class="px-lg py-md">
+<span class="px-2 py-1 rounded-full bg-warning/10 text-warning text-label-sm font-label-sm flex items-center w-fit gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-warning"></span>
+                                        Scheduled
+                                    </span>
+</td>
+<td class="px-lg py-md text-right">
+<span class="font-code-sm text-code-sm font-bold">0</span>
+</td>
+<td class="px-lg py-md text-center">
+<div class="flex items-center justify-center gap-sm">
+<button class="p-2 text-on-surface-variant hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-error hover:bg-error/10 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="px-lg py-md">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface">BOGO Winter Footwear</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Automatic Apply</span>
+</div>
+</td>
+<td class="px-lg py-md">
+<span class="font-body-md text-body-md">BOGO</span>
+</td>
+<td class="px-lg py-md">
+<span class="px-2 py-1 rounded-full bg-on-surface-variant/10 text-on-surface-variant text-label-sm font-label-sm flex items-center w-fit gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-on-surface-variant"></span>
+                                        Expired
+                                    </span>
+</td>
+<td class="px-lg py-md text-right">
+<span class="font-code-sm text-code-sm font-bold">8,211</span>
+</td>
+<td class="px-lg py-md text-center">
+<div class="flex items-center justify-center gap-sm">
+<button class="p-2 text-on-surface-variant hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-error hover:bg-error/10 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="px-lg py-md">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface">High-Volume Vendor Special</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">CODE: VIPVENDOR</span>
+</div>
+</td>
+<td class="px-lg py-md">
+<span class="font-body-md text-body-md">Percentage (15%)</span>
+</td>
+<td class="px-lg py-md">
+<span class="px-2 py-1 rounded-full bg-success/10 text-success text-label-sm font-label-sm flex items-center w-fit gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-success"></span>
+                                        Active
+                                    </span>
+</td>
+<td class="px-lg py-md text-right">
+<span class="font-code-sm text-code-sm font-bold">542</span>
+</td>
+<td class="px-lg py-md text-center">
+<div class="flex items-center justify-center gap-sm">
+<button class="p-2 text-on-surface-variant hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-error hover:bg-error/10 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="px-lg py-md">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface">Holiday Clearance</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">CODE: BYE2023</span>
+</div>
+</td>
+<td class="px-lg py-md">
+<span class="font-body-md text-body-md">Percentage (50%)</span>
+</td>
+<td class="px-lg py-md">
+<span class="px-2 py-1 rounded-full bg-on-surface-variant/10 text-on-surface-variant text-label-sm font-label-sm flex items-center w-fit gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-on-surface-variant"></span>
+                                        Expired
+                                    </span>
+</td>
+<td class="px-lg py-md text-right">
+<span class="font-code-sm text-code-sm font-bold">45,902</span>
+</td>
+<td class="px-lg py-md text-center">
+<div class="flex items-center justify-center gap-sm">
+<button class="p-2 text-on-surface-variant hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-error hover:bg-error/10 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Table Pagination -->
+<div class="p-md flex items-center justify-between border-t border-border-light bg-surface-subtle">
+<span class="text-body-sm text-on-surface-variant">Showing 1 to 5 of 142 promotions</span>
+<div class="flex gap-xs">
+<button class="p-2 border border-outline-variant rounded-lg hover:bg-surface-container transition-colors disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined text-[18px]">chevron_left</span>
+</button>
+<button class="px-3 py-1 bg-secondary text-on-secondary rounded-lg font-label-md">1</button>
+<button class="px-3 py-1 border border-outline-variant rounded-lg hover:bg-surface-container transition-colors font-label-md">2</button>
+<button class="px-3 py-1 border border-outline-variant rounded-lg hover:bg-surface-container transition-colors font-label-md">3</button>
+<button class="p-2 border border-outline-variant rounded-lg hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Secondary Insight Bento Grid -->
+<section class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+<!-- Usage by Category -->
+<div class="lg:col-span-2 bg-surface-container-lowest border border-border-light rounded-xl p-lg">
+<div class="flex items-center justify-between mb-lg">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Promotion Performance by Category</h3>
+<button class="text-secondary font-label-md hover:underline">View Detailed Report</button>
+</div>
+<div class="h-64 flex items-end gap-md px-md pb-md">
+<!-- Simulated Bar Chart -->
+<div class="flex-1 flex flex-col items-center gap-sm">
+<div class="w-full bg-secondary-fixed-dim rounded-t-lg transition-all hover:bg-secondary-container" style="height: 85%;"></div>
+<span class="text-label-sm text-on-surface-variant">Electronics</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-sm">
+<div class="w-full bg-secondary-fixed-dim rounded-t-lg transition-all hover:bg-secondary-container" style="height: 60%;"></div>
+<span class="text-label-sm text-on-surface-variant">Fashion</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-sm">
+<div class="w-full bg-secondary-fixed-dim rounded-t-lg transition-all hover:bg-secondary-container" style="height: 45%;"></div>
+<span class="text-label-sm text-on-surface-variant">Home</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-sm">
+<div class="w-full bg-secondary-fixed-dim rounded-t-lg transition-all hover:bg-secondary-container" style="height: 95%;"></div>
+<span class="text-label-sm text-on-surface-variant">Beauty</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-sm">
+<div class="w-full bg-secondary-fixed-dim rounded-t-lg transition-all hover:bg-secondary-container" style="height: 30%;"></div>
+<span class="text-label-sm text-on-surface-variant">Groceries</span>
+</div>
+</div>
+</div>
+<!-- Recent Activity Feed -->
+<div class="bg-surface-container-lowest border border-border-light rounded-xl p-lg">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-lg">Recent Updates</h3>
+<div class="space-y-md">
+<div class="flex gap-md">
+<div class="mt-1 w-2 h-2 rounded-full bg-success flex-shrink-0"></div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Summer Flash Sale launched</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">2 hours ago by Sarah J.</p>
+</div>
+</div>
+<div class="flex gap-md">
+<div class="mt-1 w-2 h-2 rounded-full bg-warning flex-shrink-0"></div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Winter BOGO edited</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">5 hours ago by Mike R.</p>
+</div>
+</div>
+<div class="flex gap-md">
+<div class="mt-1 w-2 h-2 rounded-full bg-error flex-shrink-0"></div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Holiday Promo expired</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">12 hours ago (System)</p>
+</div>
+</div>
+<div class="flex gap-md">
+<div class="mt-1 w-2 h-2 rounded-full bg-secondary flex-shrink-0"></div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">New coupon created</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Yesterday by Admin</p>
+</div>
+</div>
+</div>
+<button class="w-full mt-lg py-2 border border-outline-variant rounded-lg font-label-md hover:bg-surface-container transition-colors">View All Logs</button>
+</div>
+</section>
+</div>
+</main>
+<script>
+        // Simple micro-interaction for active states
+        document.querySelectorAll('nav a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                // If it's not the already active one
+                if (!this.classList.contains('bg-secondary-container')) {
+                    // Logic to update active state would go here in a SPA
+                    console.log('Navigating to:', this.innerText);
+                }
+            });
+        });
+
+        // Search focus effects
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput.addEventListener('focus', () => {
+            searchInput.parentElement.classList.add('scale-[1.01]');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchInput.parentElement.classList.remove('scale-[1.01]');
+        });
+    </script>
+</body></html>
