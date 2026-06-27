@@ -1,2 +1,2 @@
-import { CmsFoundationPage } from "../../../cms-page";
-export default function Page(){return <CmsFoundationPage title="Brand Kit" subtitle="Configuration logo, favicon, couleurs, polices, boutons et réseaux sociaux." endpoint="/storefront/:vendor_id/config" focus={["Logo & favicon","Couleurs premium","Réseaux sociaux"]} />;}
+import { BrandKitForm } from "@/components/storefront";
+export default function Page({params}:{params:{vendorId:string}}){return <main className="space-y-6"><header><p className="text-sm uppercase tracking-[0.25em] text-brand-primary">Brand kit</p><h1 className="mt-2 text-3xl font-bold text-brand-dark">Identité boutique</h1><p className="mt-2 text-brand-muted">Logo, favicon, couleurs, polices, boutons et réseaux sociaux avec preview live.</p></header><BrandKitForm vendorId={params.vendorId}/></main>;}

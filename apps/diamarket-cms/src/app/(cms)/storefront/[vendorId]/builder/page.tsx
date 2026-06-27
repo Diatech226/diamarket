@@ -1,2 +1,2 @@
-import { CmsFoundationPage } from "../../../cms-page";
-export default function Page(){return <CmsFoundationPage title="Home Builder" subtitle="Composition des blocs Hero, carrousel, produits vedettes, FAQ et CTA." endpoint="/storefront/:vendor_id/pages/home" focus={["Hero","Collections","FAQ/CTA"]} />;}
+import { BlockEditor } from "@/components/storefront";
+export default function Page({params}:{params:{vendorId:string}}){return <main className="space-y-6"><header><p className="text-sm uppercase tracking-[0.25em] text-brand-primary">Home builder</p><h1 className="mt-2 text-3xl font-bold text-brand-dark">Composition de la homepage</h1><p className="mt-2 text-brand-muted">Ajoutez, modifiez, réordonnez, dupliquez et activez les blocs de boutique.</p></header><BlockEditor vendorId={params.vendorId}/></main>;}

@@ -1,0 +1,2 @@
+import { StorefrontCmsPreview } from "@/components/storefront";
+export default function Page({params}:{params:{vendorId:string}}){return <main className="space-y-6"><header><p className="text-sm uppercase tracking-[0.25em] text-brand-primary">Preview</p><h1 className="mt-2 text-3xl font-bold text-brand-dark">Prévisualisation complète</h1><p className="mt-2 text-brand-muted">Thème, logo, hero, blocs actifs, produits et catégories selon disponibilité API.</p></header><StorefrontCmsPreview vendorId={params.vendorId}/></main>;}

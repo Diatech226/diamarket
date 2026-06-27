@@ -1,2 +1,2 @@
-import { CmsFoundationPage } from "../../../cms-page";
-export default function Page(){return <CmsFoundationPage title="Domaine boutique" subtitle="Connexion de sous-domaines et domaines personnalisés." endpoint="/storefront/:vendor_id/domain" focus={["Sous-domaine","Domaine personnalisé","Vérification DNS"]} />;}
+import { DomainManager } from "@/components/storefront";
+export default function Page({params}:{params:{vendorId:string}}){return <main className="space-y-6"><header><p className="text-sm uppercase tracking-[0.25em] text-brand-primary">Domaine</p><h1 className="mt-2 text-3xl font-bold text-brand-dark">Connexion DNS</h1><p className="mt-2 text-brand-muted">Sous-domaine Diamarket, domaine personnalisé, CNAME et vérification.</p></header><DomainManager vendorId={params.vendorId}/></main>;}
