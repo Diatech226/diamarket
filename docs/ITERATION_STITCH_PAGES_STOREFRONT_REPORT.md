@@ -38,3 +38,8 @@
 - `npm --prefix apps/diamarket-cms run build`
 - `npm --prefix apps/diamarket-web run build`
 - `npm --prefix apps/diamarket-api run build`
+
+## Notes iteration 3
+- Références Storefront obligatoires analysées : `06_storefront/builder/diteur_de_boutique_storefront_builder_desktop`, `06_storefront/brand-kit/identit_visuelle_brand_kit_desktop`, `06_storefront/domain/domaines_seo_desktop`, `16_public_storefront/storytelling_blog_desktop`, `16_public_storefront/store_locator_desktop_optimis`, ainsi que `PAGE_INDEX.md` et `API_MAPPING.md` pour le routage et les endpoints.
+- Le fichier demandé `docs/DIAMARKET_LOCAL_TOKENS_UI_MIGRATION_REPORT.md` n'existe pas dans ce checkout ; les tokens locaux disponibles dans `apps/diamarket-cms/src/design/` et `apps/diamarket-web/src/design/` ont donc été utilisés comme source finale.
+- Les blocs supportés par le builder couvrent `Hero`, `Carousel`, `FeaturedProducts`, `Video`, `Banners`, `Collections`, `Testimonials`, `FAQ` et `CTA`; l'édition rapide expose désormais titre et description sans copier le HTML Stitch brut.
