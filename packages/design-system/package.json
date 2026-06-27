@@ -1,0 +1,29 @@
+{
+  "name": "@diamarket/design-system",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "peerDependencies": {
+    "react": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "typescript": "^5.5.2"
+  },
+  "exports": {
+    ".": "./index.ts",
+    "./tokens": "./tokens.ts",
+    "./theme": "./theme.ts",
+    "./tailwind-preset": "./tailwind-preset.ts",
+    "./colors": "./colors.ts",
+    "./typography": "./typography.ts",
+    "./spacing": "./spacing.ts",
+    "./radius": "./radius.ts",
+    "./shadows": "./shadows.ts",
+    "./animations": "./animations.ts",
+    "./icons": "./icons.tsx",
+    "./components": "./components/index.ts"
+  }
+}
