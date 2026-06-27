@@ -1,2 +1,2 @@
-import { CmsFoundationPage } from "../cms-page";
-export default function Page(){return <CmsFoundationPage title="Storefront White-Label" subtitle="Vue d’ensemble des boutiques vendeurs et accès builder." endpoint="/storefront/:vendor_id/config" focus={["Brand kit","Home builder","Domaines"]} />;}
+import { StorefrontOverviewTable } from "@/components/storefront";
+export default function Page(){return <main className="space-y-6"><header><p className="text-sm uppercase tracking-[0.25em] text-brand-primary">Storefront white-label</p><h1 className="mt-2 text-3xl font-bold text-brand-dark">Boutiques vendeurs</h1><p className="mt-2 text-brand-muted">Pilotage premium des brand kits, builders, domaines et previews.</p></header><StorefrontOverviewTable/></main>;}
