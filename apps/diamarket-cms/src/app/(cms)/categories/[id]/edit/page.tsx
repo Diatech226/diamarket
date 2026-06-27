@@ -1,0 +1,2 @@
+import { CategoryForm, CategoryPreviewCard } from "@/components/categories";
+export default function EditCategoryPage({ params }: { params: { id: string } }) { return <div className="space-y-6"><h1 className="text-3xl font-semibold">Éditer la catégorie {params.id}</h1><div className="grid gap-6 lg:grid-cols-[1fr_360px]"><CategoryForm mode="edit" /><CategoryPreviewCard category={{ name: "Catégorie sélectionnée" }} /></div></div>; }

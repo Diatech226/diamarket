@@ -1,0 +1,2 @@
+import { ProductExportButton } from "@/components/products";
+export default function ProductExportPage() { return <div className="space-y-6"><div><p className="text-sm uppercase tracking-[0.3em] text-amber-700">Exports</p><h1 className="text-3xl font-semibold">Export produits</h1><p className="text-stone-500">Génération CSV/Excel connectée à GET /products/export.</p></div><ProductExportButton /></div>; }
