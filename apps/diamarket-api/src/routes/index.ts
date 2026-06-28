@@ -1,12 +1,12 @@
 import { Router } from 'express';
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { categoriesController } from '../controllers/categories.controller';
 import { ordersController } from '../controllers/orders.controller';
 import { paymentsController } from '../controllers/payments.controller';
 import { productsController } from '../controllers/products.controller';
 import { projectsController } from '../controllers/projects.controller';
 import { mediaController } from '../controllers/media.controller';
-import { vendorRequestsController } from '../controllers/vendor-requests.controller';
+import { validatePublicVendorRequest, vendorRequestsController } from '../controllers/vendor-requests.controller';
 import { requireAuth } from '../middlewares/requireAuth';
 import { requireRole } from '../middlewares/requireRole';
 import { requirePermission } from '../middlewares/requirePermission';
@@ -71,7 +71,20 @@ const validateCategoryUpdate = (req: Request) => {
   if (req.body.order !== undefined && !Number.isFinite(Number(req.body.order))) return 'L’ordre doit être un nombre';
   return null;
 };
-const validateVendorRequest = (req: Request) => (!req.body.businessName ? 'businessName is required' : null);
+const vendorRequestRateBucket = new Map<string, { count: number; resetAt: number }>();
+const publicVendorRequestRateLimit = (req: Request, res: Response, next: NextFunction) => {
+  const key = req.ip || 'unknown';
+  const now = Date.now();
+  const current = vendorRequestRateBucket.get(key) || { count: 0, resetAt: now + 60 * 60 * 1000 };
+  if (now > current.resetAt) {
+    current.count = 0;
+    current.resetAt = now + 60 * 60 * 1000;
+  }
+  current.count += 1;
+  vendorRequestRateBucket.set(key, current);
+  if (current.count > 5) return res.status(429).json({ success: false, message: 'Trop de demandes. Veuillez réessayer plus tard.' });
+  return next();
+};
 const validateOrder = (req: Request) => {
   if (!Array.isArray(req.body.items) || req.body.items.length === 0) return 'items must be a non-empty array';
   for (const item of req.body.items) {
@@ -141,6 +154,8 @@ apiRouter.get('/admin/vendor-requests', vendorRequestsController.list);
 apiRouter.get('/admin/vendor-requests/:id', vendorRequestsController.getById);
 apiRouter.put('/admin/vendor-requests/:id/approve', vendorRequestsController.approve);
 apiRouter.put('/admin/vendor-requests/:id/reject', vendorRequestsController.reject);
+apiRouter.patch('/admin/vendor-requests/:id/status', vendorRequestsController.updateStatus);
+apiRouter.delete('/admin/vendor-requests/:id', vendorRequestsController.remove);
 apiRouter.put('/admin/vendors/:id/status', adminController.updateVendorStatus);
 apiRouter.get('/admin/settings', adminController.settings);
 apiRouter.put('/admin/settings', adminController.updateSettings);
@@ -213,7 +228,7 @@ apiRouter.get('/categories', categoriesController.list);
 apiRouter.post('/categories', requireAuth, requireAdmin, validateRequest(validateCategory), categoriesController.create);
 apiRouter.put('/categories/:id', requireAuth, requireAdmin, validateRequest(validateCategoryUpdate), categoriesController.update);
 apiRouter.delete('/categories/:id', requireAuth, requireAdmin, categoriesController.remove);
-apiRouter.post('/vendor-requests', requireAuth, validateRequest(validateVendorRequest), vendorRequestsController.create);
+apiRouter.post('/vendor-requests', publicVendorRequestRateLimit, validateRequest(validatePublicVendorRequest), vendorRequestsController.create);
 apiRouter.get('/vendor-requests', requireAuth, requireAdmin, requirePermission('vendors:approve'), vendorRequestsController.list);
 apiRouter.put('/vendor-requests/:id/approve', requireAuth, requireAdmin, requirePermission('vendors:approve'), vendorRequestsController.approve);
 apiRouter.put('/vendor-requests/:id/reject', requireAuth, requireAdmin, requirePermission('vendors:approve'), vendorRequestsController.reject);
