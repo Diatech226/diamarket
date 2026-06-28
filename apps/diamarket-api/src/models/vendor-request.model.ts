@@ -2,10 +2,10 @@ import { Schema, model } from 'mongoose';
 
 const VendorRequestSchema = new Schema(
   {
-    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    userId: { type: Schema.Types.ObjectId, ref: 'User' },
     businessName: { type: String, required: true },
-    businessEmail: String,
-    phone: String,
+    businessEmail: { type: String, lowercase: true, trim: true },
+    phone: { type: String, trim: true },
     country: String,
     city: String,
     notes: String,
