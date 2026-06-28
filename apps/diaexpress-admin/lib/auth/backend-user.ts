@@ -1,5 +1,6 @@
 import { buildApiUrl } from '@/lib/api/client';
 import { resolveAppRouterAuthToken } from '@/lib/api/auth.server';
+import { normalizeAdminRole } from '@/lib/auth/roles';
 
 type BackendUser = {
   role?: string;
@@ -140,7 +141,7 @@ export async function resolveBackendAdminStatus(): Promise<BackendAuthStatus> {
 
     const user = payload?.user || payload?.data || {};
 
-    if (String(user.role || '').toLowerCase() !== 'admin') {
+    if (normalizeAdminRole(user.role) !== 'admin') {
       return { ok: false, status: 403, reason: 'role_forbidden', requestId };
     }
 

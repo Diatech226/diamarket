@@ -61,8 +61,8 @@ module.exports = {
     loadedFromFile: !dotenvResult.error,
   },
   server: {
-    port: toNumber(process.env.PORT, 5000),
-    corsOrigins: toList(process.env.CORS_ORIGINS),
+    port: toNumber(process.env.PORT, 5010),
+    corsOrigins: toList(process.env.CORS_ORIGINS || 'http://localhost:3001,http://localhost:3011,http://localhost:3010'),
     enableRequestLogging: toBoolean(process.env.REQUEST_LOGGING, true),
   },
   monitoring: {

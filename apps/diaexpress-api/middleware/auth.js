@@ -193,9 +193,11 @@ function userHasRole(user, _identity, role) {
   if (!role) return true;
 
   const required = String(role).toLowerCase();
-  const current = user?.role ? String(user.role).toLowerCase() : null;
+  const normalizeRole = (value) => String(value || '').toLowerCase().replace(/[-\s]+/g, '_');
+  const current = user?.role ? normalizeRole(user.role) : null;
+  const adminAliases = new Set(['admin', 'administrator', 'super_admin', 'superadmin', 'owner']);
 
-  return current === 'admin' || current === required;
+  return adminAliases.has(current) || current === required;
 }
 
 exports.requireAuth = async (req, res, next) => {

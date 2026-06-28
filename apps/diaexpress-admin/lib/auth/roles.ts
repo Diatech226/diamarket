@@ -1,5 +1,13 @@
 export type ClerkSessionClaims = Record<string, unknown> | null | undefined;
 
+export function normalizeAdminRole(role: unknown): string {
+  const normalized = String(role || '').trim().toLowerCase().replace(/[-\s]+/g, '_');
+  if (['admin', 'administrator', 'super_admin', 'superadmin', 'owner'].includes(normalized)) {
+    return 'admin';
+  }
+  return normalized;
+}
+
 function collectRoleValues(value: unknown, roles: string[]) {
   if (!value) {
     return;
@@ -16,7 +24,7 @@ function collectRoleValues(value: unknown, roles: string[]) {
   }
 
   if (typeof value === 'string' || typeof value === 'number') {
-    const normalised = String(value).trim().toLowerCase();
+    const normalised = normalizeAdminRole(value);
     if (normalised) {
       roles.push(normalised);
     }
