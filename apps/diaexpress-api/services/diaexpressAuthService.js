@@ -216,7 +216,7 @@ function collectClerkRoles(sessionClaims, user) {
 
   const normalised = uniqueList(candidates);
 
-  const hasAdminRole = normalised.some((role) => role.toLowerCase() === 'admin');
+  const hasAdminRole = normalised.some((role) => ['admin', 'administrator', 'super_admin', 'superadmin', 'owner'].includes(String(role).toLowerCase().replace(/[-\s]+/g, '_')));
   if (!hasAdminRole) {
     const adminFlag =
       isTruthyFlag(user?.publicMetadata?.isAdmin) ||

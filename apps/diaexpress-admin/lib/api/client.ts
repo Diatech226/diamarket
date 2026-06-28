@@ -10,12 +10,12 @@ const LOGISTICS_BASE_URL =
   process.env.ADMIN_API_BASE_URL ||
   process.env.BACKEND_URL ||
   process.env.NEXT_PUBLIC_LOGISTICS_API_BASE_URL ||
-  'http://localhost:5000';
+  'http://localhost:5010';
 const DIAPAY_BASE_URL =
   process.env.NEXT_PUBLIC_DIAPAY_ADMIN_API_BASE_URL ||
   process.env.ADMIN_API_BASE_URL ||
   process.env.NEXT_PUBLIC_API_BASE_URL ||
-  'http://localhost:5000/api/v1/admin';
+  'http://localhost:5010/api/v1/admin';
 
 export type ApiTarget = 'logistics' | 'diapay';
 

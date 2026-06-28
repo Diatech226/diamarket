@@ -59,12 +59,16 @@ function deriveUsername(identity) {
 function derivePrimaryRole(identity) {
   if (!identity) return 'client';
 
+  const adminAliases = new Set(['admin', 'administrator', 'super_admin', 'superadmin', 'owner']);
   const allowedRoles = new Set(['admin', 'client', 'delivery']);
   const roles = [identity.role, ...(identity.roles || [])]
-    .map((role) => (role ? String(role).trim().toLowerCase() : ''))
+    .map((role) => (role ? String(role).trim().toLowerCase().replace(/[-\s]+/g, '_') : ''))
     .filter(Boolean);
 
   for (const role of roles) {
+    if (adminAliases.has(role)) {
+      return 'admin';
+    }
     if (allowedRoles.has(role)) {
       return role;
     }
