@@ -67,3 +67,29 @@ Une couche de compatibilité enveloppe les réponses legacy sans déplacer bruta
 ## Notes de compatibilité
 
 Les URLs publiques ne sont pas renommées. Les routes restent dans le routeur legacy temporaire avec le commentaire: `Legacy route kept for compatibility during Diapay restructuring.`
+
+## Itération 2 — normalisation checkout, payments et refunds
+
+Les endpoints publics checkout, payments et refunds restent inchangés sous `/api/v1`. Leur implémentation est maintenant branchée sur des modules internes dédiés avec repositories adaptant encore le store legacy en mémoire.
+
+### Statuts paiement officiels
+
+`created`, `pending`, `processing`, `requires_action`, `paid`, `failed`, `cancelled`, `expired`, `refunded`, `partially_refunded`, `disputed`, `chargeback`.
+
+Les anciens statuts sandbox restent acceptés en compatibilité et sont normalisés en interne: `succeeded` est traité comme `paid`, `open` comme `pending`, et `canceled` comme `cancelled`.
+
+### Refunds
+
+`POST /api/v1/refunds` crée une ressource refund liée à un paiement payé. Un remboursement partiel passe le paiement en `partially_refunded`; un remboursement total passe le paiement en `refunded`. Un refund supérieur au montant payé, un refund sur paiement inexistant, ou un refund sur paiement non payé retourne une enveloppe d'erreur standard.
+
+### Erreurs de validation
+
+Les validations runtime des modules retournent l'enveloppe uniforme:
+
+```json
+{
+  "success": false,
+  "message": "Invalid payment payload",
+  "error": { "code": "VALIDATION_ERROR", "details": {} }
+}
+```

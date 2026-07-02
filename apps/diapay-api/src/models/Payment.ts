@@ -1,4 +1,4 @@
-export type PaymentStatus = 'requires_action' | 'processing' | 'succeeded' | 'failed' | 'cancelled' | 'expired' | 'refunded';
+export type PaymentStatus = 'created' | 'pending' | 'processing' | 'requires_action' | 'succeeded' | 'paid' | 'failed' | 'cancelled' | 'expired' | 'refunded' | 'partially_refunded' | 'disputed' | 'chargeback';
 export type PaymentMethod = 'mobile-money' | 'bank-card' | 'bank-transfer' | 'crypto' | 'mock';
 
 export interface Payment {

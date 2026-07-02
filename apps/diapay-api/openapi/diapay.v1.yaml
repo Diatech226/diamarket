@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Diapay Public API
   version: 1.0.0
-  description: Public /api/v1 contract frozen during Diapay progressive restructuring iteration 1.
+  description: Public /api/v1 contract frozen during Diapay progressive restructuring. Iteration 2 modularizes checkout, payments and refunds internally.
 servers:
   - url: http://localhost:5100
 paths:
@@ -60,6 +60,7 @@ paths:
             schema: { $ref: '#/components/schemas/CreatePayment' }
       responses:
         '201': { $ref: '#/components/responses/Success' }
+        '400': { $ref: '#/components/responses/Error' }
   /api/v1/payments/{id}:
     get:
       summary: Retrieve payment
@@ -71,7 +72,10 @@ paths:
     post:
       summary: Cancel payment
       parameters: [ { $ref: '#/components/parameters/Id' } ]
-      responses: { '200': { $ref: '#/components/responses/Success' } }
+      responses:
+        '200': { $ref: '#/components/responses/Success' }
+        '400': { $ref: '#/components/responses/Error' }
+        '404': { $ref: '#/components/responses/Error' }
   /api/v1/payments/{id}/refund:
     post:
       summary: Legacy refund payment route
@@ -87,6 +91,8 @@ paths:
             schema: { $ref: '#/components/schemas/CreateRefund' }
       responses:
         '201': { $ref: '#/components/responses/Success' }
+        '400': { $ref: '#/components/responses/Error' }
+        '404': { $ref: '#/components/responses/Error' }
   /api/v1/refunds/{id}:
     get:
       summary: Retrieve refund
@@ -173,6 +179,27 @@ components:
         currency: { type: string }
         successUrl: { type: string }
         cancelUrl: { type: string }
+    PaymentStatus:
+      type: string
+      enum: [created, pending, processing, requires_action, paid, failed, cancelled, expired, refunded, partially_refunded, disputed, chargeback]
+    PaymentAttempt:
+      type: object
+      properties:
+        id: { type: string }
+        paymentId: { type: string }
+        provider: { type: string }
+        method: { type: string }
+        status: { $ref: '#/components/schemas/PaymentStatus' }
+        amount: { type: integer }
+        currency: { type: string }
+        providerReference: { type: string }
+        errorCode: { type: string }
+        errorMessage: { type: string }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    RefundStatus:
+      type: string
+      enum: [created, pending, processing, succeeded, failed, cancelled]
     CreatePayment:
       type: object
       required: [amount, currency]
