@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import { cancelSession, completeSession, createSession, listSessions, publicConfig, retrieveSession } from '../controllers/checkout';
-import { createPayment, getPayment, cancelPayment, refundPayment, listTransactions, listMethods, createWebhook, getBalance, createPayout, listWebhookEventsController, listProviderConfigs } from '../controllers/payments';
+import { createPayment, getPayment, cancelPayment, refundPayment, listTransactions, listMethods, createWebhook, getBalance, createPayout, listWebhookEventsController, listProviderConfigs, createRefundController, getRefundController } from '../controllers/payments';
 import { deleteApiKey, getApiKeys, listAdmins, listApps, listLogs, listMerchants, postAdmin, postApiKey, postApp, postMerchant, rotateKey } from '../controllers/developer-platform';
 import { createMarketplacePayout, createSplitPayment, createVendor, getMarketplaceAnalytics, getMarketplaceLedger, getVendorWallet, listEscrowHolds, listMarketplacePayouts, listMarketplaceTimeline, listMarketplaceWallets, listVendors, refundEscrow, releaseEscrow } from '../controllers/marketplace';
 
 export const apiRouter = Router();
+// Legacy route kept for compatibility during Diapay restructuring.
 apiRouter.get('/config', publicConfig);
 apiRouter.post('/checkout/sessions', createSession);
 apiRouter.get('/checkout/sessions', listSessions);
@@ -15,6 +16,8 @@ apiRouter.post('/payments', createPayment);
 apiRouter.get('/payments/:id', getPayment);
 apiRouter.post('/payments/:id/cancel', cancelPayment);
 apiRouter.post('/payments/:id/refund', refundPayment);
+apiRouter.post('/refunds', createRefundController);
+apiRouter.get('/refunds/:id', getRefundController);
 apiRouter.post('/webhooks', createWebhook);
 apiRouter.get('/webhook-events', listWebhookEventsController);
 apiRouter.get('/transactions', listTransactions);

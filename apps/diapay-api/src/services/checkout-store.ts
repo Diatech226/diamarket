@@ -10,6 +10,7 @@ const payments = new Map<string, Payment>();
 const idempotency = new Map<string, string>();
 const webhookEndpoints = new Map<string, WebhookEndpoint>();
 const webhookEvents: WebhookEvent[] = [];
+const refunds = new Map<string, Record<string, unknown>>();
 const allowedCurrencies = new Set(['XOF', 'USD', 'EUR', 'GHS', 'NGN', 'USDC']);
 
 const defaultMerchant = 'Diapay Sandbox Merchant';
@@ -234,6 +235,33 @@ export async function refundDirectPayment(id: string, payload: Record<string, un
   return payment;
 }
 
+
+export async function createRefund(payload: Record<string, unknown> = {}) {
+  const paymentId = typeof payload.paymentId === 'string' ? payload.paymentId : typeof payload.payment === 'string' ? payload.payment : undefined;
+  if (!paymentId) throw Object.assign(new Error('paymentId is required'), { status: 400 });
+  const payment = await refundDirectPayment(paymentId, payload);
+  const timestamp = now();
+  const refund = {
+    id: id('re_test'),
+    paymentId,
+    amount: typeof payload.amount === 'number' ? payload.amount : payment.amount,
+    currency: payment.currency,
+    status: payment.status === 'refunded' ? 'succeeded' : payment.status,
+    reason: typeof payload.reason === 'string' ? payload.reason : undefined,
+    metadata: typeof payload.metadata === 'object' && payload.metadata !== null ? payload.metadata as Record<string, unknown> : {},
+    createdAt: timestamp,
+    updatedAt: timestamp,
+  };
+  refunds.set(refund.id, refund);
+  return refund;
+}
+
+export function retrieveRefund(id: string) {
+  const refund = refunds.get(id);
+  if (!refund) throw Object.assign(new Error('refund not found'), { status: 404 });
+  return refund;
+}
+
 export function registerWebhookEndpoint(payload: Record<string, unknown>, merchant = defaultMerchant) {
   if (typeof payload.url !== 'string') throw Object.assign(new Error('url is required'), { status: 400 });
   const timestamp = now();
@@ -281,4 +309,4 @@ async function emitWebhook(type: WebhookEventType, merchant: string, data: Recor
   return event;
 }
 
-export const sandboxState = { apiBaseUrl, sessions, payments, webhookEndpoints, webhookEvents, resolveMerchant, listProviders, listPaymentMethods };
+export const sandboxState = { apiBaseUrl, sessions, payments, webhookEndpoints, webhookEvents, refunds, resolveMerchant, listProviders, listPaymentMethods };
