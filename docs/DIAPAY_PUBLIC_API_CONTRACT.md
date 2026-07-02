@@ -110,3 +110,11 @@ The existing `/api/v1` payment, checkout, refund, and webhook contracts remain b
 - If the provider webhook is not configured, the API returns `PROVIDER_WEBHOOK_NOT_CONFIGURED`.
 
 Production must not silently fall back to the mock provider. Real providers remain explicit placeholders until configured by environment and secrets outside source control.
+
+## Iteration 4 — Webhooks, idempotence and event reliability
+
+- Sensitive creation routes now support `Idempotency-Key`: `POST /checkout/sessions`, `POST /payments`, `POST /refunds`, and `POST /payments/:id/cancel`.
+- Merchant webhook endpoints are available under `/api/v1/webhook-endpoints` with list, create, retrieve, patch, and delete operations. Secrets are returned only on creation.
+- Provider inbound webhooks are stabilized at `POST /api/v1/webhooks/providers/:provider` with unknown-provider and duplicate-event envelopes.
+- Webhook event and delivery audit logs are exposed through `/api/v1/webhook-events` and `/api/v1/webhook-deliveries`.
+- Diapay webhook signatures use `DiaPay-Signature: t=<timestamp>,v1=<hmac_sha256>` over `timestamp + "." + rawBody` with a default 5 minute anti-replay window.

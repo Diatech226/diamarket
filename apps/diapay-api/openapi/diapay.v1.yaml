@@ -251,3 +251,35 @@ components:
       responses:
         '200':
           description: Normalized provider event
+  /webhook-endpoints:
+    get:
+      summary: List merchant webhook endpoints
+      responses:
+        '200': { description: Webhook endpoints }
+    post:
+      summary: Create merchant webhook endpoint
+      responses:
+        '201': { description: Webhook endpoint with one-time secret }
+  /webhook-endpoints/{id}:
+    get:
+      summary: Retrieve webhook endpoint
+      responses:
+        '200': { description: Webhook endpoint without secret }
+    patch:
+      summary: Update webhook endpoint
+      responses:
+        '200': { description: Updated webhook endpoint }
+    delete:
+      summary: Delete webhook endpoint
+      responses:
+        '200': { description: Deleted webhook endpoint }
+  /webhook-events:
+    get:
+      summary: List sanitized webhook event audit log
+      responses:
+        '200': { description: Webhook events }
+  /webhook-deliveries:
+    get:
+      summary: List webhook delivery attempts
+      responses:
+        '200': { description: Webhook deliveries }

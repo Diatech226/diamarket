@@ -79,9 +79,9 @@ export type RefundCreateParams = { paymentId: string; amount?: number; reason?: 
 export type Refund = { id: string; paymentId: string; amount: number; currency: string; status: RefundStatus; reason?: string; metadata?: Metadata; createdAt: string };
 export type PayoutCreateParams = { amount: number; currency: string; destination: string; metadata?: Metadata };
 export type Payout = PayoutCreateParams & { id: string; status: PayoutStatus; arrivalDate?: string; createdAt?: string };
-export type WebhookEndpointCreateParams = { url: string; events?: WebhookEventType[]; description?: string };
-export type WebhookEndpoint = WebhookEndpointCreateParams & { id: string; secret: string; status: 'active' | 'disabled'; createdAt: string; updatedAt: string };
-export type DiapayWebhookEvent<T = Record<string, unknown>> = { id: string; type: WebhookEventType | string; data: T; created: string };
+export type WebhookEndpointCreateParams = { url: string; events?: (WebhookEventType | string)[]; description?: string; applicationId?: string };
+export type WebhookEndpoint = WebhookEndpointCreateParams & { id: string; secret?: string; enabled?: boolean; status?: 'active' | 'disabled'; createdAt: string; updatedAt: string };
+export type DiapayWebhookEvent<T = Record<string, unknown>> = { id: string; type: WebhookEventType | string; data: T; created?: string; createdAt?: string; livemode?: boolean; merchantId?: string; applicationId?: string };
 
 export type MarketplaceCurrency = 'FCFA' | 'XOF' | 'USD' | 'EUR' | 'USDT';
 export type MarketplaceSplitRule = { id?: string; vendorId?: string; walletId?: string; type: 'fixed' | 'percentage' | 'fallback'; amount?: number; percentage?: number; priority?: number; category?: string; description?: string };
@@ -205,10 +205,13 @@ export class Diapay {
 
   webhooks = {
     endpoints: {
-      create: (payload: WebhookEndpointCreateParams, options?: RequestOptions) => { assertUrl(payload.url, 'url'); return this.request<WebhookEndpoint>('/webhooks', { ...options, method: 'POST', body: JSON.stringify(payload) }); },
-      list: (options?: RequestOptions) => this.request<WebhookEndpoint[]>('/webhooks', options),
+      create: (payload: WebhookEndpointCreateParams, options?: RequestOptions) => this.createWebhookEndpoint(payload, options),
+      list: (options?: RequestOptions) => this.listWebhookEndpoints(options),
+      delete: (id: string, options?: RequestOptions) => this.deleteWebhookEndpoint(id, options),
     },
-    verify: (rawBody: string, signature: string, secret: string) => Diapay.verifyWebhookSignature(rawBody, signature, secret),
+    events: { list: (options?: RequestOptions) => this.listWebhookEvents(options) },
+    verify: (rawBody: string, signature: string, secret: string) => verifyWebhookSignature(rawBody, signature, secret),
+    constructEvent: (rawBody: string, signature: string, secret: string) => constructWebhookEvent(rawBody, signature, secret),
   };
 
   private headers(options: RequestOptions = {}) {
@@ -293,17 +296,25 @@ export class Diapay {
   async listProviders(options?: RequestOptions) { return this.request<ProviderDescriptor[]>('/providers', options); }
   async getProviderCapabilities(provider: string, options?: RequestOptions) { return this.request<ProviderDescriptor>(`/providers/${provider}/capabilities`, options); }
   async simulateProviderScenario(payload: { scenario: string; amount?: number; currency?: string }, options?: RequestOptions) { return this.request<unknown>('/providers/simulate', { ...options, method: 'POST', body: JSON.stringify(payload) }); }
+  async listWebhookEndpoints(options?: RequestOptions) { return this.request<WebhookEndpoint[]>('/webhook-endpoints', options); }
+  async createWebhookEndpoint(payload: WebhookEndpointCreateParams, options?: RequestOptions) { assertUrl(payload.url, 'url'); return this.request<WebhookEndpoint>('/webhook-endpoints', { ...options, method: 'POST', body: JSON.stringify(payload) }); }
+  async deleteWebhookEndpoint(id: string, options?: RequestOptions) { return this.request<{ deleted: boolean; id: string }>(`/webhook-endpoints/${id}`, { ...options, method: 'DELETE' }); }
+  async listWebhookEvents(options?: RequestOptions) { return this.request<DiapayWebhookEvent[]>('/webhook-events', options); }
   async getPayment(id: string, options?: RequestOptions) { return this.retrievePayment(id, options); }
 
   static verifyWebhookSignature(rawBody: string, signature: string, secret: string) {
     if (!rawBody || !signature || !secret) return false;
-    const normalized = signature.includes('=') ? signature.split('=').pop() ?? signature : signature;
-    const expected = crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
+    const parts = signature.includes(',') ? Object.fromEntries(signature.split(',').map((part)=>part.split('='))) : {};
+    const timestamp = parts.t;
+    const normalized = parts.v1 ?? (signature.includes('=') ? signature.split('=').pop() ?? signature : signature);
+    const signed = timestamp ? `${timestamp}.${rawBody}` : rawBody;
+    const expected = crypto.createHmac('sha256', secret).update(signed).digest('hex');
     const left = Buffer.from(normalized);
     const right = Buffer.from(expected);
     return left.length === right.length && crypto.timingSafeEqual(left, right);
   }
 
+  static constructWebhookEvent<T = Record<string, unknown>>(rawBody: string, signatureHeader: string, secret: string): DiapayWebhookEvent<T> { return constructWebhookEvent(rawBody, signatureHeader, secret); }
   verifyWebhook(rawBody: string, signature: string, secret: string) { return Diapay.verifyWebhookSignature(rawBody, signature, secret); }
 }
 
@@ -337,4 +348,9 @@ export function verifyWebhookSignature(rawBody: string, signatureHeader: string,
   if (!timestamp || !signature || Math.abs(Date.now() / 1000 - timestamp) > toleranceSeconds) return false;
   const signedPayload = `${timestamp}.${rawBody}`;
   return Diapay.verifyWebhookSignature(signedPayload, signature, secret);
+}
+
+export function constructWebhookEvent<T = Record<string, unknown>>(rawBody: string, signatureHeader: string, secret: string): DiapayWebhookEvent<T> {
+  if (!verifyWebhookSignature(rawBody, signatureHeader, secret)) throw new DiapayError('Invalid webhook signature', 400, 'INVALID_WEBHOOK_SIGNATURE');
+  return JSON.parse(rawBody) as DiapayWebhookEvent<T>;
 }

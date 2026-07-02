@@ -3,7 +3,7 @@ import { checkoutRouter } from '../modules/checkout/checkout.routes';
 import { paymentRouter } from '../modules/payments/payment.routes';
 import { refundRouter } from '../modules/refunds/refund.routes';
 import { providerRouter } from '../modules/providers/provider.routes';
-import { providerWebhookRouter } from '../modules/providers/provider-webhook.routes';
+import { webhookRouter } from '../modules/webhooks/webhook.routes';
 import { cancelSession, completeSession, createSession, listSessions, publicConfig, retrieveSession } from '../controllers/checkout';
 import { createPayment, getPayment, cancelPayment, refundPayment, listTransactions, listMethods, createWebhook, getBalance, createPayout, listWebhookEventsController, listProviderConfigs, createRefundController, getRefundController } from '../controllers/payments';
 import { deleteApiKey, getApiKeys, listAdmins, listApps, listLogs, listMerchants, postAdmin, postApiKey, postApp, postMerchant, rotateKey } from '../controllers/developer-platform';
@@ -15,7 +15,7 @@ apiRouter.use('/checkout', checkoutRouter);
 apiRouter.use('/payments', paymentRouter);
 apiRouter.use('/refunds', refundRouter);
 apiRouter.use('/providers', providerRouter);
-apiRouter.use('/webhooks/providers', providerWebhookRouter);
+apiRouter.use('/', webhookRouter);
 
 // Legacy route kept for compatibility during Diapay restructuring.
 apiRouter.get('/config', publicConfig);
