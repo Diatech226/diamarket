@@ -359,3 +359,52 @@ components:
       summary: Create an API key and return the secret once
       responses:
         '201': { description: API key created with one-time secret }
+
+  /reports/overview:
+    get:
+      summary: Merchant reporting overview
+      parameters:
+        - in: query
+          name: environment
+          schema: { type: string, enum: [test, live] }
+        - in: query
+          name: currency
+          schema: { type: string }
+        - in: query
+          name: from
+          schema: { type: string, format: date-time }
+        - in: query
+          name: to
+          schema: { type: string, format: date-time }
+      responses:
+        '200': { description: Reporting overview }
+  /reports/revenue:
+    get:
+      summary: Merchant revenue report
+      responses:
+        '200': { description: Revenue report }
+  /reports/payments:
+    get:
+      summary: Merchant payments report
+      responses:
+        '200': { description: Paginated payments report }
+  /reports/providers:
+    get:
+      summary: Provider reporting
+      responses:
+        '200': { description: Provider report }
+  /reports/webhooks:
+    get:
+      summary: Webhook reporting
+      responses:
+        '200': { description: Webhook report }
+  /reports/export/payments.csv:
+    get:
+      summary: Export payments CSV without secrets
+      responses:
+        '200': { description: Payments CSV, content: { text/csv: {} } }
+  /reports/export/ledger.csv:
+    get:
+      summary: Export ledger CSV without secrets
+      responses:
+        '200': { description: Ledger CSV, content: { text/csv: {} } }

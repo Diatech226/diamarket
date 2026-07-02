@@ -92,6 +92,9 @@ export type ApiKey = { id: string; merchantId: string; applicationId: string; na
 export type ApiKeyCreateParams = { merchantId?: string; applicationId?: string; name?: string; type?: 'public' | 'secret' | 'restricted'; environment?: 'test' | 'live'; scopes?: string[] };
 export type ApiKeyCreateResponse = ApiKey & { secret: string };
 
+export type ReportFilters = { environment?: 'test' | 'live'; merchantId?: string; applicationId?: string; currency?: string; from?: string; to?: string; startDate?: string; endDate?: string; page?: number; limit?: number };
+export type ReportOverview = { source: string; totalRevenue: number; successfulPayments: number; failedPayments: number; refundAmount: number; webhookFailures: number; apiErrors: number; payments: number };
+
 export type BalanceSummary = { source: string; productionReady: boolean; merchantPendingBalance: number; merchantAvailableBalance: number; platformFees: number; providerClearingBalance: number; refundLiabilities: number };
 
 export type MarketplaceCurrency = 'FCFA' | 'XOF' | 'USD' | 'EUR' | 'USDT';
@@ -221,6 +224,8 @@ export class Diapay {
   applications = { list: (options?: RequestOptions) => this.listApplications(options), create: (payload: Partial<Application>, options?: RequestOptions) => this.createApplication(payload, options), update: (id: string, payload: Partial<Application>, options?: RequestOptions) => this.updateApplication(id, payload, options) };
   merchantAdmins = { list: (options?: RequestOptions) => this.listMerchantAdmins(options) };
 
+  reports = { overview: (filters?: ReportFilters, options?: RequestOptions) => this.getReportOverview(filters, options), revenue: (filters?: ReportFilters, options?: RequestOptions) => this.getRevenueReport(filters, options), payments: (filters?: ReportFilters, options?: RequestOptions) => this.listPaymentsReport(filters, options), providers: (filters?: ReportFilters, options?: RequestOptions) => this.getProvidersReport(filters, options), webhooks: (filters?: ReportFilters, options?: RequestOptions) => this.getWebhooksReport(filters, options) };
+
   webhooks = {
     endpoints: {
       create: (payload: WebhookEndpointCreateParams, options?: RequestOptions) => this.createWebhookEndpoint(payload, options),
@@ -253,7 +258,9 @@ export class Diapay {
         const response = await fetch(`${this.baseUrl}/api/v1${path}`, { ...options, headers: this.headers(options), signal: controller.signal });
         const requestId = response.headers.get('x-request-id') ?? undefined;
         const text = await response.text();
-        const data = text ? JSON.parse(text) : null;
+        const contentType = response.headers.get('content-type') ?? '';
+        const wantsCsv = String(options.headers instanceof Headers ? options.headers.get('Accept') : (options.headers as Record<string, string> | undefined)?.Accept ?? '').includes('text/csv');
+        const data = contentType.includes('text/csv') || wantsCsv ? text : (text ? JSON.parse(text) : null);
         if (!response.ok) {
           const message = data?.error?.message ?? data?.message ?? `Diapay API error ${response.status}`;
           const error = new DiapayError(message, response.status, data?.error?.code ?? data?.code, requestId, data);
@@ -327,6 +334,24 @@ export class Diapay {
   async updateApplication(id: string, payload: Partial<Application>, options?: RequestOptions) { return this.request<Application>(`/applications/${id}`, { ...options, method: 'PATCH', body: JSON.stringify(payload) }); }
   async listMerchantAdmins(options?: RequestOptions) { return this.request<MerchantAdmin[]>('/merchant-admins', options); }
   async getCurrentMerchant(options?: RequestOptions) { const merchants = await this.request<Merchant[]>('/merchants', options); return merchants[0]; }
+
+  private query(filters: ReportFilters = {}) {
+    const params = new URLSearchParams();
+    for (const [key, value] of Object.entries(filters)) if (value !== undefined) params.set(key, String(value));
+    const qs = params.toString();
+    return qs ? `?${qs}` : '';
+  }
+
+  async getReportOverview(filters?: ReportFilters, options?: RequestOptions) { return this.request<{ success: boolean; data: ReportOverview }>(`/reports/overview${this.query(filters)}`, options); }
+  async getRevenueReport(filters?: ReportFilters, options?: RequestOptions) { return this.request<{ success: boolean; data: unknown }>(`/reports/revenue${this.query(filters)}`, options); }
+  async listPaymentsReport(filters?: ReportFilters, options?: RequestOptions) { return this.request<{ success: boolean; data: unknown }>(`/reports/payments${this.query(filters)}`, options); }
+  async getProvidersReport(filters?: ReportFilters, options?: RequestOptions) { return this.request<{ success: boolean; data: unknown }>(`/reports/providers${this.query(filters)}`, options); }
+  async getWebhooksReport(filters?: ReportFilters, options?: RequestOptions) { return this.request<{ success: boolean; data: unknown }>(`/reports/webhooks${this.query(filters)}`, options); }
+  async exportPaymentsCsv(filters?: ReportFilters, options?: RequestOptions) { return this.request<string>(`/reports/export/payments.csv${this.query(filters)}`, { ...options, headers: { Accept: 'text/csv', ...(options?.headers ?? {}) } }); }
+  async exportLedgerCsv(filters?: ReportFilters, options?: RequestOptions) { return this.request<string>(`/reports/export/ledger.csv${this.query(filters)}`, { ...options, headers: { Accept: 'text/csv', ...(options?.headers ?? {}) } }); }
+  async listEvents(options?: RequestOptions) { return this.listWebhookEvents(options); }
+  async listLogs(options?: RequestOptions) { return this.request<unknown[]>('/logs', options); }
+
   async listWebhookEndpoints(options?: RequestOptions) { return this.request<WebhookEndpoint[]>('/webhook-endpoints', options); }
   async createWebhookEndpoint(payload: WebhookEndpointCreateParams, options?: RequestOptions) { assertUrl(payload.url, 'url'); return this.request<WebhookEndpoint>('/webhook-endpoints', { ...options, method: 'POST', body: JSON.stringify(payload) }); }
   async deleteWebhookEndpoint(id: string, options?: RequestOptions) { return this.request<{ deleted: boolean; id: string }>(`/webhook-endpoints/${id}`, { ...options, method: 'DELETE' }); }

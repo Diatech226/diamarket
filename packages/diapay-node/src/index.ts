@@ -118,3 +118,12 @@ export function createApplication(payload: Parameters<Diapay['createApplication'
 export function updateApplication(id: string, payload: Parameters<Diapay['updateApplication']>[1], options?: DiapayOptions & RequestOptions) { return client(options).updateApplication(id, payload, options); }
 export function listMerchantAdmins(options?: DiapayOptions & RequestOptions) { return client(options).listMerchantAdmins(options); }
 export function getCurrentMerchant(options?: DiapayOptions & RequestOptions) { return client(options).getCurrentMerchant(options); }
+
+
+export function getReportOverview(filters?: Parameters<Diapay['getReportOverview']>[0], options?: DiapayOptions & RequestOptions) { return client(options).getReportOverview(filters, options); }
+export function getRevenueReport(filters?: Parameters<Diapay['getRevenueReport']>[0], options?: DiapayOptions & RequestOptions) { return client(options).getRevenueReport(filters, options); }
+export function listPaymentsReport(filters?: Parameters<Diapay['listPaymentsReport']>[0], options?: DiapayOptions & RequestOptions) { return client(options).listPaymentsReport(filters, options); }
+export function exportPaymentsCsv(filters?: Parameters<Diapay['exportPaymentsCsv']>[0], options?: DiapayOptions & RequestOptions) { return client(options).exportPaymentsCsv(filters, options); }
+export function exportLedgerCsv(filters?: Parameters<Diapay['exportLedgerCsv']>[0], options?: DiapayOptions & RequestOptions) { return client(options).exportLedgerCsv(filters, options); }
+export function listEvents(options?: DiapayOptions & RequestOptions) { return client(options).listEvents(options); }
+export function listLogs(options?: DiapayOptions & RequestOptions) { return client(options).listLogs(options); }
