@@ -104,3 +104,9 @@ export function expressWebhookMiddleware() {
     req.on?.('end', () => { req.rawBody = data; try { req.body = data ? JSON.parse(data) : {}; } catch { req.body = {}; } next(); });
   };
 }
+
+export function listWallets(options?: DiapayOptions & RequestOptions) { return client(options).listWallets(options); }
+export function getWallet(id: string, options?: DiapayOptions & RequestOptions) { return client(options).getWallet(id, options); }
+export function listLedgerTransactions(options?: DiapayOptions & RequestOptions) { return client(options).listLedgerTransactions(options); }
+export function getLedgerTransaction(id: string, options?: DiapayOptions & RequestOptions) { return client(options).getLedgerTransaction(id, options); }
+export function getBalances(options?: DiapayOptions & RequestOptions) { return client(options).getBalances(options); }

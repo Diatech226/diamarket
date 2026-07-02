@@ -1,0 +1,10 @@
+export type LedgerOwnerType = 'platform' | 'merchant' | 'customer' | 'vendor' | 'provider' | 'system';
+export type LedgerAccountType = 'platform_cash' | 'platform_revenue' | 'platform_fees' | 'merchant_pending' | 'merchant_available' | 'merchant_reserved' | 'merchant_refunds' | 'provider_clearing' | 'customer_cash' | 'escrow' | 'chargebacks' | 'adjustments';
+export type LedgerEntryDirection = 'debit' | 'credit';
+export type LedgerTransactionType = 'payment_capture' | 'payment_fee' | 'refund' | 'refund_fee_reversal' | 'payout_reserve' | 'payout_release' | 'adjustment' | 'chargeback' | 'settlement';
+export type LedgerReferenceType = 'payment' | 'refund' | 'payout' | 'adjustment' | 'chargeback' | 'settlement';
+export type LedgerTransactionStatus = 'pending' | 'posted' | 'voided' | 'reversed' | 'failed';
+export type LedgerAccount = { id: string; ownerType: LedgerOwnerType; ownerId: string; currency: string; accountType: LedgerAccountType; balance: number; createdAt: string; updatedAt: string };
+export type LedgerEntry = { id: string; transactionId: string; accountId: string; direction: LedgerEntryDirection; amount: number; currency: string; posted: boolean; createdAt: string; metadata?: Record<string, string | number | boolean | null> };
+export type LedgerTransaction = { id: string; type: LedgerTransactionType; referenceType: LedgerReferenceType; referenceId: string; currency: string; amount: number; status: LedgerTransactionStatus; entries: LedgerEntry[]; metadata?: Record<string, string | number | boolean | null>; createdAt: string; postedAt?: string; reversedTransactionId?: string };
+export type CreateLedgerEntryInput = { ownerType: LedgerOwnerType; ownerId: string; accountType: LedgerAccountType; direction: LedgerEntryDirection; amount: number };

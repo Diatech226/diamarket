@@ -4,6 +4,9 @@ import { paymentRouter } from '../modules/payments/payment.routes';
 import { refundRouter } from '../modules/refunds/refund.routes';
 import { providerRouter } from '../modules/providers/provider.routes';
 import { webhookRouter } from '../modules/webhooks/webhook.routes';
+import { ledgerRouter } from '../modules/ledger/ledger.routes';
+import { walletRouter } from '../modules/wallets/wallet.routes';
+import { balanceRouter } from '../modules/balances/balance.routes';
 import { cancelSession, completeSession, createSession, listSessions, publicConfig, retrieveSession } from '../controllers/checkout';
 import { createPayment, getPayment, cancelPayment, refundPayment, listTransactions, listMethods, createWebhook, getBalance, createPayout, listWebhookEventsController, listProviderConfigs, createRefundController, getRefundController } from '../controllers/payments';
 import { deleteApiKey, getApiKeys, listAdmins, listApps, listLogs, listMerchants, postAdmin, postApiKey, postApp, postMerchant, rotateKey } from '../controllers/developer-platform';
@@ -16,6 +19,9 @@ apiRouter.use('/payments', paymentRouter);
 apiRouter.use('/refunds', refundRouter);
 apiRouter.use('/providers', providerRouter);
 apiRouter.use('/', webhookRouter);
+apiRouter.use('/ledger', ledgerRouter);
+apiRouter.use('/wallets', walletRouter);
+apiRouter.use('/balances', balanceRouter);
 
 // Legacy route kept for compatibility during Diapay restructuring.
 apiRouter.get('/config', publicConfig);

@@ -82,6 +82,9 @@ export type Payout = PayoutCreateParams & { id: string; status: PayoutStatus; ar
 export type WebhookEndpointCreateParams = { url: string; events?: (WebhookEventType | string)[]; description?: string; applicationId?: string };
 export type WebhookEndpoint = WebhookEndpointCreateParams & { id: string; secret?: string; enabled?: boolean; status?: 'active' | 'disabled'; createdAt: string; updatedAt: string };
 export type DiapayWebhookEvent<T = Record<string, unknown>> = { id: string; type: WebhookEventType | string; data: T; created?: string; createdAt?: string; livemode?: boolean; merchantId?: string; applicationId?: string };
+export type Wallet = { id: string; ownerType: string; ownerId: string; currency: string; availableBalance: number; pendingBalance: number; reservedBalance: number; source?: string };
+export type LedgerTransaction = { id: string; type: string; referenceType: string; referenceId: string; currency: string; amount: number; status: string; entries: Array<{ id: string; accountId: string; direction: 'debit' | 'credit'; amount: number; currency: string; posted: boolean }>; createdAt: string; postedAt?: string };
+export type BalanceSummary = { source: string; productionReady: boolean; merchantPendingBalance: number; merchantAvailableBalance: number; platformFees: number; providerClearingBalance: number; refundLiabilities: number };
 
 export type MarketplaceCurrency = 'FCFA' | 'XOF' | 'USD' | 'EUR' | 'USDT';
 export type MarketplaceSplitRule = { id?: string; vendorId?: string; walletId?: string; type: 'fixed' | 'percentage' | 'fallback'; amount?: number; percentage?: number; priority?: number; category?: string; description?: string };
@@ -203,6 +206,9 @@ export class Diapay {
     analytics: (options?: RequestOptions) => this.request<Record<string, unknown>>('/marketplace/analytics', options),
   };
 
+  wallets = { list: (options?: RequestOptions) => this.listWallets(options), retrieve: (id: string, options?: RequestOptions) => this.getWallet(id, options) };
+  ledger = { transactions: { list: (options?: RequestOptions) => this.listLedgerTransactions(options), retrieve: (id: string, options?: RequestOptions) => this.getLedgerTransaction(id, options) } };
+
   webhooks = {
     endpoints: {
       create: (payload: WebhookEndpointCreateParams, options?: RequestOptions) => this.createWebhookEndpoint(payload, options),
@@ -296,6 +302,11 @@ export class Diapay {
   async listProviders(options?: RequestOptions) { return this.request<ProviderDescriptor[]>('/providers', options); }
   async getProviderCapabilities(provider: string, options?: RequestOptions) { return this.request<ProviderDescriptor>(`/providers/${provider}/capabilities`, options); }
   async simulateProviderScenario(payload: { scenario: string; amount?: number; currency?: string }, options?: RequestOptions) { return this.request<unknown>('/providers/simulate', { ...options, method: 'POST', body: JSON.stringify(payload) }); }
+  async listWallets(options?: RequestOptions) { return this.request<Wallet[]>('/wallets', options); }
+  async getWallet(id: string, options?: RequestOptions) { return this.request<Wallet>(`/wallets/${id}`, options); }
+  async listLedgerTransactions(options?: RequestOptions) { return this.request<LedgerTransaction[]>('/ledger/transactions', options); }
+  async getLedgerTransaction(id: string, options?: RequestOptions) { return this.request<LedgerTransaction>(`/ledger/transactions/${id}`, options); }
+  async getBalances(options?: RequestOptions) { return this.request<BalanceSummary>('/balances', options); }
   async listWebhookEndpoints(options?: RequestOptions) { return this.request<WebhookEndpoint[]>('/webhook-endpoints', options); }
   async createWebhookEndpoint(payload: WebhookEndpointCreateParams, options?: RequestOptions) { assertUrl(payload.url, 'url'); return this.request<WebhookEndpoint>('/webhook-endpoints', { ...options, method: 'POST', body: JSON.stringify(payload) }); }
   async deleteWebhookEndpoint(id: string, options?: RequestOptions) { return this.request<{ deleted: boolean; id: string }>(`/webhook-endpoints/${id}`, { ...options, method: 'DELETE' }); }
@@ -336,6 +347,12 @@ export function getPayment(client: Diapay, id: string, options?: RequestOptions)
 export function refundPayment(client: Diapay, id: string, payload: Omit<RefundCreateParams, 'paymentId'> = {}, options?: RequestOptions) {
   return client.refundPayment(id, payload, options);
 }
+
+export function listWallets(client: Diapay, options?: RequestOptions) { return client.listWallets(options); }
+export function getWallet(client: Diapay, id: string, options?: RequestOptions) { return client.getWallet(id, options); }
+export function listLedgerTransactions(client: Diapay, options?: RequestOptions) { return client.listLedgerTransactions(options); }
+export function getLedgerTransaction(client: Diapay, id: string, options?: RequestOptions) { return client.getLedgerTransaction(id, options); }
+export function getBalances(client: Diapay, options?: RequestOptions) { return client.getBalances(options); }
 
 export function verifyWebhookSignature(rawBody: string, signatureHeader: string, secret: string, toleranceSeconds = 300) {
   if (!signatureHeader.includes(',')) return Diapay.verifyWebhookSignature(rawBody, signatureHeader, secret);

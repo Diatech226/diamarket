@@ -5,6 +5,7 @@ import { validationError } from '../payments/payment.validation';
 import { legacyRefundRepository } from './refund.repository';
 import { validateRefundCreate } from './refund.validation';
 import type { Refund } from './refund.types';
+import { postRefundToLedger } from '../ledger/ledger.service';
 function id(prefix: string) { return `${prefix}_${crypto.randomBytes(12).toString('hex')}`; }
 function now() { return new Date().toISOString(); }
 export function createRefund(payload: unknown) {
@@ -18,6 +19,7 @@ export function createRefund(payload: unknown) {
   const timestamp = now();
   const refund: Refund = { id: id('re_test'), paymentId: payment.id, amount, currency: payment.currency, status: 'succeeded', reason: body.reason, metadata: body.metadata ?? {}, createdAt: timestamp, updatedAt: timestamp };
   legacyRefundRepository.create(refund);
+  postRefundToLedger(refund, payment);
   payment.status = previousRefunded + amount === payment.amount ? 'refunded' : 'partially_refunded';
   payment.updatedAt = timestamp;
   sandboxState.payments.set(payment.id, payment);

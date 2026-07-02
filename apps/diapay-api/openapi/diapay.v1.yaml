@@ -283,3 +283,43 @@ components:
       summary: List webhook delivery attempts
       responses:
         '200': { description: Webhook deliveries }
+  /wallets:
+    get:
+      summary: List merchant-scoped wallet views backed by the in-memory ledger
+      responses:
+        '200': { description: Wallet list }
+  /wallets/{id}:
+    get:
+      summary: Retrieve a wallet view
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Wallet }
+  /ledger/accounts:
+    get:
+      summary: List ledger accounts
+      responses:
+        '200': { description: Ledger accounts }
+  /ledger/transactions:
+    get:
+      summary: List double-entry ledger transactions
+      responses:
+        '200': { description: Ledger transactions }
+  /ledger/transactions/{id}:
+    get:
+      summary: Retrieve a ledger transaction
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Ledger transaction }
+  /balances:
+    get:
+      summary: Read in-memory balance summary from the ledger
+      responses:
+        '200': { description: Balance summary }
