@@ -68,7 +68,7 @@ export default function DeveloperPortal() {
       <article id="payouts"><h2>Payouts</h2><p>Move available balance to bank or mobile money destinations and track <code>pending</code>, <code>processing</code>, <code>completed</code> and <code>failed</code>.</p></article>
       <article id="mobile-money"><h2>Mobile Money</h2><p>Sandbox phone <code>70000000</code> succeeds, <code>70000001</code> fails, and forced statuses cover pending and expired flows.</p></article>
       <article id="crypto"><h2>Crypto</h2><p>Crypto sandbox simulates USDC wallet collection without moving real assets.</p></article>
-      <article id="webhooks"><h2>Webhooks</h2><p>Listen to <code>payment.succeeded</code>, <code>payment.failed</code>, <code>checkout.completed</code>, <code>refund.succeeded</code> and <code>payout.completed</code>. Verify <code>Diapay-Signature</code> with your <code>whsec_</code> secret.</p><CodeBlock code={`const valid = diapay.webhooks.verify(rawBody, signature, process.env.DIAPAY_WEBHOOK_SECRET!);`} /></article>
+      <article id="webhooks"><h2>Webhooks and idempotency</h2><p>Use <code>Idempotency-Key</code> on checkout sessions, payments, refunds and payment cancellation. Merchant webhooks are signed with <code>DiaPay-Signature: t=timestamp,v1=hmac_sha256(timestamp + '.' + rawBody)</code> and reject stale timestamps.</p><CodeBlock code={`const event = diapay.webhooks.constructEvent(rawBody, signature, process.env.DIAPAY_WEBHOOK_SECRET!);`} /></article>
       <article id="sdk-js"><h2>SDK JavaScript</h2><p>The JS SDK exposes <code>checkout</code>, <code>payments</code>, <code>refunds</code>, <code>payouts</code>, <code>customers</code> and <code>webhooks</code> modules with retries, typed errors and payload validation.</p></article>
       <article id="sdk-node"><h2>SDK Node.js</h2><p>The Node package provides helpers: <code>createPayment()</code>, <code>retrievePayment()</code>, <code>createCheckoutSession()</code>, <code>refundPayment()</code> and <code>verifyWebhook()</code>.</p></article>
       <article id="sandbox"><h2>Sandbox</h2><p>Use scenarios <code>success</code>, <code>failed</code>, <code>pending</code>, <code>expired</code>, split multi-vendeurs, escrow release, payout automatique and vendor refund testing.</p></article>
@@ -79,3 +79,4 @@ export default function DeveloperPortal() {
     </section>
   <section><h2>Provider Adapter Architecture</h2><p>Diapay now exposes provider discovery, explicit mock scenarios, and provider webhook parsing endpoints while preserving /api/v1 compatibility.</p><ul><li>GET /api/v1/providers</li><li>GET /api/v1/providers/:provider/capabilities</li><li>POST /api/v1/providers/simulate</li><li>POST /api/v1/webhooks/providers/:provider</li></ul></section></main>;
 }
+

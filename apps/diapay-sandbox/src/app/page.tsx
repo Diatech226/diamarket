@@ -75,8 +75,10 @@ export default function Home() {
   -H 'Content-Type: application/json' \
   -d '{'{'}"url":"http://localhost:3102/api/sandbox-webhook","events":["payment.succeeded","payment.failed","checkout.completed","refund.succeeded","payout.completed"]{'}'}'</pre>
         </section>
+        <section className="card"><h2>Webhook reliability scenarios</h2><p className="muted">Scénarios: provider webhook success, duplicate, failed signature, merchant success, timeout, retry, refund webhook et payment paid webhook. Les résultats affichent event id, signature générée, payload, delivery status, tentatives et résultat final.</p></section>
         <section className="card"><h2>Résultat scénario</h2><pre style={{ whiteSpace: 'pre-wrap', background: '#0f172a', color: '#d1fae5', padding: 16, borderRadius: 18 }}>{result || 'Cliquez un scénario pour voir la réponse sandbox.'}</pre></section>
       </div>
     </main>
   );
 }
+

@@ -42,7 +42,7 @@ export function createApp() {
   app.use(requestIdMiddleware);
   app.use(corsMiddleware);
   app.use(securityMiddleware);
-  app.use(express.json());
+  app.use(express.json({ verify: (req, _res, buf) => { (req as Request & { rawBody?: Buffer }).rawBody = Buffer.from(buf); } }));
   app.use(loggerMiddleware);
   app.use(apiResponseEnvelope);
 

@@ -1,0 +1,5 @@
+import type { DiapayEventType, WebhookDeliveryStatus, WebhookEventStatus } from './webhook-status';
+export interface WebhookEndpoint { id: string; merchantId: string; applicationId?: string; url: string; description?: string; enabled: boolean; events: string[]; secret: string; createdAt: string; updatedAt: string; }
+export interface PublicWebhookEndpoint extends Omit<WebhookEndpoint, 'secret'> { secret?: string; }
+export interface WebhookEvent { id: string; type: DiapayEventType | string; source: 'provider'|'internal'|'merchant_test'|'sandbox'; sourceId?: string; merchantId: string; applicationId?: string; provider?: string; providerEventId?: string; payloadSanitized: unknown; status: WebhookEventStatus; processedAt?: string; createdAt: string; livemode: boolean; data?: unknown; }
+export interface WebhookDelivery { id: string; eventId: string; endpointId: string; url: string; status: WebhookDeliveryStatus; attemptCount: number; nextAttemptAt?: string; lastAttemptAt?: string; responseStatus?: number; responseBodySanitized?: string; errorMessage?: string; createdAt: string; updatedAt: string; }

@@ -82,3 +82,25 @@ export function getProviderCapabilities(provider: string, options?: DiapayOption
 export function simulateProviderScenario(payload: { scenario: string; amount?: number; currency?: string }, options?: DiapayOptions & RequestOptions) {
   return client(options).simulateProviderScenario(payload, options);
 }
+
+export function verifyWebhookSignature(rawBody: string, signatureHeader: string, secret: string) {
+  return Diapay.verifyWebhookSignature(rawBody, signatureHeader, secret);
+}
+
+export function constructWebhookEvent(rawBody: string, signatureHeader: string, secret: string) {
+  return Diapay.constructWebhookEvent(rawBody, signatureHeader, secret);
+}
+
+export function listWebhookEndpoints(options?: DiapayOptions & RequestOptions) { return client(options).listWebhookEndpoints(options); }
+export function createWebhookEndpoint(payload: { url: string; events?: string[]; description?: string; applicationId?: string }, options?: DiapayOptions & RequestOptions) { return client(options).createWebhookEndpoint(payload, options); }
+export function deleteWebhookEndpoint(id: string, options?: DiapayOptions & RequestOptions) { return client(options).deleteWebhookEndpoint(id, options); }
+export function listWebhookEvents(options?: DiapayOptions & RequestOptions) { return client(options).listWebhookEvents(options); }
+
+export function expressWebhookMiddleware() {
+  return function diapayRawBody(req: any, _res: any, next: any) {
+    let data = '';
+    req.setEncoding?.('utf8');
+    req.on?.('data', (chunk: string) => { data += chunk; });
+    req.on?.('end', () => { req.rawBody = data; try { req.body = data ? JSON.parse(data) : {}; } catch { req.body = {}; } next(); });
+  };
+}
