@@ -1,11 +1,12 @@
 import { Card, PageHeader } from '../../../components/ui';
 
-const steps = ['Créer compte', 'Créer API Key', 'Tester sandbox', 'Recevoir webhook', 'Passer en production'];
+const steps = ['API key created', 'Checkout tested', 'Webhook configured', 'Webhook signature verified', 'Refund tested', 'Live mode requested'];
+const links = ['Open docs', 'Open sandbox', 'Copy test key', 'Create webhook endpoint', 'Send test webhook', 'View API logs', 'View integration checklist'];
 const events = ['payment.succeeded', 'payment.failed', 'checkout.completed', 'refund.succeeded', 'payout.completed'];
 
 export default function DevelopersPage() {
   return <><PageHeader title="Developers" description="Onboarding, snippets, Webhook Tester et liens vers le portail développeur Diapay." />
-    <div className="grid gap-6 xl:grid-cols-5">{steps.map((step, index) => <Card key={step}><span className="text-xs font-bold text-ocean">Étape {index + 1}</span><h2 className="mt-2 font-semibold">{step}</h2><p className="mt-2 text-sm text-slate-500">{index === 4 ? 'Checklist go-live, clés production et monitoring.' : 'Action guidée pour intégrer Diapay en moins de 10 minutes.'}</p></Card>)}</div>
+    <div className="grid gap-3 md:grid-cols-4">{links.map((link) => <Card key={link}><span className="text-sm font-semibold text-ocean">{link}</span></Card>)}</div><div className="mt-6 grid gap-6 xl:grid-cols-6">{steps.map((step, index) => <Card key={step}><span className="text-xs font-bold text-ocean">Étape {index + 1}</span><h2 className="mt-2 font-semibold">{step}</h2><p className="mt-2 text-sm text-slate-500">{index === 4 ? 'Checklist go-live, clés production et monitoring.' : 'Action guidée pour intégrer Diapay en moins de 10 minutes.'}</p></Card>)}</div>
     <div className="mt-6 grid gap-6 lg:grid-cols-2"><Card><h2 className="mb-4 font-semibold">Créer un paiement</h2><pre className="overflow-x-auto rounded-2xl bg-slate-950 p-4 text-sm text-mint"><code>{`curl -X POST $DIAPAY_API/api/v1/payments \\
   -H "Authorization: Bearer sk_test_***" \\
   -H "Content-Type: application/json" \\

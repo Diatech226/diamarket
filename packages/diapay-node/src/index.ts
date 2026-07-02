@@ -96,7 +96,8 @@ export function createWebhookEndpoint(payload: { url: string; events?: string[];
 export function deleteWebhookEndpoint(id: string, options?: DiapayOptions & RequestOptions) { return client(options).deleteWebhookEndpoint(id, options); }
 export function listWebhookEvents(options?: DiapayOptions & RequestOptions) { return client(options).listWebhookEvents(options); }
 
-export function expressWebhookMiddleware() {
+export function expressWebhookMiddleware(options?: { secret?: string; handler?: (event: any) => void | Promise<void>; signatureHeader?: string }) {
+  if (options?.handler) return expressWebhookMiddlewareHandler(options as WebhookMiddlewareOptions);
   return function diapayRawBody(req: any, _res: any, next: any) {
     let data = '';
     req.setEncoding?.('utf8');
@@ -127,3 +128,43 @@ export function exportPaymentsCsv(filters?: Parameters<Diapay['exportPaymentsCsv
 export function exportLedgerCsv(filters?: Parameters<Diapay['exportLedgerCsv']>[0], options?: DiapayOptions & RequestOptions) { return client(options).exportLedgerCsv(filters, options); }
 export function listEvents(options?: DiapayOptions & RequestOptions) { return client(options).listEvents(options); }
 export function listLogs(options?: DiapayOptions & RequestOptions) { return client(options).listLogs(options); }
+
+export type WebhookMiddlewareOptions = {
+  secret: string | undefined;
+  handler: (event: ReturnType<typeof Diapay.constructWebhookEvent>) => void | Promise<void>;
+  signatureHeader?: string;
+};
+
+export function rawBodyFromRequest(req: any) {
+  if (req.body && typeof req.body.toString === 'function' && req.body.constructor?.name === 'Buffer') return req.body.toString('utf8');
+  if (typeof req.rawBody === 'string') return req.rawBody;
+  if (req.rawBody && typeof req.rawBody.toString === 'function' && req.rawBody.constructor?.name === 'Buffer') return req.rawBody.toString('utf8');
+  if (typeof req.body === 'string') return req.body;
+  return JSON.stringify(req.body ?? {});
+}
+
+export function expressWebhookMiddlewareHandler(options: WebhookMiddlewareOptions) {
+  return async function diapayWebhookHandler(req: any, res: any, next: any) {
+    try {
+      if (!options.secret) throw new Error('DIAPAY_WEBHOOK_SECRET is required');
+      const rawBody = rawBodyFromRequest(req);
+      const signature = req.headers?.[options.signatureHeader ?? 'diapay-signature'] ?? req.headers?.['diapay-signature'];
+      const event = Diapay.constructWebhookEvent(rawBody, Array.isArray(signature) ? signature[0] : String(signature ?? ''), options.secret);
+      await options.handler(event);
+      res.status?.(200).json?.({ received: true });
+    } catch (error) {
+      if (next) return next(error);
+      res.status?.(400).json?.({ error: { code: 'WEBHOOK_SIGNATURE_INVALID', message: 'Invalid Diapay webhook signature' } });
+    }
+  };
+}
+
+export function nextWebhookHandler(options: WebhookMiddlewareOptions) {
+  return async function POST(request: Request) {
+    const rawBody = await request.text();
+    const signature = request.headers.get(options.signatureHeader ?? 'diapay-signature') ?? '';
+    if (!options.secret || !Diapay.verifyWebhookSignature(rawBody, signature, options.secret)) return new Response(JSON.stringify({ error: { code: 'WEBHOOK_SIGNATURE_INVALID' } }), { status: 400 });
+    await options.handler(Diapay.constructWebhookEvent(rawBody, signature, options.secret));
+    return new Response(JSON.stringify({ received: true }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+  };
+}

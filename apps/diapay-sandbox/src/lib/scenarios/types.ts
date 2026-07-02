@@ -1,0 +1,6 @@
+export type ScenarioCategory = 'checkout' | 'payment' | 'mobile-money' | 'refund' | 'webhook' | 'ledger' | 'marketplace';
+export type ScenarioRunResult = { payload: unknown; apiResponse: unknown; paymentId?: string; checkoutSessionId?: string; refundId?: string; providerReference?: string; eventId?: string; webhookSignature?: string; ledgerTransaction?: unknown; logs: string[]; finalStatus: string };
+export type SandboxScenario = { id: string; title: string; description: string; category: ScenarioCategory; payload: unknown; expectedResult: string; run: () => Promise<ScenarioRunResult> };
+export function makeScenario(input: Omit<SandboxScenario, 'run'> & { finalStatus: string; ids?: Partial<ScenarioRunResult> }): SandboxScenario {
+  return { ...input, run: async () => ({ payload: input.payload, apiResponse: { success: true, data: { status: input.finalStatus, sandbox: true, provider: 'mock' } }, providerReference: `mock_${input.id}_ref`, eventId: `evt_${input.id}`, webhookSignature: 't=1793510400,v1=sandbox_hmac_preview', ledgerTransaction: input.category === 'ledger' ? { id: `lt_${input.id}`, balanced: true, entries: [{ direction: 'debit' }, { direction: 'credit' }] } : undefined, logs: [`scenario:${input.id}`, 'no real money moved', 'secrets redacted'], finalStatus: input.finalStatus, ...input.ids }) };
+}

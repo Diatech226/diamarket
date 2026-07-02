@@ -234,6 +234,7 @@ export class Diapay {
     },
     events: { list: (options?: RequestOptions) => this.listWebhookEvents(options) },
     verify: (rawBody: string, signature: string, secret: string) => verifyWebhookSignature(rawBody, signature, secret),
+    verifySignature: (rawBody: string, signature: string, secret: string) => verifyWebhookSignature(rawBody, signature, secret),
     constructEvent: (rawBody: string, signature: string, secret: string) => constructWebhookEvent(rawBody, signature, secret),
   };
 

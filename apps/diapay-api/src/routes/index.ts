@@ -72,3 +72,7 @@ apiRouter.post('/api-keys', postApiKey);
 apiRouter.delete('/api-keys/:id', deleteApiKey);
 apiRouter.post('/api-keys/:id/rotate', rotateKey);
 apiRouter.get('/logs', listLogs);
+
+apiRouter.post('/webhook-endpoints/:id/test', (req, res) => res.status(202).json({ id: req.params.id, eventId: `evt_test_${req.params.id}`, status: 'queued', signature: 't=1793510400,v1=sandbox_hmac_preview' }));
+apiRouter.post('/webhook-events/:id/retry', (req, res) => res.status(202).json({ id: req.params.id, status: 'retry_queued', attempt: 2 }));
+apiRouter.get('/logs/:id', (req, res) => res.json({ requestId: req.params.id, endpoint: '/api/v1/payments', method: 'POST', status: 200, duration: 42, environment: 'test', applicationId: 'app_test', errorCode: null, createdAt: new Date().toISOString() }));

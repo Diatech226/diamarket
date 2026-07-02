@@ -1,0 +1,3 @@
+import { scenarios, type ScenarioCategory } from '../../../lib/scenarios';
+const category: string = 'scenarios';
+export default function Page(){const items=scenarios.filter(s=> category === 'scenarios' || category === 'logs' || s.category === (category as ScenarioCategory));return <main className="shell"><section className="card"><span className="pill">/scenarios</span><h1>scenarios sandbox</h1><p className="muted">Payload, API response, ids, providerReference, eventId, HMAC signature, ledger transaction, logs and final status are displayed by the scenario runner. Values are mock/test only and secrets/OTP are redacted.</p><pre style={{whiteSpace:'pre-wrap'}}>{JSON.stringify(items.map(({run,...s})=>s),null,2)}</pre></section></main>}

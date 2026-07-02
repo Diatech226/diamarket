@@ -1,0 +1,3 @@
+import { makeScenario } from './types';
+export const scenario = makeScenario({ id: 'marketplace-split-placeholder', title: 'Marketplace split placeholder', description: 'Sandbox scenario for Marketplace split placeholder. Mobile Money/provider flows are mock placeholders only.', category: 'marketplace', payload: { amount: 25000, currency: 'XOF', provider: 'mock', scenario: 'marketplace-split-placeholder', phoneNumber: '+2250700000000', operator: 'mock' }, expectedResult: 'placeholder', finalStatus: 'placeholder', ids: { paymentId: 'payment_marketplace-split-placeholder' } });
+export default scenario;

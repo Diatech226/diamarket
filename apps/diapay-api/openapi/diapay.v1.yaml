@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Diapay Public API
   version: 1.0.0
-  description: Public /api/v1 contract frozen during Diapay progressive restructuring. Iteration 2 modularizes checkout, payments and refunds internally.
+  description: Public /api/v1 contract for checkout, payments, refunds, webhooks, webhook endpoints, API keys, applications, wallets, ledger, reports, sanitized logs, errors and idempotency.
 servers:
   - url: http://localhost:5100
 paths:
@@ -132,6 +132,25 @@ paths:
   /api/v1/transactions:
     get:
       summary: List transactions
+      responses: { '200': { $ref: '#/components/responses/Success' } }
+  /api/v1/webhook-endpoints/{id}/test:
+    post:
+      summary: Send signed webhook test event
+      parameters: [ { $ref: '#/components/parameters/Id' } ]
+      responses: { '202': { $ref: '#/components/responses/Success' } }
+  /api/v1/webhook-events/{id}/retry:
+    post:
+      summary: Retry webhook event delivery
+      parameters: [ { $ref: '#/components/parameters/Id' } ]
+      responses: { '202': { $ref: '#/components/responses/Success' } }
+  /api/v1/logs:
+    get:
+      summary: List sanitized developer API logs
+      responses: { '200': { $ref: '#/components/responses/Success' } }
+  /api/v1/logs/{id}:
+    get:
+      summary: Retrieve one sanitized developer API log
+      parameters: [ { $ref: '#/components/parameters/Id' } ]
       responses: { '200': { $ref: '#/components/responses/Success' } }
 components:
   parameters:

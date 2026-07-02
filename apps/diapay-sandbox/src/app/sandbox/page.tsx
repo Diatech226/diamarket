@@ -1,0 +1,3 @@
+import Link from 'next/link';
+const pages = ['checkout','payments','mobile-money','refunds','webhooks','ledger','scenarios','logs'];
+export default function SandboxHome(){return <main className="shell"><section className="card"><span className="pill">Sandbox Diapay</span><h1>Developer test environment</h1><p className="muted">Simulate checkout, payments, Mobile Money OTP/timeouts, refunds, webhooks, ledger impact and sanitized API logs. No real operators or money are connected.</p><div className="scenario-grid">{pages.map(p=><Link className="btn btn-secondary" href={`/sandbox/${p}`} key={p}>{p}</Link>)}<Link className="btn btn-primary" href="/playground">Open playground</Link></div></section></main>}
