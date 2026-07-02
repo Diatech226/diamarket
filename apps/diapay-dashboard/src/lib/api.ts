@@ -34,6 +34,10 @@ export const diapayApi = {
   getCheckoutSession: (id: string) => request<CheckoutSession>(`/checkout/sessions/${id}`),
   listWebhookEvents: () => request<WebhookEvent[]>('/webhook-events'),
   listProviders: () => request<ProviderDescriptor[]>('/providers'),
+  listApiKeys: () => request<ApiKey[]>('/api-keys'),
+  createApiKey: (payload: Partial<ApiKey>) => request<ApiKey>('/api-keys', { method: 'POST', body: JSON.stringify(payload) }),
+  revokeApiKey: (id: string) => request<ApiKey>(`/api-keys/${id}`, { method: 'DELETE' }),
+  listApplications: () => request<unknown[]>('/applications'),
 };
 
 export function maskSecret(secret: string) {
@@ -89,15 +93,15 @@ export const webhookEventsData: WebhookEvent[] = [
 export const transactions: Transaction[] = payments.map((payment, index) => ({ ...payment, fee: Math.round(payment.amount * 0.018), net: Math.round(payment.amount * 0.982), id: `txn_${index + 1420}` }));
 
 export const apiKeys: ApiKey[] = [
-  { id: 'key_1', name: 'Backend production', key: 'sk_live_Km28xYa932jjJwKeQp8812', environment: 'live', role: 'merchant', createdAt: '2026-02-14', lastUsed: 'Il y a 2 min', active: true },
-  { id: 'key_2', name: 'Sandbox checkout', key: 'sk_test_Bb72nPa118zzLwFqEe4421', environment: 'test', role: 'admin', createdAt: '2026-04-08', lastUsed: 'Hier', active: true },
-  { id: 'key_3', name: 'Frontend publishable test', key: 'pk_test_Js81nPa118zzLwFqEe4421', environment: 'test', role: 'merchant', createdAt: '2026-05-20', lastUsed: 'Il y a 10 min', active: true },
-  { id: 'key_4', name: 'Legacy mobile app', key: 'sk_live_Rr90pQa551aaTzJmCc3310', environment: 'live', role: 'merchant', createdAt: '2025-11-21', lastUsed: 'Jamais', active: false },
+  { id: 'key_1', name: 'Backend production', key: 'sk_live_••••••••••••8812', environment: 'live', role: 'merchant', createdAt: '2026-02-14', lastUsed: 'Il y a 2 min', active: true },
+  { id: 'key_2', name: 'Sandbox checkout', key: 'sk_test_••••••••••••4421', environment: 'test', role: 'admin', createdAt: '2026-04-08', lastUsed: 'Hier', active: true },
+  { id: 'key_3', name: 'Frontend publishable test', key: 'pk_test_••••••••••••4421', environment: 'test', role: 'merchant', createdAt: '2026-05-20', lastUsed: 'Il y a 10 min', active: true },
+  { id: 'key_4', name: 'Legacy mobile app', key: 'sk_live_••••••••••••3310', environment: 'live', role: 'merchant', createdAt: '2025-11-21', lastUsed: 'Jamais', active: false },
 ];
 
 export const webhooks: WebhookEndpoint[] = [
-  { id: 'wh_1', url: 'https://api.kora.ci/diapay/webhooks', events: ['payment.succeeded', 'payment.failed', 'refund.succeeded'], secret: 'whsec_live_9zXY82bB4mPqL6', status: 'active', successRate: 99.2 },
-  { id: 'wh_2', url: 'https://staging.kora.ci/hooks/diapay', events: ['payment.created', 'payout.paid'], secret: 'whsec_test_1aBC77lLpQwE8', status: 'paused', successRate: 91.4 },
+  { id: 'wh_1', url: 'https://api.kora.ci/diapay/webhooks', events: ['payment.succeeded', 'payment.failed', 'refund.succeeded'], secret: 'whsec_live_••••••••••••PqL6', status: 'active', successRate: 99.2 },
+  { id: 'wh_2', url: 'https://staging.kora.ci/hooks/diapay', events: ['payment.created', 'payout.paid'], secret: 'whsec_test_••••••••••••QwE8', status: 'paused', successRate: 91.4 },
 ];
 
 export const webhookLogs: WebhookLog[] = [

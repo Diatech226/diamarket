@@ -62,15 +62,15 @@ export default function Home() {
     <main className="shell">
       <div className="grid grid-2">
         <section className="card">
-          <span className="pill">Boutique sandbox merchant</span>
+          <span className="pill">Mode test · merchant test · application test</span>
           <h1>Produit test Diapay</h1>
-          <p className="muted">Crée une Checkout Session côté backend sandbox puis redirige vers le checkout hébergé.</p>
+          <p className="muted">Crée une Checkout Session côté backend sandbox avec une clé test masquée (sk_test_••••sandbox) puis redirige vers le checkout hébergé.</p>
           <div className="row"><strong>Pack API + Checkout</strong><strong>25 000 XOF</strong></div>
           <button className="btn btn-primary" onClick={pay} disabled={loading}>{loading ? 'Création…' : 'Payer avec Diapay'}</button>
           {error && <p style={{ color: '#be123c' }}>{error}</p>}
         </section>
         <section className="card">
-          <h2>Scénarios sandbox améliorés</h2>
+          <h2>Scénarios sandbox améliorés (pk_test/sk_test)</h2>
           <p className="muted">Simulez success, failed, pending, expired, remboursements, ledger double-entry (entries débit/crédit, balance impact, wallet impact), webhook, payout, mobile money, crypto et scénarios marketplace (split, escrow, payout auto, refund vendeur) sans argent réel.</p>
           <div className="scenario-grid">{scenarios.map((scenario) => <button key={scenario.id} className="btn btn-secondary" onClick={() => runScenario(scenario.id)}>{scenario.label}</button>)}</div>
         </section>
@@ -81,7 +81,7 @@ export default function Home() {
   -H 'Content-Type: application/json' \
   -d '{'{'}"url":"http://localhost:3102/api/sandbox-webhook","events":["payment.succeeded","payment.failed","checkout.completed","refund.succeeded","payout.completed"]{'}'}'</pre>
         </section>
-        <section className="card"><h2>Webhook reliability scenarios</h2><p className="muted">Scénarios: provider webhook success, duplicate, failed signature, merchant success, timeout, retry, refund webhook et payment paid webhook. Les résultats affichent event id, signature générée, payload, delivery status, tentatives et résultat final.</p></section>
+        <section className="card"><h2>Webhook reliability scenarios</h2><p className="muted">Scénarios: checkout avec clé test, payment avec clé test, refund avec clé test, webhook endpoint test, erreur clé absente, scope insuffisant, provider webhook success, duplicate, failed signature, merchant success, timeout, retry, refund webhook et payment paid webhook. Les résultats affichent event id, signature générée, payload, delivery status, tentatives et résultat final.</p></section>
         <section className="card"><h2>Résultat scénario</h2><pre style={{ whiteSpace: 'pre-wrap', background: '#0f172a', color: '#d1fae5', padding: 16, borderRadius: 18 }}>{result || 'Cliquez un scénario pour voir la réponse sandbox.'}</pre></section>
       </div>
     </main>

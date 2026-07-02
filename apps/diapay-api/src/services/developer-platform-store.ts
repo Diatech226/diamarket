@@ -1,52 +1,32 @@
 import crypto from 'crypto';
+import { DIAPAY_SCOPES, DiapayScope, MerchantRole, ROLE_SCOPES } from '../modules/auth/scopes';
 
-export type MerchantRole = 'owner' | 'admin' | 'developer' | 'finance' | 'support' | 'viewer';
 export type Environment = 'test' | 'live';
-
-type Status = 'active' | 'pending' | 'disabled' | 'revoked';
-export interface Merchant { id: string; name: string; businessName: string; country: string; currency: string; status: Status; ownerId: string; createdAt: string }
-export interface MerchantAdmin { id: string; merchantId: string; name: string; email: string; role: MerchantRole; status: Status; lastLoginAt?: string }
-export interface Application { id: string; merchantId: string; name: string; environment: Environment; allowedOrigins: string[]; successUrl: string; cancelUrl: string; webhookUrl?: string; status: Status }
-export interface ApiKey { id: string; merchantId: string; name: string; prefix: string; environment: Environment; scopes: string[]; keyHash: string; status: Status; lastUsedAt?: string; createdAt: string; rotatedAt?: string }
-
-const merchants = new Map<string, Merchant>();
-const admins = new Map<string, MerchantAdmin>();
-const applications = new Map<string, Application>();
-const apiKeys = new Map<string, ApiKey>();
+export type MerchantStatus = 'pending' | 'active' | 'suspended' | 'rejected' | 'closed';
+export type AdminStatus = 'invited' | 'active' | 'disabled' | 'removed';
+export type ApplicationStatus = 'active' | 'disabled' | 'archived';
+export type ApiKeyType = 'public' | 'secret' | 'restricted';
+export type ApiKeyStatus = 'active' | 'revoked' | 'expired';
+export interface Merchant { id: string; name: string; businessName: string; country: string; defaultCurrency: string; currency: string; status: MerchantStatus; livemodeEnabled: boolean; ownerId: string; createdAt: string; updatedAt: string }
+export interface MerchantAdmin { id: string; merchantId: string; name: string; email: string; role: MerchantRole; status: AdminStatus; createdAt: string; updatedAt: string; lastLoginAt?: string }
+export interface Application { id: string; merchantId: string; name: string; environment: Environment; allowedOrigins: string[]; webhookDefaultUrl?: string; webhookUrl?: string; successUrl?: string; cancelUrl?: string; status: ApplicationStatus; createdAt: string; updatedAt: string }
+export interface ApiKey { id: string; merchantId: string; applicationId: string; name: string; type: ApiKeyType; prefix: string; environment: Environment; scopes: DiapayScope[]; keyHash: string; last4: string; status: ApiKeyStatus; createdAt: string; updatedAt: string; lastUsedAt?: string; revokedAt?: string; rotatedAt?: string }
+const merchants = new Map<string, Merchant>(), admins = new Map<string, MerchantAdmin>(), applications = new Map<string, Application>(), apiKeys = new Map<string, ApiKey>();
 const logs: Array<{ id: string; merchantId: string; level: string; message: string; createdAt: string; metadata?: Record<string, unknown> }> = [];
-function now() { return new Date().toISOString(); }
-function id(prefix: string) { return `${prefix}_${crypto.randomBytes(10).toString('hex')}`; }
-function hash(value: string) { return crypto.createHash('sha256').update(value).digest('hex'); }
-function sanitize(key: ApiKey) { const { keyHash, ...safe } = key; return safe; }
-export function seedMerchant() {
-  if (merchants.size) return Array.from(merchants.values())[0];
-  const merchant = createMerchant({ name: 'Diapay Demo', businessName: 'Diapay Sandbox Merchant', country: 'BF', currency: 'XOF', ownerId: 'user_owner_demo' });
-  createMerchantAdmin({ merchantId: merchant.id, name: 'Owner Demo', email: 'owner@diapay.test', role: 'owner' });
-  createApplication({ merchantId: merchant.id, name: 'Diamarket Sandbox', environment: 'test', allowedOrigins: ['http://localhost:3000'], successUrl: 'https://example.com/success', cancelUrl: 'https://example.com/cancel', webhookUrl: 'https://example.com/webhook' });
-  return merchant;
-}
-export function createMerchant(payload: Partial<Merchant>) {
-  const created: Merchant = { id: id('mrc'), name: payload.name ?? String(payload.businessName ?? 'Merchant'), businessName: payload.businessName ?? payload.name ?? 'Merchant', country: payload.country ?? 'BF', currency: (payload.currency ?? 'XOF').toUpperCase(), status: 'active', ownerId: payload.ownerId ?? 'user_demo', createdAt: now() };
-  merchants.set(created.id, created); logs.push({ id: id('log'), merchantId: created.id, level: 'info', message: 'merchant.created', createdAt: now() }); return created;
-}
-export function createMerchantAdmin(payload: Partial<MerchantAdmin>) {
-  const merchant = payload.merchantId ? merchants.get(payload.merchantId) : seedMerchant(); if (!merchant) throw Object.assign(new Error('merchant not found'), { status: 404 });
-  const admin: MerchantAdmin = { id: id('adm'), merchantId: merchant.id, name: payload.name ?? 'Merchant Admin', email: payload.email ?? 'admin@diapay.test', role: payload.role ?? 'admin', status: 'active', lastLoginAt: payload.lastLoginAt };
-  admins.set(admin.id, admin); return admin;
-}
-export function createApplication(payload: Partial<Application>) {
-  const merchant = payload.merchantId ? merchants.get(payload.merchantId) : seedMerchant(); if (!merchant) throw Object.assign(new Error('merchant not found'), { status: 404 });
-  const app: Application = { id: id('app'), merchantId: merchant.id, name: payload.name ?? 'Sandbox app', environment: payload.environment ?? 'test', allowedOrigins: payload.allowedOrigins ?? [], successUrl: payload.successUrl ?? 'https://example.com/success', cancelUrl: payload.cancelUrl ?? 'https://example.com/cancel', webhookUrl: payload.webhookUrl, status: 'active' };
-  applications.set(app.id, app); return app;
-}
-export function createApiKey(payload: Partial<ApiKey> & { type?: 'public' | 'secret' }) {
-  const merchant = payload.merchantId ? merchants.get(payload.merchantId) : seedMerchant(); if (!merchant) throw Object.assign(new Error('merchant not found'), { status: 404 }); const environment = payload.environment ?? 'test'; const type = payload.type ?? 'secret';
-  const secret = `${type === 'public' ? 'pk' : 'sk'}_${environment}_${crypto.randomBytes(24).toString('hex')}`;
-  const key: ApiKey = { id: id('key'), merchantId: merchant.id, name: payload.name ?? `${environment} ${type} key`, prefix: secret.slice(0, 16), environment, scopes: payload.scopes ?? ['checkout:write', 'payments:read', 'webhooks:write'], keyHash: hash(secret), status: 'active', createdAt: now() };
-  apiKeys.set(key.id, key); return { ...sanitize(key), secret };
-}
+const now = () => new Date().toISOString(); const id = (p: string) => `${p}_${crypto.randomBytes(10).toString('hex')}`;
+function hash(value: string) { return crypto.pbkdf2Sync(value, process.env.DIAPAY_API_KEY_PEPPER ?? 'diapay-dev-pepper', 120000, 32, 'sha256').toString('hex'); }
+function keyPrefix(type: ApiKeyType, env: Environment) { return `${type === 'public' ? 'pk' : type === 'restricted' ? 'rk' : 'sk'}_${env}_`; }
+function sanitize(key: ApiKey) { const { keyHash, ...safe } = key; return { ...safe, maskedKey: `${key.prefix}••••${key.last4}` }; }
+function assertLive(merchant: Merchant, env: Environment) { if (env === 'live' && !merchant.livemodeEnabled) throw Object.assign(new Error('live mode is disabled for this merchant'), { status: 403, code: 'LIVE_MODE_DISABLED' }); }
+export function seedMerchant() { if (merchants.size) return Array.from(merchants.values())[0]; const merchant = createMerchant({ name: 'Diapay Demo', businessName: 'Diapay Sandbox Merchant', country: 'BF', defaultCurrency: 'XOF', ownerId: 'user_owner_demo', status: 'active' }); createMerchantAdmin({ merchantId: merchant.id, name: 'Owner Demo', email: 'owner@diapay.test', role: 'owner' }); const app = createApplication({ merchantId: merchant.id, name: 'Diamarket Sandbox', environment: 'test', allowedOrigins: ['http://localhost:3000'], webhookDefaultUrl: 'https://example.com/webhook', successUrl: 'https://example.com/success', cancelUrl: 'https://example.com/cancel' }); createApiKey({ merchantId: merchant.id, applicationId: app.id, name: 'Sandbox secret key', environment: 'test', type: 'secret', scopes: [...DIAPAY_SCOPES] }); return merchant; }
+export function createMerchant(payload: Partial<Merchant>) { const t = now(); const created: Merchant = { id: id('mrc'), name: payload.name ?? String(payload.businessName ?? 'Merchant'), businessName: payload.businessName ?? payload.name ?? 'Merchant', country: payload.country ?? 'BF', defaultCurrency: (payload.defaultCurrency ?? payload.currency ?? 'XOF').toUpperCase(), currency: (payload.defaultCurrency ?? payload.currency ?? 'XOF').toUpperCase(), status: payload.status ?? 'pending', livemodeEnabled: payload.livemodeEnabled ?? false, ownerId: payload.ownerId ?? 'user_demo', createdAt: t, updatedAt: t }; merchants.set(created.id, created); logs.push({ id: id('log'), merchantId: created.id, level: 'info', message: 'merchant.created', createdAt: t }); return created; }
+export function createMerchantAdmin(payload: Partial<MerchantAdmin>) { const merchant = payload.merchantId ? merchants.get(payload.merchantId) : seedMerchant(); if (!merchant) throw Object.assign(new Error('merchant not found'), { status: 404 }); const t = now(); const admin: MerchantAdmin = { id: id('adm'), merchantId: merchant.id, name: payload.name ?? 'Merchant Admin', email: payload.email ?? 'admin@diapay.test', role: payload.role ?? 'admin', status: payload.status ?? 'active', createdAt: t, updatedAt: t, lastLoginAt: payload.lastLoginAt }; admins.set(admin.id, admin); return admin; }
+export function createApplication(payload: Partial<Application>) { const merchant = payload.merchantId ? merchants.get(payload.merchantId) : seedMerchant(); if (!merchant) throw Object.assign(new Error('merchant not found'), { status: 404 }); const env = payload.environment ?? 'test'; assertLive(merchant, env); const t = now(); const app: Application = { id: id('app'), merchantId: merchant.id, name: payload.name ?? 'Sandbox app', environment: env, allowedOrigins: payload.allowedOrigins ?? [], webhookDefaultUrl: payload.webhookDefaultUrl ?? payload.webhookUrl, webhookUrl: payload.webhookUrl ?? payload.webhookDefaultUrl, successUrl: payload.successUrl, cancelUrl: payload.cancelUrl, status: payload.status ?? 'active', createdAt: t, updatedAt: t }; applications.set(app.id, app); return app; }
+export function updateApplication(idValue: string, payload: Partial<Application>) { const app = applications.get(idValue); if (!app) throw Object.assign(new Error('application not found'), { status: 404 }); Object.assign(app, payload, { updatedAt: now() }); return app; }
+export function createApiKey(payload: Partial<ApiKey> & { type?: ApiKeyType }) { const merchant = payload.merchantId ? merchants.get(payload.merchantId) : seedMerchant(); if (!merchant) throw Object.assign(new Error('merchant not found'), { status: 404 }); const environment = payload.environment ?? 'test'; assertLive(merchant, environment); const application = payload.applicationId ? applications.get(payload.applicationId) : Array.from(applications.values()).find((app) => app.merchantId === merchant.id && app.environment === environment) ?? createApplication({ merchantId: merchant.id, environment }); if (!application) throw Object.assign(new Error('application not found'), { status: 404 }); if (application.merchantId !== merchant.id || application.environment !== environment) throw Object.assign(new Error('application does not belong to merchant/environment'), { status: 400 }); const type = payload.type ?? 'secret'; const secret = `${keyPrefix(type, environment)}${crypto.randomBytes(24).toString('base64url')}`; const t = now(); const key: ApiKey = { id: id('key'), merchantId: merchant.id, applicationId: application.id, name: payload.name ?? `${environment} ${type} key`, type, prefix: secret.slice(0, keyPrefix(type, environment).length + 6), environment, scopes: (payload.scopes as DiapayScope[]) ?? (type === 'public' ? ['checkout:read', 'checkout:write'] : ROLE_SCOPES.owner), keyHash: hash(secret), last4: secret.slice(-4), status: 'active', createdAt: t, updatedAt: t }; apiKeys.set(key.id, key); return { ...sanitize(key), secret }; }
 export function listApiKeys() { seedMerchant(); return Array.from(apiKeys.values()).map(sanitize); }
-export function revokeApiKey(id: string) { const key = apiKeys.get(id); if (!key) throw Object.assign(new Error('api key not found'), { status: 404 }); key.status = 'revoked'; return sanitize(key); }
-export function rotateApiKey(idValue: string) { const old = apiKeys.get(idValue); if (!old) throw Object.assign(new Error('api key not found'), { status: 404 }); old.status = 'revoked'; old.rotatedAt = now(); return createApiKey({ merchantId: old.merchantId, name: old.name, environment: old.environment, scopes: old.scopes, type: old.prefix.startsWith('pk_') ? 'public' : 'secret' }); }
+export function revokeApiKey(idValue: string) { const key = apiKeys.get(idValue); if (!key) throw Object.assign(new Error('api key not found'), { status: 404 }); key.status = 'revoked'; key.revokedAt = now(); key.updatedAt = now(); return sanitize(key); }
+export function rotateApiKey(idValue: string) { const old = apiKeys.get(idValue); if (!old) throw Object.assign(new Error('api key not found'), { status: 404 }); revokeApiKey(idValue); old.rotatedAt = now(); return createApiKey({ merchantId: old.merchantId, applicationId: old.applicationId, name: old.name, environment: old.environment, scopes: old.scopes, type: old.type }); }
+export function authenticateApiKey(secret: string) { const key = Array.from(apiKeys.values()).find((candidate) => candidate.keyHash === hash(secret)); if (!key || key.status !== 'active') return undefined; const app = applications.get(key.applicationId); if (!app || app.status !== 'active') return undefined; key.lastUsedAt = now(); key.updatedAt = key.lastUsedAt; return { merchantId: key.merchantId, applicationId: key.applicationId, environment: key.environment, scopes: key.scopes, apiKeyId: key.id, livemode: key.environment === 'live' }; }
 export const developerState = { merchants, admins, applications, apiKeys, logs };
 seedMerchant();

@@ -131,3 +131,12 @@ Les endpoints suivants sont ajoutés sous `/api/v1` sans casser les routes exist
 - `GET /api/v1/balances`
 
 Le ledger est double-entry: chaque transaction postée contient au moins un débit et un crédit, et `totalDebit === totalCredit`. Les écritures postées sont immutables; les corrections doivent passer par une transaction reversal. Les données restent actuellement en mémoire et ne sont pas production-ready. La commission de capture paiement utilise temporairement `DIAPAY_DEFAULT_FEE_PERCENT` avec un défaut explicite de `2.5`.
+
+
+## Itération 6 — Merchant Auth, Applications et API Keys
+
+- Les scopes marchands sont centralisés dans `apps/diapay-api/src/modules/auth/scopes.ts`.
+- Les applications marchandes sont disponibles via `/api/v1/applications` avec alias legacy `/api/v1/apps`.
+- Les clés API sont liées à merchant + application + environment; le secret complet est affiché une seule fois, stocké uniquement sous forme de hash PBKDF2-SHA256, puis masqué.
+- Le mode `live` est refusé tant que `livemodeEnabled=false`.
+- `apiKeyAuthMiddleware` supporte `Authorization: Bearer sk_...` et `X-Diapay-Secret-Key`, attache `authContext`, met à jour `lastUsedAt` et vérifie les scopes.
