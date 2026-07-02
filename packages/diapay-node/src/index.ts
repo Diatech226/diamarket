@@ -25,12 +25,28 @@ export function retrievePayment(paymentId: string, options?: DiapayOptions & Req
   return client(options).payments.retrieve(paymentId, options);
 }
 
+export function getPayment(paymentId: string, options?: DiapayOptions & RequestOptions) {
+  return retrievePayment(paymentId, options);
+}
+
+export function cancelPayment(paymentId: string, options?: DiapayOptions & RequestOptions) {
+  return client(options).payments.cancel(paymentId, options);
+}
+
 export function createCheckoutSession(payload: CheckoutSessionCreateParams, options?: DiapayOptions & RequestOptions) {
   return client(options).checkout.sessions.create(payload, options);
 }
 
+export function createRefund(payload: { paymentId: string; amount?: number; reason?: string; metadata?: Record<string, string | number | boolean | null> }, options?: DiapayOptions & RequestOptions) {
+  return client(options).refunds.create(payload, options);
+}
+
+export function getRefund(refundId: string, options?: DiapayOptions & RequestOptions) {
+  return client(options).refunds.retrieve(refundId, options);
+}
+
 export function refundPayment(paymentId: string, payload: { amount?: number; reason?: string; metadata?: Record<string, string | number | boolean | null> } = {}, options?: DiapayOptions & RequestOptions) {
-  return client(options).refundPayment(paymentId, payload, options);
+  return createRefund({ ...payload, paymentId }, options);
 }
 
 

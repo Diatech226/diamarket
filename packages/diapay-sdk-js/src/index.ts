@@ -2,10 +2,10 @@ import * as crypto from 'crypto';
 
 export type DiapayEnvironment = 'test' | 'production';
 export type PaymentMethod = 'mobile-money' | 'bank-card' | 'bank-transfer' | 'crypto' | 'mock';
-export type PaymentStatus = 'requires_action' | 'processing' | 'succeeded' | 'failed' | 'cancelled' | 'expired' | 'refunded';
-export type RefundStatus = 'pending' | 'succeeded' | 'failed';
+export type PaymentStatus = 'created' | 'pending' | 'processing' | 'requires_action' | 'succeeded' | 'paid' | 'failed' | 'cancelled' | 'expired' | 'refunded' | 'partially_refunded' | 'disputed' | 'chargeback';
+export type RefundStatus = 'created' | 'pending' | 'processing' | 'succeeded' | 'failed' | 'cancelled';
 export type PayoutStatus = 'pending' | 'processing' | 'completed' | 'failed';
-export type WebhookEventType = 'payment.succeeded' | 'payment.failed' | 'checkout.completed' | 'refund.succeeded' | 'payout.completed' | 'payment.expired' | 'payment.cancelled';
+export type WebhookEventType = 'payment.succeeded' | 'payment.paid' | 'payment.failed' | 'checkout.completed' | 'refund.succeeded' | 'payout.completed' | 'payment.expired' | 'payment.cancelled';
 
 export type DiapayOptions = {
   secretKey: string;
@@ -35,6 +35,8 @@ export type PaymentCreateParams = {
   [key: string]: unknown;
 };
 
+export type PaymentAttempt = { id: string; paymentId: string; provider: string; method: PaymentMethod; status: PaymentStatus; amount: number; currency: string; providerReference?: string; errorCode?: string; errorMessage?: string; createdAt: string; updatedAt: string };
+
 export type PaymentResponse = {
   id: string;
   amount: number;
@@ -47,6 +49,7 @@ export type PaymentResponse = {
   failureCode?: string;
   failureMessage?: string;
   metadata?: Metadata;
+  attempts?: PaymentAttempt[];
   createdAt: string;
   updatedAt: string;
 };
@@ -164,7 +167,7 @@ export class Diapay {
   };
 
   refunds = {
-    create: (payload: RefundCreateParams, options?: RequestOptions) => this.refundPayment(payload.paymentId, payload, options),
+    create: (payload: RefundCreateParams, options?: RequestOptions) => this.createRefund(payload, options),
     retrieve: (id: string, options?: RequestOptions) => this.request<Refund>(`/refunds/${id}`, options),
   };
 
@@ -283,7 +286,9 @@ export class Diapay {
 
   async retrievePayment(id: string, options?: RequestOptions) { return this.request<PaymentResponse>(`/payments/${id}`, options); }
   async cancelPayment(id: string, options?: RequestOptions) { return this.request<PaymentResponse>(`/payments/${id}/cancel`, { ...options, method: 'POST' }); }
-  async refundPayment(id: string, payload: Omit<RefundCreateParams, 'paymentId'> = {}, options?: RequestOptions) { return this.request<PaymentResponse>(`/payments/${id}/refund`, { ...options, method: 'POST', body: JSON.stringify(payload) }); }
+  async createRefund(payload: RefundCreateParams, options?: RequestOptions) { return this.request<Refund>('/refunds', { ...options, method: 'POST', body: JSON.stringify(payload) }); }
+  async getRefund(id: string, options?: RequestOptions) { return this.request<Refund>(`/refunds/${id}`, options); }
+  async refundPayment(id: string, payload: Omit<RefundCreateParams, 'paymentId'> = {}, options?: RequestOptions) { return this.createRefund({ ...payload, paymentId: id }, options); }
   async listPaymentMethods(options?: RequestOptions) { return this.request<PaymentMethod[]>('/payment-methods', options); }
   async listProviders(options?: RequestOptions) { return this.request<ProviderDescriptor[]>('/providers', options); }
   async getPayment(id: string, options?: RequestOptions) { return this.retrievePayment(id, options); }
