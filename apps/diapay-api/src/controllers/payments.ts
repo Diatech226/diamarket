@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { cancelDirectPayment, createDirectPayment, listWebhookEvents, refundDirectPayment, registerWebhookEndpoint, retrievePayment, sandboxState } from '../services/checkout-store';
+import { cancelDirectPayment, createDirectPayment, createRefund, listWebhookEvents, refundDirectPayment, registerWebhookEndpoint, retrievePayment, retrieveRefund, sandboxState } from '../services/checkout-store';
 
 function handle(error: unknown, res: Response) {
   const status = typeof error === 'object' && error !== null && 'status' in error ? Number((error as { status: number }).status) : 500;
@@ -28,3 +28,10 @@ export const getBalance = async (_req: Request, res: Response) => res.json({ ava
 export const createPayout = async (_req: Request, res: Response) => res.status(201).json({ id: 'po_mock_1', status: 'pending' });
 export const listMethods = async (_req: Request, res: Response) => res.json(sandboxState.listPaymentMethods());
 export const listProviderConfigs = async (_req: Request, res: Response) => res.json(sandboxState.listProviders());
+
+export const createRefundController = async (req: Request, res: Response) => {
+  try { res.status(201).json(await createRefund(req.body)); } catch (error) { handle(error, res); }
+};
+export const getRefundController = async (req: Request, res: Response) => {
+  try { res.json(retrieveRefund(req.params.id)); } catch (error) { handle(error, res); }
+};

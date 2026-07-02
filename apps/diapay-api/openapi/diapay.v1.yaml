@@ -1,0 +1,189 @@
+openapi: 3.0.3
+info:
+  title: Diapay Public API
+  version: 1.0.0
+  description: Public /api/v1 contract frozen during Diapay progressive restructuring iteration 1.
+servers:
+  - url: http://localhost:5100
+paths:
+  /health:
+    get:
+      summary: Healthcheck
+      responses:
+        '200': { $ref: '#/components/responses/Success' }
+  /api/v1/config:
+    get:
+      summary: Public checkout configuration
+      responses:
+        '200': { $ref: '#/components/responses/Success' }
+  /api/v1/checkout/sessions:
+    get:
+      summary: List checkout sessions
+      responses:
+        '200': { $ref: '#/components/responses/Success' }
+    post:
+      summary: Create checkout session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateCheckoutSession' }
+      responses:
+        '201': { $ref: '#/components/responses/Success' }
+        '400': { $ref: '#/components/responses/Error' }
+  /api/v1/checkout/sessions/{id}:
+    get:
+      summary: Retrieve checkout session
+      parameters: [ { $ref: '#/components/parameters/Id' } ]
+      responses:
+        '200': { $ref: '#/components/responses/Success' }
+        '404': { $ref: '#/components/responses/Error' }
+  /api/v1/checkout/sessions/{id}/complete:
+    post:
+      summary: Complete checkout session
+      parameters: [ { $ref: '#/components/parameters/Id' } ]
+      responses:
+        '200': { $ref: '#/components/responses/Success' }
+  /api/v1/checkout/sessions/{id}/cancel:
+    post:
+      summary: Cancel checkout session
+      parameters: [ { $ref: '#/components/parameters/Id' } ]
+      responses:
+        '200': { $ref: '#/components/responses/Success' }
+  /api/v1/payments:
+    post:
+      summary: Create direct payment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreatePayment' }
+      responses:
+        '201': { $ref: '#/components/responses/Success' }
+  /api/v1/payments/{id}:
+    get:
+      summary: Retrieve payment
+      parameters: [ { $ref: '#/components/parameters/Id' } ]
+      responses:
+        '200': { $ref: '#/components/responses/Success' }
+        '404': { $ref: '#/components/responses/Error' }
+  /api/v1/payments/{id}/cancel:
+    post:
+      summary: Cancel payment
+      parameters: [ { $ref: '#/components/parameters/Id' } ]
+      responses: { '200': { $ref: '#/components/responses/Success' } }
+  /api/v1/payments/{id}/refund:
+    post:
+      summary: Legacy refund payment route
+      parameters: [ { $ref: '#/components/parameters/Id' } ]
+      responses: { '200': { $ref: '#/components/responses/Success' } }
+  /api/v1/refunds:
+    post:
+      summary: Create refund
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateRefund' }
+      responses:
+        '201': { $ref: '#/components/responses/Success' }
+  /api/v1/refunds/{id}:
+    get:
+      summary: Retrieve refund
+      parameters: [ { $ref: '#/components/parameters/Id' } ]
+      responses:
+        '200': { $ref: '#/components/responses/Success' }
+        '404': { $ref: '#/components/responses/Error' }
+  /api/v1/webhooks:
+    post:
+      summary: Register webhook endpoint
+      responses: { '201': { $ref: '#/components/responses/Success' } }
+  /api/v1/webhook-events:
+    get:
+      summary: List webhook events
+      responses: { '200': { $ref: '#/components/responses/Success' } }
+  /api/v1/api-keys:
+    get:
+      summary: List API keys
+      responses: { '200': { $ref: '#/components/responses/Success' } }
+    post:
+      summary: Create API key
+      responses: { '201': { $ref: '#/components/responses/Success' } }
+  /api/v1/api-keys/{id}:
+    delete:
+      summary: Delete API key
+      parameters: [ { $ref: '#/components/parameters/Id' } ]
+      responses: { '200': { $ref: '#/components/responses/Success' } }
+  /api/v1/api-keys/{id}/rotate:
+    post:
+      summary: Rotate API key
+      parameters: [ { $ref: '#/components/parameters/Id' } ]
+      responses: { '200': { $ref: '#/components/responses/Success' } }
+  /api/v1/marketplace/wallets:
+    get:
+      summary: List marketplace wallets
+      responses: { '200': { $ref: '#/components/responses/Success' } }
+  /api/v1/transactions:
+    get:
+      summary: List transactions
+      responses: { '200': { $ref: '#/components/responses/Success' } }
+components:
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema: { type: string }
+  responses:
+    Success:
+      description: Standard success envelope
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/SuccessEnvelope' }
+    Error:
+      description: Standard error envelope
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+  schemas:
+    SuccessEnvelope:
+      type: object
+      required: [success, data, message]
+      properties:
+        success: { type: boolean, enum: [true] }
+        data: { type: object, additionalProperties: true }
+        message: { type: string }
+    ErrorEnvelope:
+      type: object
+      required: [success, message, error]
+      properties:
+        success: { type: boolean, enum: [false] }
+        message: { type: string }
+        error:
+          type: object
+          required: [code, details]
+          properties:
+            code: { type: string }
+            details: { type: object, additionalProperties: true }
+    CreateCheckoutSession:
+      type: object
+      required: [amount, currency, successUrl, cancelUrl]
+      properties:
+        amount: { type: integer, minimum: 1 }
+        currency: { type: string }
+        successUrl: { type: string }
+        cancelUrl: { type: string }
+    CreatePayment:
+      type: object
+      required: [amount, currency]
+      properties:
+        amount: { type: integer, minimum: 1 }
+        currency: { type: string }
+        method: { type: string }
+    CreateRefund:
+      type: object
+      required: [paymentId]
+      properties:
+        paymentId: { type: string }
+        amount: { type: integer, minimum: 1 }
+        reason: { type: string }
