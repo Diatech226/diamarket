@@ -140,3 +140,19 @@ Le ledger est double-entry: chaque transaction postée contient au moins un déb
 - Les clés API sont liées à merchant + application + environment; le secret complet est affiché une seule fois, stocké uniquement sous forme de hash PBKDF2-SHA256, puis masqué.
 - Le mode `live` est refusé tant que `livemodeEnabled=false`.
 - `apiKeyAuthMiddleware` supporte `Authorization: Bearer sk_...` et `X-Diapay-Secret-Key`, attache `authContext`, met à jour `lastUsedAt` et vérifie les scopes.
+
+## Itération 7 — Reporting Dashboard
+
+Ajouts stables sous `/api/v1/reports` pour le Merchant Dashboard Pro:
+
+| Méthode | URL | Auth requise | Query | Succès | Sécurité |
+|---|---|---|---|---|---|
+| GET | `/api/v1/reports/overview` | Bearer marchand recommandé | `merchantId`, `environment`, `applicationId`, `currency`, `from`, `to`, `page`, `limit` | métriques revenus/paiements/webhooks | isolation marchand par contexte, aucun secret |
+| GET | `/api/v1/reports/revenue` | Bearer marchand recommandé | idem | breakdown daily/currency/provider | source sandbox indiquée |
+| GET | `/api/v1/reports/payments` | Bearer marchand recommandé | idem | liste paginée paiements | sans raw secrets provider |
+| GET | `/api/v1/reports/providers` | Bearer marchand recommandé | idem | santé/capacités providers + usage | sans credentials |
+| GET | `/api/v1/reports/webhooks` | Bearer marchand recommandé | idem | événements et livraisons | payloads sanitisés |
+| GET | `/api/v1/reports/export/payments.csv` | Bearer marchand recommandé | idem | CSV paiements | sans secrets ni hashes |
+| GET | `/api/v1/reports/export/ledger.csv` | Bearer marchand recommandé | idem | CSV ledger | ledger source de vérité, wallets agrégés |
+
+Les données temporaires retournent `source: "sandbox_in_memory"` afin de ne pas être confondues avec de la production.
