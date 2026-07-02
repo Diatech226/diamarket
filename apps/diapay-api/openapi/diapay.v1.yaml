@@ -214,3 +214,40 @@ components:
         paymentId: { type: string }
         amount: { type: integer, minimum: 1 }
         reason: { type: string }
+
+  /providers:
+    get:
+      summary: List payment provider capabilities
+      responses:
+        '200':
+          description: Provider capability list
+  /providers/{provider}/capabilities:
+    get:
+      summary: Get provider capabilities
+      parameters:
+        - in: path
+          name: provider
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Provider capability descriptor
+  /providers/simulate:
+    post:
+      summary: Simulate an explicit mock provider scenario
+      responses:
+        '201':
+          description: Mock provider result
+  /webhooks/providers/{provider}:
+    post:
+      summary: Parse inbound provider webhook
+      parameters:
+        - in: path
+          name: provider
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Normalized provider event

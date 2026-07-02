@@ -93,3 +93,20 @@ Les validations runtime des modules retournent l'enveloppe uniforme:
   "error": { "code": "VALIDATION_ERROR", "details": {} }
 }
 ```
+
+## Iteration 3 — Provider Adapter public additions
+
+The existing `/api/v1` payment, checkout, refund, and webhook contracts remain backward compatible. Iteration 3 adds provider-discovery and provider-webhook endpoints without removing legacy endpoints.
+
+### Provider discovery
+
+- `GET /api/v1/providers` returns configured and placeholder provider capabilities.
+- `GET /api/v1/providers/:provider/capabilities` returns one provider capability descriptor.
+- `POST /api/v1/providers/simulate` executes explicit mock-provider scenarios for sandbox/test usage only.
+
+### Provider webhooks
+
+- `POST /api/v1/webhooks/providers/:provider` parses an inbound provider event when that provider exposes `parseWebhook`.
+- If the provider webhook is not configured, the API returns `PROVIDER_WEBHOOK_NOT_CONFIGURED`.
+
+Production must not silently fall back to the mock provider. Real providers remain explicit placeholders until configured by environment and secrets outside source control.

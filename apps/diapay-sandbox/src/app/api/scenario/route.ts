@@ -7,7 +7,12 @@ const scenarios: Record<string, Record<string, unknown>> = {
   'payment-success': { type: 'payment', method: 'bank-card', cardNumber: '4242424242424242' },
   'payment-failed': { type: 'payment', method: 'bank-card', cardNumber: '4000000000000002', forceStatus: 'failed' },
   'payment-pending': { type: 'payment', method: 'mobile-money', phone: '70000000', forceStatus: 'pending' },
-  'payment-expired': { type: 'payment', method: 'mobile-money', phone: '70000000', forceStatus: 'expired' },
+  'payment-expired': { type: 'payment', method: 'mock', scenario: 'payment_expired' },
+  'payment-requires-action': { type: 'payment', method: 'mock', scenario: 'payment_requires_action' },
+  'provider-timeout': { type: 'payment', method: 'mock', scenario: 'provider_timeout' },
+  'insufficient-funds': { type: 'payment', method: 'mock', scenario: 'insufficient_funds' },
+  'refund-success': { type: 'refund', refundScenario: 'refund_success' },
+  'refund-failed': { type: 'refund', refundScenario: 'refund_failed' },
   'mobile-money': { type: 'payment', method: 'mobile-money', phone: '70000000' },
   crypto: { type: 'payment', method: 'crypto' },
   payout: { type: 'payout' },
@@ -92,8 +97,9 @@ export async function POST(request: NextRequest) {
   if (scenario.type === 'refund') {
     const payment = await api('/payments', { amount: 25000, currency: 'XOF', method: 'bank-card', cardNumber: '4242424242424242' });
     const paymentId = typeof payment.body === 'object' && payment.body && 'id' in payment.body ? String(payment.body.id) : 'pay_test_missing';
-    return NextResponse.json({ payment, refund: await api(`/payments/${paymentId}/refund`, { amount: 10000, reason: 'sandbox_refund' }) });
+    return NextResponse.json({ payment, refund: await api(`/payments/${paymentId}/refund`, { amount: 10000, reason: 'sandbox_refund', scenario: scenario.refundScenario ?? 'refund_success' }) });
   }
 
-  return NextResponse.json(await api('/payments', { amount: 25000, currency: 'XOF', metadata: { scenario: id }, ...scenario, type: undefined }));
+  const result = await api('/payments', { amount: 25000, currency: 'XOF', metadata: { scenario: id }, ...scenario, type: undefined });
+  return NextResponse.json({ provider: 'mock', scenario: id, result, attemptStatus: result.body?.data?.attempts?.[0]?.status, paymentStatusFinal: result.body?.data?.status, providerReference: result.body?.data?.providerPaymentId, simulatedWebhook: scenario.scenario ? { provider: 'mock', status: scenario.scenario } : null });
 }

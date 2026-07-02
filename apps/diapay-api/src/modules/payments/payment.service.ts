@@ -11,7 +11,7 @@ function withAttempt(payment: Payment): Payment & { attempts: PaymentAttempt[] }
   const existing = (payment as Payment & { attempts?: PaymentAttempt[] }).attempts;
   if (existing?.length) return payment as Payment & { attempts: PaymentAttempt[] };
   const timestamp = payment.createdAt ?? now();
-  const attempt: PaymentAttempt = { id: id('pa_test'), paymentId: payment.id, provider: payment.provider, method: payment.method, status: normalizePaymentStatus(payment.status), amount: payment.amount, currency: payment.currency, providerReference: payment.providerPaymentId, errorCode: payment.failureCode, errorMessage: payment.failureMessage, createdAt: timestamp, updatedAt: payment.updatedAt ?? timestamp };
+  const attempt: PaymentAttempt = { id: id('pa_test'), paymentId: payment.id, provider: payment.provider, method: payment.method, status: normalizePaymentStatus(payment.status), amount: payment.amount, currency: payment.currency, providerReference: payment.providerPaymentId, providerStatus: payment.providerStatus, errorCode: payment.failureCode, errorMessage: payment.failureMessage, rawProviderResponse: payment.rawProviderResponse, createdAt: timestamp, updatedAt: payment.updatedAt ?? timestamp };
   (payment as Payment & { attempts: PaymentAttempt[] }).attempts = [attempt];
   sandboxState.payments.set(payment.id, payment);
   return payment as Payment & { attempts: PaymentAttempt[] };
