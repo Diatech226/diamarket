@@ -118,3 +118,16 @@ Production must not silently fall back to the mock provider. Real providers rema
 - Provider inbound webhooks are stabilized at `POST /api/v1/webhooks/providers/:provider` with unknown-provider and duplicate-event envelopes.
 - Webhook event and delivery audit logs are exposed through `/api/v1/webhook-events` and `/api/v1/webhook-deliveries`.
 - Diapay webhook signatures use `DiaPay-Signature: t=<timestamp>,v1=<hmac_sha256>` over `timestamp + "." + rawBody` with a default 5 minute anti-replay window.
+
+## Itération 5 — Ledger, wallets et balances
+
+Les endpoints suivants sont ajoutés sous `/api/v1` sans casser les routes existantes:
+
+- `GET /api/v1/wallets`
+- `GET /api/v1/wallets/:id`
+- `GET /api/v1/ledger/accounts`
+- `GET /api/v1/ledger/transactions`
+- `GET /api/v1/ledger/transactions/:id`
+- `GET /api/v1/balances`
+
+Le ledger est double-entry: chaque transaction postée contient au moins un débit et un crédit, et `totalDebit === totalCredit`. Les écritures postées sont immutables; les corrections doivent passer par une transaction reversal. Les données restent actuellement en mémoire et ne sont pas production-ready. La commission de capture paiement utilise temporairement `DIAPAY_DEFAULT_FEE_PERCENT` avec un défaut explicite de `2.5`.

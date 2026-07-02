@@ -4,6 +4,7 @@ import type { Payment } from '../../models/Payment';
 import type { PaymentAttempt } from './payment-attempt.model';
 import { canTransitionPaymentStatus, normalizePaymentStatus } from './payment-status';
 import { validatePaymentCreate, validationError } from './payment.validation';
+import { postPaymentCaptureToLedger } from '../ledger/ledger.service';
 
 function id(prefix: string) { return `${prefix}_${crypto.randomBytes(12).toString('hex')}`; }
 function now() { return new Date().toISOString(); }
@@ -17,6 +18,6 @@ function withAttempt(payment: Payment): Payment & { attempts: PaymentAttempt[] }
   return payment as Payment & { attempts: PaymentAttempt[] };
 }
 
-export async function createPayment(payload: unknown, merchant: string) { const body = validatePaymentCreate(payload); return withAttempt(await createDirectPayment(body, merchant)); }
+export async function createPayment(payload: unknown, merchant: string) { const body = validatePaymentCreate(payload); const payment = withAttempt(await createDirectPayment(body, merchant)); if (normalizePaymentStatus(payment.status) === 'paid') postPaymentCaptureToLedger(payment); return payment; }
 export function getPayment(id: string) { return withAttempt(retrievePayment(id)); }
 export async function cancelPayment(id: string) { const payment = retrievePayment(id); if (!canTransitionPaymentStatus(payment.status, 'cancelled')) throw validationError('Payment status transition is not allowed', { from: payment.status, to: 'cancelled' }); return withAttempt(await cancelDirectPayment(id)); }

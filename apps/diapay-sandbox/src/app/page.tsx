@@ -4,6 +4,12 @@ import { useState } from 'react';
 
 const scenarios = [
   { id: 'payment-success', label: 'Paiement réussi', type: 'payment', forceStatus: '' },
+  { id: 'ledger-payment-paid', label: 'Paid → ledger entries', type: 'ledger' },
+  { id: 'ledger-partial-refund', label: 'Partial refund reversal', type: 'ledger' },
+  { id: 'ledger-full-refund', label: 'Full refund reversal', type: 'ledger' },
+  { id: 'ledger-fee', label: 'Fee calculated', type: 'ledger' },
+  { id: 'ledger-unbalanced', label: 'Unbalanced rejected', type: 'ledger' },
+  { id: 'ledger-duplicate-webhook', label: 'Duplicate webhook idempotent', type: 'ledger' },
   { id: 'payment-failed', label: 'Paiement échoué', type: 'payment', forceStatus: 'failed' },
   { id: 'payment-pending', label: 'Paiement pending', type: 'payment', forceStatus: 'pending' },
   { id: 'payment-expired', label: 'Paiement expiré', type: 'payment', forceStatus: 'expired' },
@@ -65,7 +71,7 @@ export default function Home() {
         </section>
         <section className="card">
           <h2>Scénarios sandbox améliorés</h2>
-          <p className="muted">Simulez success, failed, pending, expired, remboursement, webhook, payout, mobile money, crypto et scénarios marketplace (split, escrow, payout auto, refund vendeur) sans argent réel.</p>
+          <p className="muted">Simulez success, failed, pending, expired, remboursements, ledger double-entry (entries débit/crédit, balance impact, wallet impact), webhook, payout, mobile money, crypto et scénarios marketplace (split, escrow, payout auto, refund vendeur) sans argent réel.</p>
           <div className="scenario-grid">{scenarios.map((scenario) => <button key={scenario.id} className="btn btn-secondary" onClick={() => runScenario(scenario.id)}>{scenario.label}</button>)}</div>
         </section>
         <section className="card">
