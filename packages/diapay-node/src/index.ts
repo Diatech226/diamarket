@@ -110,3 +110,11 @@ export function getWallet(id: string, options?: DiapayOptions & RequestOptions) 
 export function listLedgerTransactions(options?: DiapayOptions & RequestOptions) { return client(options).listLedgerTransactions(options); }
 export function getLedgerTransaction(id: string, options?: DiapayOptions & RequestOptions) { return client(options).getLedgerTransaction(id, options); }
 export function getBalances(options?: DiapayOptions & RequestOptions) { return client(options).getBalances(options); }
+export function listApiKeys(options?: DiapayOptions & RequestOptions) { return client(options).listApiKeys(options); }
+export function createApiKey(payload: Parameters<Diapay['createApiKey']>[0], options?: DiapayOptions & RequestOptions) { return client(options).createApiKey(payload, options); }
+export function revokeApiKey(id: string, options?: DiapayOptions & RequestOptions) { return client(options).revokeApiKey(id, options); }
+export function listApplications(options?: DiapayOptions & RequestOptions) { return client(options).listApplications(options); }
+export function createApplication(payload: Parameters<Diapay['createApplication']>[0], options?: DiapayOptions & RequestOptions) { return client(options).createApplication(payload, options); }
+export function updateApplication(id: string, payload: Parameters<Diapay['updateApplication']>[1], options?: DiapayOptions & RequestOptions) { return client(options).updateApplication(id, payload, options); }
+export function listMerchantAdmins(options?: DiapayOptions & RequestOptions) { return client(options).listMerchantAdmins(options); }
+export function getCurrentMerchant(options?: DiapayOptions & RequestOptions) { return client(options).getCurrentMerchant(options); }

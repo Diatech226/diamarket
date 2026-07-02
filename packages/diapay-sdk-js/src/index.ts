@@ -84,6 +84,14 @@ export type WebhookEndpoint = WebhookEndpointCreateParams & { id: string; secret
 export type DiapayWebhookEvent<T = Record<string, unknown>> = { id: string; type: WebhookEventType | string; data: T; created?: string; createdAt?: string; livemode?: boolean; merchantId?: string; applicationId?: string };
 export type Wallet = { id: string; ownerType: string; ownerId: string; currency: string; availableBalance: number; pendingBalance: number; reservedBalance: number; source?: string };
 export type LedgerTransaction = { id: string; type: string; referenceType: string; referenceId: string; currency: string; amount: number; status: string; entries: Array<{ id: string; accountId: string; direction: 'debit' | 'credit'; amount: number; currency: string; posted: boolean }>; createdAt: string; postedAt?: string };
+
+export type Merchant = { id: string; name: string; businessName: string; country: string; defaultCurrency: string; status: string; livemodeEnabled: boolean; createdAt: string; updatedAt: string };
+export type MerchantAdmin = { id: string; merchantId: string; email: string; name: string; role: string; status: string; createdAt: string; updatedAt: string };
+export type Application = { id: string; merchantId: string; name: string; environment: 'test' | 'live'; status: string; allowedOrigins: string[]; webhookDefaultUrl?: string; createdAt: string; updatedAt: string };
+export type ApiKey = { id: string; merchantId: string; applicationId: string; name: string; type: 'public' | 'secret' | 'restricted'; environment: 'test' | 'live'; prefix: string; last4: string; maskedKey: string; scopes: string[]; status: string; createdAt: string; lastUsedAt?: string; revokedAt?: string };
+export type ApiKeyCreateParams = { merchantId?: string; applicationId?: string; name?: string; type?: 'public' | 'secret' | 'restricted'; environment?: 'test' | 'live'; scopes?: string[] };
+export type ApiKeyCreateResponse = ApiKey & { secret: string };
+
 export type BalanceSummary = { source: string; productionReady: boolean; merchantPendingBalance: number; merchantAvailableBalance: number; platformFees: number; providerClearingBalance: number; refundLiabilities: number };
 
 export type MarketplaceCurrency = 'FCFA' | 'XOF' | 'USD' | 'EUR' | 'USDT';
@@ -209,6 +217,10 @@ export class Diapay {
   wallets = { list: (options?: RequestOptions) => this.listWallets(options), retrieve: (id: string, options?: RequestOptions) => this.getWallet(id, options) };
   ledger = { transactions: { list: (options?: RequestOptions) => this.listLedgerTransactions(options), retrieve: (id: string, options?: RequestOptions) => this.getLedgerTransaction(id, options) } };
 
+  apiKeys = { list: (options?: RequestOptions) => this.listApiKeys(options), create: (payload: ApiKeyCreateParams, options?: RequestOptions) => this.createApiKey(payload, options), revoke: (id: string, options?: RequestOptions) => this.revokeApiKey(id, options) };
+  applications = { list: (options?: RequestOptions) => this.listApplications(options), create: (payload: Partial<Application>, options?: RequestOptions) => this.createApplication(payload, options), update: (id: string, payload: Partial<Application>, options?: RequestOptions) => this.updateApplication(id, payload, options) };
+  merchantAdmins = { list: (options?: RequestOptions) => this.listMerchantAdmins(options) };
+
   webhooks = {
     endpoints: {
       create: (payload: WebhookEndpointCreateParams, options?: RequestOptions) => this.createWebhookEndpoint(payload, options),
@@ -307,6 +319,14 @@ export class Diapay {
   async listLedgerTransactions(options?: RequestOptions) { return this.request<LedgerTransaction[]>('/ledger/transactions', options); }
   async getLedgerTransaction(id: string, options?: RequestOptions) { return this.request<LedgerTransaction>(`/ledger/transactions/${id}`, options); }
   async getBalances(options?: RequestOptions) { return this.request<BalanceSummary>('/balances', options); }
+  async listApiKeys(options?: RequestOptions) { return this.request<ApiKey[]>('/api-keys', options); }
+  async createApiKey(payload: ApiKeyCreateParams, options?: RequestOptions) { return this.request<ApiKeyCreateResponse>('/api-keys', { ...options, method: 'POST', body: JSON.stringify(payload) }); }
+  async revokeApiKey(id: string, options?: RequestOptions) { return this.request<ApiKey>(`/api-keys/${id}`, { ...options, method: 'DELETE' }); }
+  async listApplications(options?: RequestOptions) { return this.request<Application[]>('/applications', options); }
+  async createApplication(payload: Partial<Application>, options?: RequestOptions) { return this.request<Application>('/applications', { ...options, method: 'POST', body: JSON.stringify(payload) }); }
+  async updateApplication(id: string, payload: Partial<Application>, options?: RequestOptions) { return this.request<Application>(`/applications/${id}`, { ...options, method: 'PATCH', body: JSON.stringify(payload) }); }
+  async listMerchantAdmins(options?: RequestOptions) { return this.request<MerchantAdmin[]>('/merchant-admins', options); }
+  async getCurrentMerchant(options?: RequestOptions) { const merchants = await this.request<Merchant[]>('/merchants', options); return merchants[0]; }
   async listWebhookEndpoints(options?: RequestOptions) { return this.request<WebhookEndpoint[]>('/webhook-endpoints', options); }
   async createWebhookEndpoint(payload: WebhookEndpointCreateParams, options?: RequestOptions) { assertUrl(payload.url, 'url'); return this.request<WebhookEndpoint>('/webhook-endpoints', { ...options, method: 'POST', body: JSON.stringify(payload) }); }
   async deleteWebhookEndpoint(id: string, options?: RequestOptions) { return this.request<{ deleted: boolean; id: string }>(`/webhook-endpoints/${id}`, { ...options, method: 'DELETE' }); }
@@ -352,6 +372,14 @@ export function listWallets(client: Diapay, options?: RequestOptions) { return c
 export function getWallet(client: Diapay, id: string, options?: RequestOptions) { return client.getWallet(id, options); }
 export function listLedgerTransactions(client: Diapay, options?: RequestOptions) { return client.listLedgerTransactions(options); }
 export function getLedgerTransaction(client: Diapay, id: string, options?: RequestOptions) { return client.getLedgerTransaction(id, options); }
+export function listApiKeys(client: Diapay, options?: RequestOptions) { return client.listApiKeys(options); }
+export function createApiKey(client: Diapay, payload: ApiKeyCreateParams, options?: RequestOptions) { return client.createApiKey(payload, options); }
+export function revokeApiKey(client: Diapay, id: string, options?: RequestOptions) { return client.revokeApiKey(id, options); }
+export function listApplications(client: Diapay, options?: RequestOptions) { return client.listApplications(options); }
+export function createApplication(client: Diapay, payload: Partial<Application>, options?: RequestOptions) { return client.createApplication(payload, options); }
+export function updateApplication(client: Diapay, id: string, payload: Partial<Application>, options?: RequestOptions) { return client.updateApplication(id, payload, options); }
+export function listMerchantAdmins(client: Diapay, options?: RequestOptions) { return client.listMerchantAdmins(options); }
+export function getCurrentMerchant(client: Diapay, options?: RequestOptions) { return client.getCurrentMerchant(options); }
 export function getBalances(client: Diapay, options?: RequestOptions) { return client.getBalances(options); }
 
 export function verifyWebhookSignature(rawBody: string, signatureHeader: string, secret: string, toleranceSeconds = 300) {

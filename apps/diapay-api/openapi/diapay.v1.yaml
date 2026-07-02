@@ -323,3 +323,39 @@ components:
       summary: Read in-memory balance summary from the ledger
       responses:
         '200': { description: Balance summary }
+  /applications:
+    get:
+      summary: List merchant applications
+      responses:
+        '200': { description: Application list }
+    post:
+      summary: Create a merchant application
+      responses:
+        '201': { description: Application created }
+  /applications/{id}:
+    get:
+      summary: Retrieve a merchant application
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Application }
+    patch:
+      summary: Update a merchant application
+      responses:
+        '200': { description: Application updated }
+    delete:
+      summary: Archive a merchant application
+      responses:
+        '200': { description: Application archived }
+  /api-keys:
+    get:
+      summary: List masked API keys
+      responses:
+        '200': { description: API keys without keyHash or full secret }
+    post:
+      summary: Create an API key and return the secret once
+      responses:
+        '201': { description: API key created with one-time secret }
