@@ -19,6 +19,8 @@ export interface Payment {
   };
   failureCode?: string;
   failureMessage?: string;
+  providerStatus?: string;
+  rawProviderResponse?: Record<string, unknown>;
   metadata?: Record<string, unknown>;
   createdAt: string;
   updatedAt: string;

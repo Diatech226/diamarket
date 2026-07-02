@@ -1,0 +1,2 @@
+import type { ProviderCapabilities, ProviderCapabilityInput } from './provider.types';
+export function capabilitySupports(capability: ProviderCapabilities, input: ProviderCapabilityInput) { return capability.configured && capability.methods.includes(input.method) && capability.currencies.includes(input.currency.toUpperCase()) && (!input.country || capability.countries.includes(input.country.toUpperCase())) && (capability.minAmount === undefined || input.amount >= capability.minAmount) && (capability.maxAmount === undefined || input.amount <= capability.maxAmount); }

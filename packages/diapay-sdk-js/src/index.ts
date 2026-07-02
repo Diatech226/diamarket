@@ -93,7 +93,7 @@ export type MarketplaceEscrowActionParams = { escrowId: string; amount?: number;
 export type MarketplaceVendor = MarketplaceVendorCreateParams & { id: string; wallet: string; kycStatus: string; createdAt: string; updatedAt: string };
 export type MarketplacePayment = { id: string; paymentId: string; merchant: string; amount: number; currency: MarketplaceCurrency; allocations: Array<Record<string, unknown>>; escrowId?: string; timeline: Array<{ type: string; at: string; data?: Record<string, unknown> }>; createdAt: string; updatedAt: string };
 
-export type ProviderDescriptor = { id: string; name: string; method: PaymentMethod; environment: DiapayEnvironment | 'live'; capabilities: string[]; currencies: string[]; countries: string[]; status: 'ready' | 'degraded' | 'disabled'; testMode: boolean; implementation: 'mock' | 'connector'; notes?: string };
+export type ProviderDescriptor = { id?: string; provider?: string; name?: string; type?: string; method?: PaymentMethod; methods?: PaymentMethod[]; environment?: DiapayEnvironment | 'live'; mode?: 'sandbox' | 'live'; capabilities?: string[]; currencies: string[]; countries: string[]; status: string; testMode?: boolean; configured?: boolean; implementation?: 'mock' | 'connector'; notes?: string; supportsRefund?: boolean; supportsPartialRefund?: boolean; supportsCancel?: boolean; supportsWebhook?: boolean; supportsAsyncPayment?: boolean };
 
 export type MarketplaceWallet = { id: string; type: 'merchant_wallet' | 'vendor_wallet' | 'platform_wallet' | 'escrow_wallet' | 'reserve_wallet'; balance: number; availableBalance: number; pendingBalance: number; currency: string; status: 'active' | 'frozen' | 'closed'; owner: { id: string; type: string; name?: string }; ledgerEntries: string[]; createdAt: string; updatedAt: string };
 export type VendorAccountCreateParams = { businessName: string; country: string; currencies?: string[]; payoutMethods?: Array<{ type: 'mobile_money' | 'bank_transfer' | 'crypto'; label: string; destination: string; currency: string; country?: string; default?: boolean }> };
@@ -291,6 +291,8 @@ export class Diapay {
   async refundPayment(id: string, payload: Omit<RefundCreateParams, 'paymentId'> = {}, options?: RequestOptions) { return this.createRefund({ ...payload, paymentId: id }, options); }
   async listPaymentMethods(options?: RequestOptions) { return this.request<PaymentMethod[]>('/payment-methods', options); }
   async listProviders(options?: RequestOptions) { return this.request<ProviderDescriptor[]>('/providers', options); }
+  async getProviderCapabilities(provider: string, options?: RequestOptions) { return this.request<ProviderDescriptor>(`/providers/${provider}/capabilities`, options); }
+  async simulateProviderScenario(payload: { scenario: string; amount?: number; currency?: string }, options?: RequestOptions) { return this.request<unknown>('/providers/simulate', { ...options, method: 'POST', body: JSON.stringify(payload) }); }
   async getPayment(id: string, options?: RequestOptions) { return this.retrievePayment(id, options); }
 
   static verifyWebhookSignature(rawBody: string, signature: string, secret: string) {

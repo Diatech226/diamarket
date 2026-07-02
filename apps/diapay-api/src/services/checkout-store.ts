@@ -3,7 +3,8 @@ import type { CheckoutSession, CheckoutSessionStatus } from '../models/CheckoutS
 import type { Payment, PaymentMethod } from '../models/Payment';
 import type { WebhookEndpoint } from '../models/WebhookEndpoint';
 import type { WebhookDeliveryAttempt, WebhookEvent, WebhookEventType } from '../models/WebhookEvent';
-import { getProvider, listPaymentMethods, listProviders } from '../providers';
+import { listProviderCapabilities, selectProvider } from '../modules/providers';
+import type { NormalizedPaymentStatus } from '../modules/payments/payment-status';
 
 const sessions = new Map<string, CheckoutSession>();
 const payments = new Map<string, Payment>();
@@ -113,7 +114,7 @@ export async function completeCheckoutSession(sessionId: string, payload: Record
   const session = getCheckoutSession(sessionId, merchant);
   ensureOpen(session);
   const method = (payload.method as PaymentMethod) ?? 'bank-card';
-  const provider = getProvider(method);
+  const provider = selectProvider({ amount: Number(payload.amount), currency: String(payload.currency).toUpperCase(), method, country: typeof payload.country === 'string' ? payload.country : undefined, provider: typeof payload.provider === 'string' ? payload.provider : undefined });
   const result = await provider.createPayment({
     amount: session.amount,
     currency: session.currency,
@@ -123,6 +124,7 @@ export async function completeCheckoutSession(sessionId: string, payload: Record
     customer: session.customer,
     metadata: session.metadata,
     details: payload,
+    scenario: typeof payload.scenario === 'string' ? payload.scenario : undefined,
   });
   const timestamp = now();
   const payment: Payment = {
@@ -132,22 +134,24 @@ export async function completeCheckoutSession(sessionId: string, payload: Record
     amount: session.amount,
     currency: session.currency,
     method,
-    status: result.status,
+    status: result.status as Payment['status'],
     provider: result.provider,
-    providerPaymentId: result.providerPaymentId,
+    providerPaymentId: result.providerReference,
     actionRequired: result.actionRequired,
-    failureCode: result.failureCode,
-    failureMessage: result.failureMessage,
+    failureCode: result.errorCode,
+    failureMessage: result.errorMessage,
+    providerStatus: result.providerStatus,
+    rawProviderResponse: result.rawProviderResponse,
     metadata: session.metadata,
     createdAt: timestamp,
     updatedAt: timestamp,
   };
   payments.set(payment.id, payment);
   session.payment = payment.id;
-  session.status = result.status === 'succeeded' ? 'completed' : result.status === 'expired' ? 'expired' : 'open';
+  session.status = result.status === 'paid' ? 'completed' : result.status === 'expired' ? 'expired' : 'open';
   session.updatedAt = timestamp;
 
-  if (payment.status === 'succeeded') {
+  if (payment.status === 'paid') {
     await emitWebhook('checkout.session.completed', session.merchant, { checkoutSession: session, payment });
     await emitWebhook('payment.paid', session.merchant, { payment, checkoutSession: session });
   } else if (payment.status === 'failed') {
@@ -173,7 +177,7 @@ export async function createDirectPayment(payload: Record<string, unknown>, merc
   validateAmountCurrency(payload.amount, payload.currency);
   const timestamp = now();
   const method = (payload.method as PaymentMethod) ?? 'mock';
-  const provider = getProvider(method);
+  const provider = selectProvider({ amount: Number(payload.amount), currency: String(payload.currency).toUpperCase(), method, country: typeof payload.country === 'string' ? payload.country : undefined, provider: typeof payload.provider === 'string' ? payload.provider : undefined });
   const result = await provider.createPayment({
     amount: Number(payload.amount),
     currency: String(payload.currency).toUpperCase(),
@@ -182,6 +186,7 @@ export async function createDirectPayment(payload: Record<string, unknown>, merc
     customer: typeof payload.customer === 'object' && payload.customer !== null ? payload.customer as Record<string, unknown> : undefined,
     metadata: typeof payload.metadata === 'object' && payload.metadata !== null ? payload.metadata as Record<string, unknown> : {},
     details: payload,
+    scenario: typeof payload.scenario === 'string' ? payload.scenario : undefined,
   });
   const payment: Payment = {
     id: id('pay_test'),
@@ -189,12 +194,14 @@ export async function createDirectPayment(payload: Record<string, unknown>, merc
     amount: Number(payload.amount),
     currency: String(payload.currency).toUpperCase(),
     method,
-    status: result.status,
+    status: result.status as Payment['status'],
     provider: result.provider,
-    providerPaymentId: result.providerPaymentId,
+    providerPaymentId: result.providerReference,
     actionRequired: result.actionRequired,
-    failureCode: result.failureCode,
-    failureMessage: result.failureMessage,
+    failureCode: result.errorCode,
+    failureMessage: result.errorMessage,
+    providerStatus: result.providerStatus,
+    rawProviderResponse: result.rawProviderResponse,
     metadata: typeof payload.metadata === 'object' && payload.metadata !== null ? payload.metadata as Record<string, unknown> : {},
     createdAt: timestamp,
     updatedAt: timestamp,
@@ -211,26 +218,27 @@ export function retrievePayment(id: string) {
 
 export async function cancelDirectPayment(id: string) {
   const payment = retrievePayment(id);
-  const provider = getProvider(payment.method);
-  const result = provider.cancelPayment ? await provider.cancelPayment(payment.providerPaymentId ?? payment.id) : { status: 'cancelled' as const };
-  payment.status = result.status;
+  const provider = selectProvider({ amount: payment.amount, currency: payment.currency, method: payment.method, provider: payment.provider });
+  const result = provider.cancelPayment ? await provider.cancelPayment({ providerReference: payment.providerPaymentId ?? payment.id, amount: payment.amount, currency: payment.currency }) : { status: 'cancelled' as NormalizedPaymentStatus };
+  payment.status = result.status as Payment['status'];
   payment.updatedAt = now();
   return payment;
 }
 
 export async function refundDirectPayment(id: string, payload: Record<string, unknown> = {}) {
   const payment = retrievePayment(id);
-  const provider = getProvider(payment.method);
+  const provider = selectProvider({ amount: payment.amount, currency: payment.currency, method: payment.method, provider: payment.provider });
   const result = provider.refundPayment
     ? await provider.refundPayment({
-      paymentId: payment.providerPaymentId ?? payment.id,
+      providerReference: payment.providerPaymentId ?? payment.id,
       amount: typeof payload.amount === 'number' ? payload.amount : payment.amount,
       currency: payment.currency,
       reason: typeof payload.reason === 'string' ? payload.reason : undefined,
       metadata: typeof payload.metadata === 'object' && payload.metadata !== null ? payload.metadata as Record<string, unknown> : undefined,
+      scenario: typeof payload.scenario === 'string' ? payload.scenario : undefined,
     })
     : { status: 'refunded' as const };
-  payment.status = result.status;
+  payment.status = result.status as Payment['status'];
   payment.updatedAt = now();
   return payment;
 }
@@ -309,4 +317,4 @@ async function emitWebhook(type: WebhookEventType, merchant: string, data: Recor
   return event;
 }
 
-export const sandboxState = { apiBaseUrl, sessions, payments, webhookEndpoints, webhookEvents, refunds, resolveMerchant, listProviders, listPaymentMethods };
+export const sandboxState = { apiBaseUrl, sessions, payments, webhookEndpoints, webhookEvents, refunds, resolveMerchant, listProviders: listProviderCapabilities, listPaymentMethods: () => listProviderCapabilities().flatMap((p) => p.methods) };

@@ -1,0 +1,12 @@
+import { registerProviderAdapter } from './provider-registry';
+import { mockProvider } from './mock/mock.provider';
+import { bankTransferProvider, manualProvider, moovMoneyProvider, mtnProvider, orangeMoneyProvider, stablecoinProvider, stripeProvider, waveProvider } from './placeholders';
+[mockProvider, orangeMoneyProvider, moovMoneyProvider, waveProvider, mtnProvider, stripeProvider, bankTransferProvider, stablecoinProvider, manualProvider].forEach(registerProviderAdapter);
+export * from './provider-adapter';
+export * from './provider-capabilities';
+export * from './provider-errors';
+export * from './provider-event.mapper';
+export * from './provider-registry';
+export * from './provider.types';
+export * from './mock/mock.scenarios';
+export { mockProvider } from './mock/mock.provider';

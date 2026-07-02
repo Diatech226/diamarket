@@ -10,8 +10,10 @@ export interface PaymentAttempt {
   amount: number;
   currency: string;
   providerReference?: string;
+  providerStatus?: string;
   errorCode?: string;
   errorMessage?: string;
+  rawProviderResponse?: Record<string, unknown>;
   createdAt: string;
   updatedAt: string;
 }

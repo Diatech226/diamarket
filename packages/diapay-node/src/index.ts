@@ -70,3 +70,15 @@ export function createSplitPayment(payload: SplitPaymentCreateParams, options?: 
 export function createMarketplacePayout(payload: MarketplacePayoutCreateParams, options?: DiapayOptions & RequestOptions) {
   return client(options).marketplace.payouts.create(payload, options);
 }
+
+export function listProviders(options?: DiapayOptions & RequestOptions) {
+  return client(options).listProviders(options);
+}
+
+export function getProviderCapabilities(provider: string, options?: DiapayOptions & RequestOptions) {
+  return client(options).getProviderCapabilities(provider, options);
+}
+
+export function simulateProviderScenario(payload: { scenario: string; amount?: number; currency?: string }, options?: DiapayOptions & RequestOptions) {
+  return client(options).simulateProviderScenario(payload, options);
+}

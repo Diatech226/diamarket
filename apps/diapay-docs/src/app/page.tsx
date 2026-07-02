@@ -77,5 +77,5 @@ export default function DeveloperPortal() {
 
       <article className="playground"><h2>API Playground & Code Generator</h2><div className="controls"><input value={apiKey} onChange={(event) => setApiKey(event.target.value)} /><select value={endpointIndex} onChange={(event) => setEndpointIndex(Number(event.target.value))}>{endpoints.map((item, index) => <option value={index} key={item.path}>{item.name}</option>)}</select><select value={language} onChange={(event) => setLanguage(event.target.value as Language)}>{languages.map((item) => <option key={item}>{item}</option>)}</select><button onClick={runDemo}>Send Test Request</button></div><h3>Request</h3><CodeBlock code={code} /><h3>Response</h3><CodeBlock code={response || '{\n  "status": "ready",\n  "hint": "Click Send Test Request"\n}'} /></article>
     </section>
-  </main>;
+  <section><h2>Provider Adapter Architecture</h2><p>Diapay now exposes provider discovery, explicit mock scenarios, and provider webhook parsing endpoints while preserving /api/v1 compatibility.</p><ul><li>GET /api/v1/providers</li><li>GET /api/v1/providers/:provider/capabilities</li><li>POST /api/v1/providers/simulate</li><li>POST /api/v1/webhooks/providers/:provider</li></ul></section></main>;
 }
