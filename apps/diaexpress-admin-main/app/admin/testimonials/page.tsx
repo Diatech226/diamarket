@@ -1,0 +1,1 @@
+import { PageHeader } from '@/components/ui/page-header';import { CmsCrud } from '@/components/cms/CmsForms';export default function Page(){return <div className="page-stack"><PageHeader title="Témoignages" description="Gérer clients, photos, entreprises, commentaires et notes."/><CmsCrud resource="testimonials"/></div>}

@@ -1,0 +1,6 @@
+{
+  "name": "Diapay",
+  "description": "Unified African payment gateway orchestration engine, featuring an interactive checkout simulator, double-entry master ledger, developer API keys/webhooks console, disputes desk, support lookup, and automated notifications.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
