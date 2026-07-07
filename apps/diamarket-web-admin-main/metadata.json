@@ -1,0 +1,6 @@
+{
+  "name": "AuraMarket",
+  "description": "Un prototype d'e-commerce moderne pour les clients et un espace de gestion complet pour les vendeurs.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

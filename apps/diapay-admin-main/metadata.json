@@ -1,0 +1,6 @@
+{
+  "name": "Stripe Africa Admin",
+  "description": "Enterprise-grade infrastructure control panel and merchant administration dashboard for multi-channel African payment rails.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
