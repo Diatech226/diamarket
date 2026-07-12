@@ -70,6 +70,36 @@ function buildDiaPayMetadata({ quote, userId, localPaymentId, successUrl, cancel
   );
 }
 
+/**
+ * @swagger
+ * /payments/create:
+ *   post:
+ *     tags: [Payments]
+ *     summary: Créer un paiement diaPay pour un devis
+ *     security: [{ bearerAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       201:
+ *         description: Paiement créé
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 payment:
+ *                   $ref: '#/components/schemas/Payment'
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ */
 router.post("/create", requireAuth, syncUser, async (req, res) => {
   if (!ENABLE_DIAPAY) {
     return res.status(503).json({
@@ -310,6 +340,28 @@ router.post("/create", requireAuth, syncUser, async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /payments/mine:
+ *   get:
+ *     tags: [Payments]
+ *     summary: Lister les paiements de l'utilisateur courant
+ *     security: [{ bearerAuth: [] }]
+ *     responses:
+ *       200:
+ *         description: Liste des paiements
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 payments:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Payment'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ */
 router.get("/mine", requireAuth, syncUser, async (req, res) => {
   try {
     const payments = await Payment.find({ user: req.userId }).sort({ createdAt: -1 });
@@ -319,6 +371,30 @@ router.get("/mine", requireAuth, syncUser, async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /payments/callbacks/diapay:
+ *   post:
+ *     tags: [Payments]
+ *     summary: Callback webhook diaPay (signé par le fournisseur, pas d'authentification utilisateur)
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: Callback traité
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ */
 router.post("/callbacks/diapay", async (req, res) => {
   try {
     const payload = req.body || {};
@@ -394,6 +470,20 @@ router.post("/callbacks/diapay", async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /payments/webhook/crypto:
+ *   post:
+ *     tags: [Payments]
+ *     summary: Webhook des paiements crypto on-chain (signé par le fournisseur, désormais géré par diaPay)
+ *     responses:
+ *       410:
+ *         description: Endpoint obsolète, les paiements on-chain sont gérés par diaPay
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ */
 router.post("/webhook/crypto", (_req, res) => {
   res.status(410).json({ message: "Les paiements on-chain sont désormais gérés par diaPay" });
 });

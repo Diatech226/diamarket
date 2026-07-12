@@ -42,6 +42,36 @@ function buildTransportLineFilters(query) {
 }
 
 // Transport lines
+/**
+ * @swagger
+ * /expeditions/transport-lines:
+ *   get:
+ *     tags: [Expeditions]
+ *     summary: Lister les lignes de transport
+ *     security: [{ bearerAuth: [] }]
+ *     responses:
+ *       200:
+ *         description: Liste des lignes de transport
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 items:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/TransportLine'
+ *                 total:
+ *                   type: integer
+ *                 page:
+ *                   type: integer
+ *                 pageSize:
+ *                   type: integer
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ */
 router.get('/transport-lines', requireAuth, requireRole('admin'), async (req, res, next) => {
   try {
     const { page, limit, skip } = buildPagination(req.query);
@@ -58,6 +88,33 @@ router.get('/transport-lines', requireAuth, requireRole('admin'), async (req, re
   }
 });
 
+/**
+ * @swagger
+ * /expeditions/transport-lines:
+ *   post:
+ *     tags: [Expeditions]
+ *     summary: Créer une ligne de transport
+ *     security: [{ bearerAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       201:
+ *         description: Ligne de transport créée
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/TransportLine'
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ */
 router.post('/transport-lines', requireAuth, requireRole('admin'), async (req, res, next) => {
   try {
     const transportLine = await createTransportLine(req.body || {});
@@ -67,6 +124,30 @@ router.post('/transport-lines', requireAuth, requireRole('admin'), async (req, r
   }
 });
 
+/**
+ * @swagger
+ * /expeditions/transport-lines/meta:
+ *   get:
+ *     tags: [Expeditions]
+ *     summary: Obtenir les métadonnées des lignes de transport (origines/destinations)
+ *     security: [{ bearerAuth: [] }]
+ *     responses:
+ *       200:
+ *         description: Métadonnées des lignes de transport
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 origins:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ */
 router.get('/transport-lines/meta', requireAuth, requireRole('admin'), async (_req, res, next) => {
   try {
     const lines = await listTransportLines({ isActive: true }, { limit: 1000 });
@@ -90,6 +171,29 @@ router.get('/transport-lines/meta', requireAuth, requireRole('admin'), async (_r
   }
 });
 
+/**
+ * @swagger
+ * /expeditions/transport-lines/{id}:
+ *   get:
+ *     tags: [Expeditions]
+ *     summary: Détail d'une ligne de transport
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - $ref: '#/components/parameters/IdPathParam'
+ *     responses:
+ *       200:
+ *         description: Détail de la ligne de transport
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/TransportLine'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ */
 router.get('/transport-lines/:id', requireAuth, requireRole('admin'), async (req, res, next) => {
   try {
     const line = await TransportLine.findById(req.params.id);
@@ -102,6 +206,37 @@ router.get('/transport-lines/:id', requireAuth, requireRole('admin'), async (req
   }
 });
 
+/**
+ * @swagger
+ * /expeditions/transport-lines/{id}:
+ *   put:
+ *     tags: [Expeditions]
+ *     summary: Mettre à jour une ligne de transport
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - $ref: '#/components/parameters/IdPathParam'
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: Ligne de transport mise à jour
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/TransportLine'
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ */
 router.put('/transport-lines/:id', requireAuth, requireRole('admin'), async (req, res, next) => {
   try {
     const updated = await TransportLine.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -114,6 +249,29 @@ router.put('/transport-lines/:id', requireAuth, requireRole('admin'), async (req
   }
 });
 
+/**
+ * @swagger
+ * /expeditions/transport-lines/{id}:
+ *   delete:
+ *     tags: [Expeditions]
+ *     summary: Désactiver une ligne de transport
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - $ref: '#/components/parameters/IdPathParam'
+ *     responses:
+ *       200:
+ *         description: Ligne de transport désactivée
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/TransportLine'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ */
 router.delete('/transport-lines/:id', requireAuth, requireRole('admin'), async (req, res, next) => {
   try {
     const updated = await TransportLine.findByIdAndUpdate(
@@ -131,6 +289,36 @@ router.delete('/transport-lines/:id', requireAuth, requireRole('admin'), async (
 });
 
 // Expeditions
+/**
+ * @swagger
+ * /expeditions:
+ *   get:
+ *     tags: [Expeditions]
+ *     summary: Lister les expéditions
+ *     security: [{ bearerAuth: [] }]
+ *     responses:
+ *       200:
+ *         description: Liste des expéditions
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 items:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                 total:
+ *                   type: integer
+ *                 page:
+ *                   type: integer
+ *                 pageSize:
+ *                   type: integer
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ */
 router.get('/', requireAuth, requireRole('admin'), async (req, res, next) => {
   try {
     const { page, limit, skip } = buildPagination(req.query);
@@ -188,6 +376,33 @@ router.get('/', requireAuth, requireRole('admin'), async (req, res, next) => {
   }
 });
 
+/**
+ * @swagger
+ * /expeditions:
+ *   post:
+ *     tags: [Expeditions]
+ *     summary: Créer une expédition
+ *     security: [{ bearerAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       201:
+ *         description: Expédition créée
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ */
 router.post('/', requireAuth, requireRole('admin'), async (req, res, next) => {
   try {
     const expedition = new Expedition(req.body);
@@ -199,6 +414,29 @@ router.post('/', requireAuth, requireRole('admin'), async (req, res, next) => {
   }
 });
 
+/**
+ * @swagger
+ * /expeditions/{id}:
+ *   get:
+ *     tags: [Expeditions]
+ *     summary: Détail d'une expédition
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - $ref: '#/components/parameters/IdPathParam'
+ *     responses:
+ *       200:
+ *         description: Détail de l'expédition
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ */
 router.get('/:id', requireAuth, requireRole('admin'), async (req, res, next) => {
   try {
     const expedition = await Expedition.findById(req.params.id)
@@ -214,6 +452,37 @@ router.get('/:id', requireAuth, requireRole('admin'), async (req, res, next) => 
   }
 });
 
+/**
+ * @swagger
+ * /expeditions/{id}:
+ *   put:
+ *     tags: [Expeditions]
+ *     summary: Mettre à jour une expédition
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - $ref: '#/components/parameters/IdPathParam'
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: Expédition mise à jour
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ */
 router.put('/:id', requireAuth, requireRole('admin'), async (req, res, next) => {
   try {
     const updated = await Expedition.findByIdAndUpdate(req.params.id, req.body, { new: true })

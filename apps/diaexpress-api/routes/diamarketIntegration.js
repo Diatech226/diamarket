@@ -37,6 +37,31 @@ async function audit(req, payload) {
 
 router.use(requireIntegrationToken);
 
+/**
+ * @swagger
+ * /integrations/diamarket/shipping/estimate:
+ *   post:
+ *     tags: [Integrations]
+ *     summary: Estimer un prix d'expédition (nécessite un header x-integration-api-key, pas un JWT)
+ *     security: [{ bearerAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: Estimation calculée
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/QuoteEstimate'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ */
 router.post('/shipping/estimate', async (req, res, next) => {
   try {
     const estimate = await getInternalQuote({ ...req.body, dimensions: req.body.dimensions || { length: req.body.length, width: req.body.width, height: req.body.height }, currency: req.body.currency || 'XOF' });
@@ -47,6 +72,35 @@ router.post('/shipping/estimate', async (req, res, next) => {
   } catch (error) { await audit(req, { statusCode: error.status || 500, error: { code: error.code, message: error.message } }); return next(error); }
 });
 
+/**
+ * @swagger
+ * /integrations/diamarket/shipments:
+ *   post:
+ *     tags: [Integrations]
+ *     summary: Créer une expédition depuis une commande Diamarket (nécessite un header x-integration-api-key, pas un JWT)
+ *     security: [{ bearerAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       201:
+ *         description: Expédition créée
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Shipment'
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ *       409:
+ *         description: Expédition déjà existante pour cette commande
+ */
 router.post('/shipments', async (req, res, next) => {
   try {
     const idempotencyKey = req.get('Idempotency-Key');
@@ -68,6 +122,31 @@ router.post('/shipments', async (req, res, next) => {
   } catch (error) { await audit(req, { statusCode: error.status || 500, error: { code: error.code, message: error.message, details: error.details } }); return next(error); }
 });
 
+/**
+ * @swagger
+ * /integrations/diamarket/shipments/{trackingNumber}:
+ *   get:
+ *     tags: [Integrations]
+ *     summary: Suivre une expédition par numéro de suivi (nécessite un header x-integration-api-key, pas un JWT)
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - name: trackingNumber
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Informations de suivi
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/TrackingResponse'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ */
 router.get('/shipments/:trackingNumber', async (req, res, next) => {
   try {
     const shipment = await Shipment.findOne({ trackingCode: req.params.trackingNumber, source: 'diamarket' });
@@ -76,6 +155,35 @@ router.get('/shipments/:trackingNumber', async (req, res, next) => {
   } catch (error) { return next(error); }
 });
 
+/**
+ * @swagger
+ * /integrations/diamarket/webhooks/{event}:
+ *   post:
+ *     tags: [Integrations]
+ *     summary: Recevoir un webhook d'événement d'expédition (nécessite un header x-integration-api-key, pas un JWT)
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - name: event
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: false
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: Webhook accepté
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       409:
+ *         description: Webhook déjà traité
+ */
 router.post('/webhooks/:event', async (req, res, next) => {
   try {
     const event = req.params.event;

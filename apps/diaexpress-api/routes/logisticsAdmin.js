@@ -26,6 +26,36 @@ function buildPagination(query) {
 }
 
 // Countries
+/**
+ * @swagger
+ * /admin/countries:
+ *   get:
+ *     tags: [Admin]
+ *     summary: Lister les pays
+ *     security: [{ bearerAuth: [] }]
+ *     responses:
+ *       200:
+ *         description: Liste des pays
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 items:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                 total:
+ *                   type: integer
+ *                 page:
+ *                   type: integer
+ *                 pageSize:
+ *                   type: integer
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ */
 router.get('/countries', async (req, res, next) => {
   try {
     const { page, limit, skip } = buildPagination(req.query);
@@ -45,6 +75,33 @@ router.get('/countries', async (req, res, next) => {
   }
 });
 
+/**
+ * @swagger
+ * /admin/countries:
+ *   post:
+ *     tags: [Admin]
+ *     summary: Créer un pays
+ *     security: [{ bearerAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       201:
+ *         description: Pays créé
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ */
 router.post('/countries', async (req, res, next) => {
   try {
     const country = await createCountry(req.body || {});
@@ -54,6 +111,37 @@ router.post('/countries', async (req, res, next) => {
   }
 });
 
+/**
+ * @swagger
+ * /admin/countries/{id}:
+ *   patch:
+ *     tags: [Admin]
+ *     summary: Mettre à jour un pays
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - $ref: '#/components/parameters/IdPathParam'
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: Pays mis à jour
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ */
 router.patch('/countries/:id', async (req, res, next) => {
   try {
     const updated = await Country.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -64,6 +152,29 @@ router.patch('/countries/:id', async (req, res, next) => {
   }
 });
 
+/**
+ * @swagger
+ * /admin/countries/{id}:
+ *   delete:
+ *     tags: [Admin]
+ *     summary: Désactiver un pays
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - $ref: '#/components/parameters/IdPathParam'
+ *     responses:
+ *       200:
+ *         description: Pays désactivé
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ */
 router.delete('/countries/:id', async (req, res, next) => {
   try {
     const updated = await Country.findByIdAndUpdate(req.params.id, { active: false }, { new: true });
@@ -122,6 +233,36 @@ const buildExpeditionLinePayload = async (body = {}) => {
   return payload;
 };
 
+/**
+ * @swagger
+ * /admin/expedition-lines:
+ *   get:
+ *     tags: [Admin]
+ *     summary: Lister les lignes d'expédition
+ *     security: [{ bearerAuth: [] }]
+ *     responses:
+ *       200:
+ *         description: Liste des lignes d'expédition
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 items:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                 total:
+ *                   type: integer
+ *                 page:
+ *                   type: integer
+ *                 pageSize:
+ *                   type: integer
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ */
 router.get('/expedition-lines', async (req, res, next) => {
   try {
     const { page, limit, skip } = buildPagination(req.query);
@@ -150,6 +291,33 @@ router.get('/expedition-lines', async (req, res, next) => {
   }
 });
 
+/**
+ * @swagger
+ * /admin/expedition-lines:
+ *   post:
+ *     tags: [Admin]
+ *     summary: Créer une ligne d'expédition
+ *     security: [{ bearerAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       201:
+ *         description: Ligne d'expédition créée
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ */
 router.post('/expedition-lines', async (req, res, next) => {
   try {
     const payload = await buildExpeditionLinePayload(req.body);
@@ -167,6 +335,37 @@ router.post('/expedition-lines', async (req, res, next) => {
   }
 });
 
+/**
+ * @swagger
+ * /admin/expedition-lines/{id}:
+ *   patch:
+ *     tags: [Admin]
+ *     summary: Mettre à jour une ligne d'expédition
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - $ref: '#/components/parameters/IdPathParam'
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: Ligne d'expédition mise à jour
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ */
 router.patch('/expedition-lines/:id', async (req, res, next) => {
   try {
     const payload = await buildExpeditionLinePayload(req.body);
@@ -180,6 +379,29 @@ router.patch('/expedition-lines/:id', async (req, res, next) => {
   }
 });
 
+/**
+ * @swagger
+ * /admin/expedition-lines/{id}:
+ *   delete:
+ *     tags: [Admin]
+ *     summary: Désactiver une ligne d'expédition
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - $ref: '#/components/parameters/IdPathParam'
+ *     responses:
+ *       200:
+ *         description: Ligne d'expédition désactivée
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ */
 router.delete('/expedition-lines/:id', async (req, res, next) => {
   try {
     const updated = await ExpeditionLine.findByIdAndUpdate(req.params.id, { active: false }, { new: true });
@@ -191,6 +413,36 @@ router.delete('/expedition-lines/:id', async (req, res, next) => {
 });
 
 // Embarkments
+/**
+ * @swagger
+ * /admin/embarkments:
+ *   get:
+ *     tags: [Admin]
+ *     summary: Lister les embarquements
+ *     security: [{ bearerAuth: [] }]
+ *     responses:
+ *       200:
+ *         description: Liste des embarquements
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 items:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                 total:
+ *                   type: integer
+ *                 page:
+ *                   type: integer
+ *                 pageSize:
+ *                   type: integer
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ */
 router.get('/embarkments', async (req, res, next) => {
   try {
     const { page, limit, skip } = buildPagination(req.query);
@@ -220,6 +472,33 @@ router.get('/embarkments', async (req, res, next) => {
   }
 });
 
+/**
+ * @swagger
+ * /admin/embarkments:
+ *   post:
+ *     tags: [Admin]
+ *     summary: Créer un embarquement
+ *     security: [{ bearerAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       201:
+ *         description: Embarquement créé
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ */
 router.post('/embarkments', async (req, res, next) => {
   try {
     const embarkment = await createEmbarkment(req.body || {});
@@ -229,6 +508,37 @@ router.post('/embarkments', async (req, res, next) => {
   }
 });
 
+/**
+ * @swagger
+ * /admin/embarkments/{id}:
+ *   patch:
+ *     tags: [Admin]
+ *     summary: Mettre à jour un embarquement
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - $ref: '#/components/parameters/IdPathParam'
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: Embarquement mis à jour
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ */
 router.patch('/embarkments/:id', async (req, res, next) => {
   try {
     const transportLineId = req.body.transportLineId || req.body.expeditionLineId;
@@ -264,6 +574,29 @@ router.patch('/embarkments/:id', async (req, res, next) => {
   }
 });
 
+/**
+ * @swagger
+ * /admin/embarkments/{id}:
+ *   delete:
+ *     tags: [Admin]
+ *     summary: Annuler un embarquement
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - $ref: '#/components/parameters/IdPathParam'
+ *     responses:
+ *       200:
+ *         description: Embarquement annulé
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ */
 router.delete('/embarkments/:id', async (req, res, next) => {
   try {
     const updated = await Embarkment.findByIdAndUpdate(
@@ -313,6 +646,36 @@ const buildAddressPayload = (body = {}) => {
   return payload;
 };
 
+/**
+ * @swagger
+ * /admin/addresses:
+ *   get:
+ *     tags: [Admin]
+ *     summary: Lister les adresses logistiques
+ *     security: [{ bearerAuth: [] }]
+ *     responses:
+ *       200:
+ *         description: Liste des adresses
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 items:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Address'
+ *                 total:
+ *                   type: integer
+ *                 page:
+ *                   type: integer
+ *                 pageSize:
+ *                   type: integer
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ */
 router.get('/addresses', async (req, res, next) => {
   try {
     const { page, limit, skip } = buildPagination(req.query);
@@ -333,6 +696,33 @@ router.get('/addresses', async (req, res, next) => {
   }
 });
 
+/**
+ * @swagger
+ * /admin/addresses:
+ *   post:
+ *     tags: [Admin]
+ *     summary: Créer une adresse logistique
+ *     security: [{ bearerAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       201:
+ *         description: Adresse créée
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Address'
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ */
 router.post('/addresses', async (req, res, next) => {
   try {
     const payload = buildAddressPayload(req.body);
@@ -344,6 +734,37 @@ router.post('/addresses', async (req, res, next) => {
   }
 });
 
+/**
+ * @swagger
+ * /admin/addresses/{id}:
+ *   patch:
+ *     tags: [Admin]
+ *     summary: Mettre à jour une adresse logistique
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - $ref: '#/components/parameters/IdPathParam'
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: Adresse mise à jour
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Address'
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ */
 router.patch('/addresses/:id', async (req, res, next) => {
   try {
     const payload = buildAddressPayload(req.body);
@@ -355,6 +776,29 @@ router.patch('/addresses/:id', async (req, res, next) => {
   }
 });
 
+/**
+ * @swagger
+ * /admin/addresses/{id}:
+ *   delete:
+ *     tags: [Admin]
+ *     summary: Désactiver une adresse logistique
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - $ref: '#/components/parameters/IdPathParam'
+ *     responses:
+ *       200:
+ *         description: Adresse désactivée
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Address'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ */
 router.delete('/addresses/:id', async (req, res, next) => {
   try {
     const updated = await Address.findByIdAndUpdate(req.params.id, { active: false }, { new: true });

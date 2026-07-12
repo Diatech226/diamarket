@@ -280,6 +280,27 @@ function buildPublicServices(packageTypes, pricings) {
   return services.sort((a, b) => a.name.localeCompare(b.name, 'fr', { sensitivity: 'base' }));
 }
 
+/**
+ * @swagger
+ * /v1/public/services:
+ *   get:
+ *     tags: [Public]
+ *     summary: Lister les services publics (catalogue colis et transport)
+ *     responses:
+ *       200:
+ *         description: Liste des services disponibles
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 services:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
+ */
 router.get('/services', async (req, res, next) => {
   try {
     const [packageTypes, pricings] = await Promise.all([
@@ -294,6 +315,27 @@ router.get('/services', async (req, res, next) => {
   }
 });
 
+/**
+ * @swagger
+ * /v1/public/rates:
+ *   get:
+ *     tags: [Public]
+ *     summary: Lister les taux de change publics
+ *     responses:
+ *       200:
+ *         description: Liste des taux de change
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 rates:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
+ */
 router.get('/rates', async (req, res, next) => {
   try {
     const quotes = await fetchPublicRates();

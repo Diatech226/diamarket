@@ -41,6 +41,23 @@ const sanitizeUserUpdate = (payload = {}) => {
   return Object.fromEntries(Object.entries(updates).filter(([, value]) => value !== undefined));
 };
 
+/**
+ * @swagger
+ * /users/me:
+ *   get:
+ *     tags: [Users]
+ *     summary: Récupérer le profil de l'utilisateur courant
+ *     security: [{ bearerAuth: [] }]
+ *     responses:
+ *       200:
+ *         description: Profil utilisateur
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ */
 router.get('/me', requireAuth, async (req, res) => {
   const user = req.dbUser.toObject();
   const identity = req.identity || req.auth || null;
@@ -58,7 +75,57 @@ const updateHandler = async (req, res, next) => {
   } catch (error) { return next(error); }
 };
 
+/**
+ * @swagger
+ * /users/me:
+ *   put:
+ *     tags: [Users]
+ *     summary: Mettre à jour le profil de l'utilisateur courant
+ *     security: [{ bearerAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: Profil mis à jour
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ */
 router.put('/me', requireAuth, updateHandler);
+/**
+ * @swagger
+ * /users/me:
+ *   patch:
+ *     tags: [Users]
+ *     summary: Mettre à jour partiellement le profil de l'utilisateur courant
+ *     security: [{ bearerAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: Profil mis à jour
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ */
 router.patch('/me', requireAuth, updateHandler);
 
 module.exports = router;
