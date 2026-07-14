@@ -1,0 +1,2 @@
+import type{Meta,StoryObj}from'@storybook/react';import{DiaButton,DiaCard,DiaAppShell}from'@dia-ui/react';
+export default{title:'App Shells/DiaPay Developer Console'} satisfies Meta;export const Console:StoryObj={render:()=> <DiaAppShell config={{id:'x',name:'DiaPay',category:'payment',layout:{navigationMode:'sidebar'},navigation:{sidebarItems:[{id:'a',label:'Dashboard',href:'/'}]},search:{enabled:true}}}><DiaCard><DiaButton>Deploy checkout</DiaButton></DiaCard></DiaAppShell>};

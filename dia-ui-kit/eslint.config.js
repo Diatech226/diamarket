@@ -1,0 +1,1 @@
+export default [{ignores:['**/dist/**','**/storybook-static/**']},{files:['**/*.{ts,tsx}'],languageOptions:{parserOptions:{ecmaVersion:'latest',sourceType:'module',ecmaFeatures:{jsx:true}}},rules:{}}];
